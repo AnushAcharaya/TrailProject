@@ -1,0 +1,17 @@
+.env
+.venv/
+venv/
+.kiro
+
+# Django media files (user uploads)
+Backend/media/*
+!Backend/media/.gitkeep
+!Backend/media/nid_photos/
+!Backend/media/certificates/
+Backend/media/nid_photos/*
+!Backend/media/nid_photos/.gitkeep
+Backend/media/certificates/*
+!Backend/media/certificates/.gitkeep
+
+# Django static files
+Backend/staticfiles/

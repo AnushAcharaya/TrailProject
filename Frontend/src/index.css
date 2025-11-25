@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ===== Theme Variables ===== */
+@theme {
+  --color-primary: #16a34a;
+  --color-primary-dark: #15803d;
+  --color-secondary: #e2e8f0;
+  --shadow-soft: 0 2px 15px -3px rgb(0 0 0 / 0.07), 0 10px 20px -2px rgb(0 0 0 / 0.04);
+}
+
+/* ===== Base Styles ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: white;
+  color: #1f2937;
+}
+
+/* ===== Section Background ===== */
+.section-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #f0fdf4, #dcfce7, #bbf7d0);
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .section-bg {
+    padding: 2.5rem;
+  }
+}
+
+/* ===== Card Style ===== */
+.card {
+  background-color: white;
+  border-radius: 1rem;
+  border: 1px solid #dcfce7;
+  box-shadow: var(--shadow-soft);
+  padding: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .card {
+    padding: 2rem;
+  }
+}
+
+/* ===== Form Styles ===== */
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.form-row .label {
+  width: 30%;
+  margin-bottom: 0;
+  text-align: right;
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.form-row .input-field {
+  width: 70%;
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-row .label {
+    width: 100%;
+    text-align: left;
+  }
+
+  .form-row .input-field {
+    width: 100%;
+  }
+}
+
+/* ===== Input Field ===== */
+.input-field {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  outline: none;
+  font-size: 0.875rem;
+}
+
+.input-field:focus {
+  outline: 2px solid var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+@media (min-width: 640px) {
+  .input-field {
+    font-size: 1rem;
+  }
+}
+
+/* ===== Upload Box ===== */
+.upload-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #86efac;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: white;
+}
+
+.upload-box:hover {
+  background-color: #f0fdf4;
+}
+
+/* ===== Button ===== */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+
+.btn-google {
+  background-color: #4285F4;
+  color: white;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+.btn-google:hover {
+  background-color: #357ae8;
+}

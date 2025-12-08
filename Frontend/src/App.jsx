@@ -5,6 +5,7 @@ import AccountCreate from "./pages/CreateAccount";
 import LoginPage from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import Page from "./pages/LandingPage";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/landingpage" element={<Page />} />
+        <Route path="/adminpage" element={<AdminPage />} />
+
       </Routes>
     </Router>
   )

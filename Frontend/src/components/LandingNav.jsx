@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Stethoscope, Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,12 +34,16 @@ const Navbar = () => {
 
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          <button className="text-sm text-gray-700 hover:text-green-700 transition">
-            Sign In
-          </button>
-          <button className="bg-green-600 text-white text-sm px-4 py-2 rounded-md hover:bg-green-700 transition">
-            Sign Up
-          </button>
+          <Link to="/login">
+            <button className="text-sm text-gray-700 hover:text-green-700 transition">
+              Sign In
+            </button>
+          </Link>
+          <Link to="/create-account">
+            <button className="bg-green-600 text-white text-sm px-4 py-2 rounded-md hover:bg-green-700 transition">
+              Sign Up
+            </button>
+          </Link>
         </div>
 
         {/* Mobile Menu Icon */}
@@ -54,7 +59,7 @@ const Navbar = () => {
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-white shadow-md border-r border-gray-100 transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out md:hidden z-40`}
+        } transition-transform duration-300 ease-in-out md:hidden z-50`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <div className="flex items-center space-x-2">
@@ -84,12 +89,16 @@ const Navbar = () => {
 
           <hr />
 
-          <button className="text-sm text-gray-700 hover:text-green-700 text-left">
-            Sign In
-          </button>
-          <button className="bg-green-600 text-white text-sm px-4 py-2 rounded-md hover:bg-green-700 transition text-left">
-            Sign Up
-          </button>
+          <Link to="/login" onClick={() => setIsOpen(false)}>
+            <button className="text-sm text-gray-700 hover:text-green-700 text-left w-full">
+              Sign In
+            </button>
+          </Link>
+          <Link to="/create-account" onClick={() => setIsOpen(false)}>
+            <button className="bg-green-600 text-white text-sm px-4 py-2 rounded-md hover:bg-green-700 transition text-left w-full">
+              Sign Up
+            </button>
+          </Link>
         </div>
       </div>
 

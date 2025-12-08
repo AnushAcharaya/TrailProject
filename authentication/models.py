@@ -12,13 +12,20 @@ ROLE_CHOICES = [
     ('admin', 'Admin'),
 ]
 
+STATUS_CHOICES = [
+    ('pending', 'Pending'),
+    ('approved', 'Approved'),
+    ('declined', 'Declined'),
+]
+
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=150)
-    address = models.CharField(max_length=255, blank=True)
+    address = models.CharField(max_length=255)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     phone = models.CharField(max_length=20, unique=True)
-    farm_name = models.CharField(max_length=150, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    farm_name = models.CharField(max_length=150, blank=True, null=True, unique=True)
     nid_photo = models.ImageField(upload_to='nid_photos/', blank=True, null=True,
                                   validators=[validate_image_extension, validate_image_size])
     specialization = models.CharField(max_length=150, blank=True, null=True)
@@ -36,12 +43,19 @@ class CustomUser(AbstractUser):
 
 class EmailVerificationToken(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='email_tokens')
-    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Keep for backward compatibility
+    code = models.CharField(max_length=6, blank=True)  # New OTP code field
     created_at = models.DateTimeField(auto_now_add=True)
     used = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        if not self.code:
+            import random
+            self.code = str(random.randint(100000, 999999))
+        super().save(*args, **kwargs)
+
     def is_expired(self):
-        return timezone.now() > self.created_at + timezone.timedelta(days=1)
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=10)
 
 
 class PhoneOTP(models.Model):
@@ -49,6 +63,12 @@ class PhoneOTP(models.Model):
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     used = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            import random
+            self.code = str(random.randint(100000, 999999))
+        super().save(*args, **kwargs)
 
     def is_expired(self):
         return timezone.now() > self.created_at + timezone.timedelta(minutes=10)
@@ -67,4 +87,26 @@ class PasswordResetToken(models.Model):
     def mark_used(self):
         self.used = True
         self.save()
+
+
+class LoginOTP(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='login_otps')
+    email_code = models.CharField(max_length=6, blank=True)
+    phone_code = models.CharField(max_length=6, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    email_verified = models.BooleanField(default=False)
+    phone_verified = models.BooleanField(default=False)
+    used = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.email_code:
+            import random
+            self.email_code = str(random.randint(100000, 999999))
+        if not self.phone_code:
+            import random
+            self.phone_code = str(random.randint(100000, 999999))
+        super().save(*args, **kwargs)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=10)
 

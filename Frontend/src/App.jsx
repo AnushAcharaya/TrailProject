@@ -10,6 +10,11 @@ import ProfilePage from "./components/profile/ProfilePage";
 import LivestockPage from "./pages/livestockCrud/LivestockPage";
 import AddLivestockPage from "./pages/livestockCrud/AddLivestockPage";
 import EditLivestockPage from "./pages/livestockCrud/EditLivestockPage";
+import AddTreatmentRecord from "./pages/medicalHistory/AddTreatmentRecord";
+import EditTreatmentRecord from "./pages/medicalHistory/EditTreatmentRecord";
+import ViewTreatmentHistory from "./pages/medicalHistory/ViewTreatmentHistory";
+import MonitorDeadlines from "./pages/medicalHistory/MonitorDeadlines";
+import AlertsNotifications from "./pages/medicalHistory/AlertNotifications";
 
 function App() {
   return (
@@ -25,6 +30,11 @@ function App() {
         <Route path="/livestock" element={<LivestockPage />} />
         <Route path="/livestock/add" element={<AddLivestockPage />} />
         <Route path="/livestock/edit/:id" element={<EditLivestockPage />} />
+        <Route path="/medical/add" element={<AddTreatmentRecord />} />
+        <Route path="/medical/edit" element={<EditTreatmentRecord />} />
+        <Route path="/medical/history" element={<ViewTreatmentHistory />} />
+        <Route path="/medical/deadlines" element={<MonitorDeadlines />} />
+        <Route path="/medical/alerts" element={<AlertsNotifications />} />
 
       </Routes>
     </Router>

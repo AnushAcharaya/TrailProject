@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, Upload, LogIn, Mail, Phone, CheckCircle } from "lucide-react";
+import { UserPlus, Upload, LogIn, Mail, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import { registerUser, verifyEmailOTP, verifyPhoneOTP, resendEmailOTP, resendPhoneOTP } from "../services/api";
+import { registerUser, verifyEmailOTP, resendEmailOTP } from "../services/api";
 
 const CreateAccount = () => {
   const [step, setStep] = useState(1); // 1: Registration, 2: Success Message, 3: OTP Verification
   const [registeredUser, setRegisteredUser] = useState(null);
   const [emailVerified, setEmailVerified] = useState(false);
-  const [phoneVerified, setPhoneVerified] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [emailOtpError, setEmailOtpError] = useState("");
   
   const [otpData, setOtpData] = useState({
     emailOtp: "",
-    phoneOtp: "",
   });
   
   const [formData, setFormData] = useState({
@@ -36,6 +36,7 @@ const CreateAccount = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(""); // Clear previous errors
     
     // Call the registration API
     const result = await registerUser(formData);
@@ -53,9 +54,9 @@ const CreateAccount = () => {
         setStep(3);
       }, 5000);
     } else {
-      // Handle registration error
-      const errorMessage = result.error.message || JSON.stringify(result.error);
-      alert(`Registration failed: ${errorMessage}`);
+      // Handle registration error - show as red text
+      const errorMsg = result.error.message || result.error.error || JSON.stringify(result.error);
+      setErrorMessage(errorMsg);
     }
   };
 
@@ -69,46 +70,26 @@ const CreateAccount = () => {
 
   const handleVerifyEmail = async (e) => {
     e.preventDefault();
+    setEmailOtpError(""); // Clear previous errors
     
     const result = await verifyEmailOTP(registeredUser.email, otpData.emailOtp);
     
     if (result.success) {
       setEmailVerified(true);
-      alert('Email verified successfully!');
     } else {
-      const errorMessage = result.error.message || JSON.stringify(result.error);
-      alert(`Email verification failed: ${errorMessage}`);
+      const errorMsg = result.error.message || result.error.error || JSON.stringify(result.error);
+      setEmailOtpError(errorMsg);
     }
   };
 
-  const handleVerifyPhone = async (e) => {
-    e.preventDefault();
-    
-    const result = await verifyPhoneOTP(registeredUser.phone, otpData.phoneOtp);
+  const handleResendOtp = async () => {
+    const result = await resendEmailOTP(registeredUser.email);
     
     if (result.success) {
-      setPhoneVerified(true);
-      alert('Phone verified successfully!');
+      alert('Email OTP has been resent!');
     } else {
       const errorMessage = result.error.message || JSON.stringify(result.error);
-      alert(`Phone verification failed: ${errorMessage}`);
-    }
-  };
-
-  const handleResendOtp = async (type) => {
-    let result;
-    
-    if (type === 'Email') {
-      result = await resendEmailOTP(registeredUser.email);
-    } else {
-      result = await resendPhoneOTP(registeredUser.phone);
-    }
-    
-    if (result.success) {
-      alert(`${type} OTP has been resent!`);
-    } else {
-      const errorMessage = result.error.message || JSON.stringify(result.error);
-      alert(`Failed to resend ${type} OTP: ${errorMessage}`);
+      alert(`Failed to resend Email OTP: ${errorMessage}`);
     }
   };
 
@@ -308,6 +289,13 @@ const CreateAccount = () => {
             Login with Google
           </motion.button>
 
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="text-red-600 text-sm mt-3 text-center">
+              {errorMessage}
+            </div>
+          )}
+
           {/* Submit Button */}
           <motion.button
             whileHover={{ scale: 1.03 }}
@@ -330,12 +318,7 @@ const CreateAccount = () => {
             <CheckCircle className="w-20 h-20 text-green-600 mx-auto" />
             <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg">
               <p className="font-bold text-xl">Registration Completed!</p>
-              <p className="text-base mt-2">Please verify your account.</p>
-            </div>
-            <div className="text-gray-600">
-              <p className="text-sm">OTP codes have been sent to:</p>
-              <p className="font-semibold mt-2">{registeredUser.email}</p>
-              <p className="font-semibold">{registeredUser.phone}</p>
+              <p className="text-base mt-2">Please verify your email.</p>
             </div>
             <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
@@ -347,17 +330,10 @@ const CreateAccount = () => {
         {/* Step 3: OTP Verification */}
         {step === 3 && registeredUser && (
           <div className="space-y-6">
-            <div className="text-center text-gray-700 mb-4">
-              <p className="text-lg font-semibold">Verify Your Account</p>
-              <p className="text-sm mt-2">Enter the OTP codes sent to:</p>
-              <p className="font-semibold text-blue-600">{registeredUser.email}</p>
-              <p className="font-semibold text-green-600">{registeredUser.phone}</p>
-            </div>
-
             {/* Email OTP Verification */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               className={`p-6 rounded-xl space-y-4 ${emailVerified ? 'bg-green-100 border-2 border-green-500' : 'bg-blue-50'}`}
             >
               <div className="flex items-center justify-between">
@@ -381,6 +357,11 @@ const CreateAccount = () => {
                     maxLength="6"
                     className="w-full input-field py-2 px-4 border rounded-lg text-center text-2xl tracking-widest"
                   />
+                  {emailOtpError && (
+                    <div className="text-red-600 text-sm text-center">
+                      {emailOtpError}
+                    </div>
+                  )}
                   <div className="flex gap-3">
                     <motion.button
                       whileHover={{ scale: 1.03 }}
@@ -394,7 +375,7 @@ const CreateAccount = () => {
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => handleResendOtp('Email')}
+                      onClick={handleResendOtp}
                       className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
                     >
                       Resend
@@ -406,58 +387,8 @@ const CreateAccount = () => {
               )}
             </motion.div>
 
-            {/* Phone OTP Verification */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className={`p-6 rounded-xl space-y-4 ${phoneVerified ? 'bg-green-100 border-2 border-green-500' : 'bg-green-50'}`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Phone className="text-green-600 w-6 h-6" />
-                  <h3 className="text-lg font-semibold text-green-900">Phone Verification</h3>
-                </div>
-                {phoneVerified && <CheckCircle className="w-6 h-6 text-green-600" />}
-              </div>
-              
-              {!phoneVerified ? (
-                <>
-                  <input
-                    type="text"
-                    name="phoneOtp"
-                    value={otpData.phoneOtp}
-                    onChange={handleOtpChange}
-                    placeholder="Enter 6-digit phone OTP"
-                    maxLength="6"
-                    className="w-full input-field py-2 px-4 border rounded-lg text-center text-2xl tracking-widest"
-                  />
-                  <div className="flex gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleVerifyPhone}
-                      disabled={otpData.phoneOtp.length !== 6}
-                      className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Verify Phone
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleResendOtp('Phone')}
-                      className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
-                    >
-                      Resend
-                    </motion.button>
-                  </div>
-                </>
-              ) : (
-                <p className="text-green-700 font-semibold text-center">✓ Phone Verified Successfully!</p>
-              )}
-            </motion.div>
-
             {/* Success and Login Link */}
-            {(emailVerified || phoneVerified) && (
+            {emailVerified && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -465,13 +396,6 @@ const CreateAccount = () => {
               >
                 <CheckCircle className="w-16 h-16 text-green-600 mx-auto" />
                 <p className="font-bold text-xl">Account Verified Successfully!</p>
-                <p className="text-sm">
-                  {emailVerified && phoneVerified 
-                    ? "Both email and phone verified! You can now login."
-                    : emailVerified 
-                    ? "Email verified! You can now login."
-                    : "Phone verified! You can now login."}
-                </p>
                 <Link to="/login">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -483,10 +407,6 @@ const CreateAccount = () => {
                 </Link>
               </motion.div>
             )}
-
-            <p className="text-center text-sm text-gray-500 mt-4">
-              Verify either email or phone to complete registration.
-            </p>
           </div>
         )}
       </motion.div>

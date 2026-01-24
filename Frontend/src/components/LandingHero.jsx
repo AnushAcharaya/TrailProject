@@ -16,16 +16,6 @@ const HeroSection = () => {
             animal records — all from your phone.
           </p>
 
-          {/* ==== Buttons ==== */}
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-            <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-md text-sm md:text-base font-medium shadow-sm transition w-full sm:w-auto">
-              Register as Farmer →
-            </button>
-            <button className="border border-green-600 text-green-700 hover:bg-green-50 px-6 py-2.5 rounded-md text-sm md:text-base font-medium transition w-full sm:w-auto">
-              Join as Veterinarian
-            </button>
-          </div>
-
           {/* ==== Stats Section ==== */}
           <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-8 pt-6">
             <div className="text-center lg:text-left">

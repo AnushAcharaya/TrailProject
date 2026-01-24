@@ -1,5 +1,6 @@
 // src/components/medicalHistory/MedicineTrackingCard.jsx
 import { useState, useEffect } from "react";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import "./../../styles/medicalHistory.css";
 
 const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
@@ -251,14 +252,16 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
         <div className="flex gap-2">
           <button
             onClick={() => onEdit && onEdit(treatment)}
-            className="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600 transition"
+            className="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600 transition flex items-center gap-1"
           >
+            <FaEdit size={12} />
             Edit
           </button>
           <button
             onClick={() => onDelete && onDelete(treatment)}
-            className="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600 transition"
+            className="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600 transition flex items-center gap-1"
           >
+            <FaTrash size={12} />
             Delete
           </button>
         </div>

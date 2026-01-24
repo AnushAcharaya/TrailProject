@@ -15,10 +15,8 @@ const Login = () => {
     });
     const [otpData, setOtpData] = useState({
         emailOtp: "",
-        phoneOtp: "",
     });
     const [emailVerified, setEmailVerified] = useState(false);
-    const [phoneVerified, setPhoneVerified] = useState(false);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -46,21 +44,15 @@ const Login = () => {
             return false;
         }
 
-        // Admin: Email only
-        if (formData.role === "admin") {
-            if (!formData.email) {
-                newErrors.email = "Email is required";
-            } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-                newErrors.email = "Email address is invalid";
-            }
-        } else {
-            // Farmer/Vet: Both email and phone
-            if (!formData.email) {
-                newErrors.email = "Email is required";
-            } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-                newErrors.email = "Email address is invalid";
-            }
-            
+        // Email validation for all roles
+        if (!formData.email) {
+            newErrors.email = "Email is required";
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = "Email address is invalid";
+        }
+
+        // Phone validation for farmer/vet
+        if (formData.role !== "admin") {
             if (!formData.phone) {
                 newErrors.phone = "Phone number is required";
             } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
@@ -108,64 +100,37 @@ const Login = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // For admin, verify and login immediately
-        if (formData.role === "admin") {
-            const response = await verifyLoginOTP(formData.email, otpData.emailOtp, '', formData.role);
+        // Only verify email OTP - phone OTP is commented out in backend
+        const response = await verifyLoginOTP(formData.email, otpData.emailOtp, '', formData.role);
+        
+        if (response.success) {
+            // Store tokens and user info
+            localStorage.setItem('token', response.data.access);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             
-            if (response.success) {
-                // Store tokens and user info
-                localStorage.setItem('token', response.data.access);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
-                
-                // Redirect to admin page
-                navigate('/adminpage');
-            } else {
-                const errorMessage = response.error.error || response.error.message || JSON.stringify(response.error);
-                alert(`Verification failed: ${errorMessage}`);
-            }
-        } else {
-            // For farmer/vet, just mark email as verified
             setEmailVerified(true);
-        }
-        
-        setIsSubmitting(false);
-    };
-
-    const handleVerifyPhoneOtp = async (e) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-
-        // For farmer/vet, verify both OTPs together
-        if (emailVerified) {
-            const response = await verifyLoginOTP(formData.email, otpData.emailOtp, otpData.phoneOtp, formData.role);
             
-            if (response.success) {
-                // Store tokens and user info
-                localStorage.setItem('token', response.data.access);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
-                
-                setPhoneVerified(true);
-                
-                // Redirect based on role
-                alert("Login successful!");
-                // TODO: Add navigation for farmer/vet pages
-                // navigate('/dashboard');
-            } else {
-                const errorMessage = response.error.error || response.error.message || JSON.stringify(response.error);
-                alert(`Verification failed: ${errorMessage}`);
-            }
+            // Redirect based on role
+            setTimeout(() => {
+                if (formData.role === 'admin') {
+                    navigate('/adminpage');
+                } else {
+                    navigate('/landing');
+                }
+            }, 1500);
         } else {
-            alert("Please verify email first");
+            const errorMessage = response.error.error || response.error.message || JSON.stringify(response.error);
+            alert(`Verification failed: ${errorMessage}`);
         }
         
         setIsSubmitting(false);
     };
 
-    const handleResendOtp = async (type) => {
+    const handleResendOtp = async () => {
         const response = await sendLoginOTP(formData);
         
         if (response.success) {
-            alert(`${type} OTP has been resent!`);
+            alert('Email OTP has been resent!');
         } else {
             const errorMessage = response.error.error || response.error.message || JSON.stringify(response.error);
             alert(`Failed to resend OTP: ${errorMessage}`);
@@ -299,15 +264,6 @@ const Login = () => {
                 {/* Step 2: OTP Verification */}
                 {step === 2 && (
                     <div className="space-y-6">
-                        <div className="text-center text-gray-700 mb-4">
-                            <p className="text-lg font-semibold">Verify Your Account</p>
-                            <p className="text-sm mt-2">Enter the OTP codes sent to:</p>
-                            <p className="font-semibold text-blue-600">{formData.email}</p>
-                            {formData.role !== "admin" && (
-                                <p className="font-semibold text-green-600">{formData.phone}</p>
-                            )}
-                        </div>
-
                         {/* Email OTP Verification */}
                         <div className={`p-6 rounded-xl space-y-4 ${emailVerified ? 'bg-green-100 border-2 border-green-500' : 'bg-blue-50'}`}>
                             <div className="flex items-center justify-between">
@@ -341,7 +297,7 @@ const Login = () => {
                                         <motion.button
                                             whileHover={{ scale: 1.03 }}
                                             whileTap={{ scale: 0.95 }}
-                                            onClick={() => handleResendOtp('Email')}
+                                            onClick={handleResendOtp}
                                             className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
                                         >
                                             Resend
@@ -353,58 +309,13 @@ const Login = () => {
                             )}
                         </div>
 
-                        {/* Phone OTP Verification - Only for Farmer/Vet */}
-                        {formData.role !== "admin" && (
-                            <div className={`p-6 rounded-xl space-y-4 ${phoneVerified ? 'bg-green-100 border-2 border-green-500' : 'bg-green-50'}`}>
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-semibold text-green-900">Phone Verification</h3>
-                                    {phoneVerified && <span className="text-green-600">✓ Verified</span>}
-                                </div>
-                                
-                                {!phoneVerified ? (
-                                    <>
-                                        <input
-                                            type="text"
-                                            name="phoneOtp"
-                                            value={otpData.phoneOtp}
-                                            onChange={handleOtpChange}
-                                            placeholder="Enter 6-digit phone OTP"
-                                            maxLength="6"
-                                            className="w-full input-field py-2 px-4 border rounded-lg text-center text-2xl tracking-widest"
-                                        />
-                                        <div className="flex gap-3">
-                                            <motion.button
-                                                whileHover={{ scale: 1.03 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={handleVerifyPhoneOtp}
-                                                disabled={otpData.phoneOtp.length !== 6}
-                                                className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                Verify Phone
-                                            </motion.button>
-                                            <motion.button
-                                                whileHover={{ scale: 1.03 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => handleResendOtp('Phone')}
-                                                className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
-                                            >
-                                                Resend
-                                            </motion.button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <p className="text-green-700 font-semibold text-center">✓ Phone Verified Successfully!</p>
-                                )}
-                            </div>
-                        )}
-
                         {/* Success Message */}
-                        {(formData.role === "admin" && emailVerified) || (formData.role !== "admin" && emailVerified && phoneVerified) ? (
+                        {emailVerified && (
                             <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg text-center">
                                 <p className="font-bold text-xl">Login Successful!</p>
                                 <p className="text-sm mt-2">Redirecting...</p>
                             </div>
-                        ) : null}
+                        )}
 
                         <div className="text-center">
                             <button

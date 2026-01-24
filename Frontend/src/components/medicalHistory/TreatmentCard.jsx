@@ -1,4 +1,5 @@
 // src/components/medicalHistory/TreatmentCard.jsx
+import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import "./../../styles/medicalHistory.css";
 import StatusBadge from "./StatusBadge";
 
@@ -30,8 +31,9 @@ const TreatmentCard = ({ treatment, onEdit, onDelete, onView }) => {
             e.stopPropagation();
             onView && onView(treatment);
           }}
-          className="flex-1 bg-green-500 text-white px-3 py-1.5 rounded text-sm hover:bg-green-600 transition"
+          className="flex-1 bg-green-500 text-white px-3 py-1.5 rounded text-sm hover:bg-green-600 transition flex items-center justify-center gap-1"
         >
+          <FaEye size={14} />
           View
         </button>
         <button
@@ -39,8 +41,9 @@ const TreatmentCard = ({ treatment, onEdit, onDelete, onView }) => {
             e.stopPropagation();
             onEdit && onEdit(treatment);
           }}
-          className="flex-1 bg-blue-500 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-600 transition"
+          className="flex-1 bg-blue-500 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-600 transition flex items-center justify-center gap-1"
         >
+          <FaEdit size={14} />
           Edit
         </button>
         <button
@@ -48,8 +51,9 @@ const TreatmentCard = ({ treatment, onEdit, onDelete, onView }) => {
             e.stopPropagation();
             onDelete && onDelete(treatment);
           }}
-          className="flex-1 bg-red-500 text-white px-3 py-1.5 rounded text-sm hover:bg-red-600 transition"
+          className="flex-1 bg-red-500 text-white px-3 py-1.5 rounded text-sm hover:bg-red-600 transition flex items-center justify-center gap-1"
         >
+          <FaTrash size={14} />
           Delete
         </button>
       </div>

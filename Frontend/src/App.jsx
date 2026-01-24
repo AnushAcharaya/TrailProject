@@ -15,16 +15,18 @@ import EditTreatmentRecord from "./pages/medicalHistory/EditTreatmentRecord";
 import ViewTreatmentHistory from "./pages/medicalHistory/ViewTreatmentHistory";
 import MonitorDeadlines from "./pages/medicalHistory/MonitorDeadlines";
 import AlertsNotifications from "./pages/medicalHistory/AlertNotifications";
+import VaccinationPage from "./pages/vaccination/VaccinationPage";
+import AddVaccinationPage from "./pages/vaccination/AddVaccinationPage";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        
         <Route path="/register" element={<AccountCreate />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/landingpage" element={<Page />} />
+        <Route path="/" element={<Page />} />
         <Route path="/adminpage" element={<AdminPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/livestock" element={<LivestockPage />} />
@@ -35,6 +37,8 @@ function App() {
         <Route path="/medical/history" element={<ViewTreatmentHistory />} />
         <Route path="/medical/deadlines" element={<MonitorDeadlines />} />
         <Route path="/medical/alerts" element={<AlertsNotifications />} />
+        <Route path="/vaccination" element={<VaccinationPage />} />
+        <Route path="/vaccination/add" element={<AddVaccinationPage />} />
 
       </Routes>
     </Router>

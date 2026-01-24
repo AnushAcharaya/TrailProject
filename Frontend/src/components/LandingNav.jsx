@@ -39,7 +39,7 @@ const Navbar = () => {
               Sign In
             </button>
           </Link>
-          <Link to="/create-account">
+          <Link to="/register">
             <button className="bg-green-600 text-white text-sm px-4 py-2 rounded-md hover:bg-green-700 transition">
               Sign Up
             </button>
@@ -94,7 +94,7 @@ const Navbar = () => {
               Sign In
             </button>
           </Link>
-          <Link to="/create-account" onClick={() => setIsOpen(false)}>
+          <Link to="/register" onClick={() => setIsOpen(false)}>
             <button className="bg-green-600 text-white text-sm px-4 py-2 rounded-md hover:bg-green-700 transition text-left w-full">
               Sign Up
             </button>

@@ -374,7 +374,7 @@ class VerifyLoginOTPView(APIView):
         
         email = serializer.validated_data['email']
         email_code = serializer.validated_data['email_code']
-        phone_code = serializer.validated_data.get('phone_code', '')
+        # phone_code = serializer.validated_data.get('phone_code', '')  # COMMENTED OUT - Phone OTP not required
         role = serializer.validated_data['role']
         
         # Find user
@@ -397,10 +397,11 @@ class VerifyLoginOTPView(APIView):
         if login_otp.email_code != email_code:
             return Response({'success': False, 'error': 'Invalid email OTP'}, status=status.HTTP_400_BAD_REQUEST)
         
+        # COMMENTED OUT - Phone OTP verification not required
         # For farmer/vet, verify phone OTP
-        if role in ['farmer', 'vet']:
-            if not phone_code or login_otp.phone_code != phone_code:
-                return Response({'success': False, 'error': 'Invalid phone OTP'}, status=status.HTTP_400_BAD_REQUEST)
+        # if role in ['farmer', 'vet']:
+        #     if not phone_code or login_otp.phone_code != phone_code:
+        #         return Response({'success': False, 'error': 'Invalid phone OTP'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Mark OTP as used
         login_otp.used = True

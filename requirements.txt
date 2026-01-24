@@ -1,0 +1,33 @@
+# Core Django
+Django>=5.2
+
+# Django REST Framework
+djangorestframework
+
+# JWT Authentication
+djangorestframework-simplejwt
+
+# PostgreSQL
+psycopg2
+
+# Environment Variables
+python-dotenv
+
+# Image & File Upload
+Pillow
+
+# API Documentation (Swagger)
+drf-yasg
+
+# CORS (for frontend React / mobile apps)
+django-cors-headers
+
+# Optional — Use Celery for async tasks (emails, SMS, notifications)
+# celery
+# redis
+
+# Optional — For better password hashing
+# argon2-cffi
+
+# Optional — If you plan to use Django Filters
+# django-filter

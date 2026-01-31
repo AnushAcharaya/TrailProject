@@ -1,5 +1,6 @@
 // SettingsTab.jsx
-import React from "react";
+import React, { useState } from "react";
+import { updatePreferences } from "../../services/profileApi";
 
 // Brand colors (from your palette)
 const BRAND = {
@@ -13,12 +14,13 @@ const BRAND = {
 };
 
 // Reusable toggle using brand green gradient
-const ToggleSwitch = ({ checked, onChange, onLabel = "ON", offLabel = "OFF" }) => {
+const ToggleSwitch = ({ checked, onChange, onLabel = "ON", offLabel = "OFF", disabled = false }) => {
   return (
     <button
       type="button"
       onClick={onChange}
-      className="relative inline-flex items-center h-7 w-14 rounded-full transition-all duration-200 hover:shadow-lg"
+      disabled={disabled}
+      className="relative inline-flex items-center h-7 w-14 rounded-full transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
       style={{
         background: checked
           ? `linear-gradient(90deg, ${BRAND.primary}, ${BRAND.primaryLight})`
@@ -46,6 +48,10 @@ const ToggleSwitch = ({ checked, onChange, onLabel = "ON", offLabel = "OFF" }) =
 };
 
 const SettingsTab = ({ preferences = {}, onUpdate }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState(null);
+  
   // provide safe defaults so buttons always work
   const {
     theme = "light",
@@ -54,27 +60,52 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
     pushNotifications = false,
   } = preferences;
 
+  const handlePreferenceUpdate = async (updatedPreference) => {
+    setLoading(true);
+    setError(null);
+    setStatus(null);
+    
+    const result = await updatePreferences(updatedPreference);
+    
+    if (result.success) {
+      onUpdate(result.data);
+      setStatus("Preferences updated successfully!");
+      setTimeout(() => setStatus(null), 2000);
+    } else {
+      const errorMsg = result.error?.theme?.[0] || 
+                       result.error?.language?.[0] || 
+                       result.error?.email_notifications?.[0] ||
+                       result.error?.push_notifications?.[0] ||
+                       result.error?.message || 
+                       "Failed to update preferences.";
+      setError(errorMsg);
+      setTimeout(() => setError(null), 3000);
+    }
+    
+    setLoading(false);
+  };
+
   const toggleTheme = () => {
-    onUpdate({
+    handlePreferenceUpdate({
       theme: theme === "light" ? "dark" : "light",
     });
   };
 
   const toggleLanguage = () => {
-    onUpdate({
+    handlePreferenceUpdate({
       language: language === "en" ? "np" : "en",
     });
   };
 
   const toggleEmail = () => {
-    onUpdate({
-      emailNotifications: !emailNotifications,
+    handlePreferenceUpdate({
+      email_notifications: !emailNotifications,
     });
   };
 
   const togglePush = () => {
-    onUpdate({
-      pushNotifications: !pushNotifications,
+    handlePreferenceUpdate({
+      push_notifications: !pushNotifications,
     });
   };
 
@@ -92,8 +123,22 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
         Preferences
       </h3>
       <p className="text-xs mb-4" style={{ color: BRAND.textLight }}>
-        These settings are for UI demo only and are not persisted anywhere.
+        Customize your experience with theme, language, and notification settings.
       </p>
+
+      {/* Error message */}
+      {error && (
+        <div className="mb-3 p-3 rounded-md text-xs" style={{ backgroundColor: "#FFEBEE", color: "#C62828", border: "1px solid #FFCDD2" }}>
+          {error}
+        </div>
+      )}
+
+      {/* Success message */}
+      {status && (
+        <div className="mb-3 p-3 rounded-md text-xs" style={{ backgroundColor: "#C8E6C9", color: BRAND.primaryDark, border: `1px solid ${BRAND.primaryLight}` }}>
+          {status}
+        </div>
+      )}
 
       <div className="space-y-4">
         {/* Theme */}
@@ -115,6 +160,7 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
             onChange={toggleTheme}
             onLabel="DARK"
             offLabel="LIGHT"
+            disabled={loading}
           />
         </div>
 
@@ -140,6 +186,7 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
             onChange={toggleLanguage}
             onLabel="NP"
             offLabel="EN"
+            disabled={loading}
           />
         </div>
 
@@ -160,12 +207,13 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
             <ToggleSwitch
               checked={emailNotifications}
               onChange={toggleEmail}
+              disabled={loading}
             />
           </div>
 
           <div className="flex items-center justify-between text-xs">
             <span style={{ color: BRAND.textDark }}>Push notifications</span>
-            <ToggleSwitch checked={pushNotifications} onChange={togglePush} />
+            <ToggleSwitch checked={pushNotifications} onChange={togglePush} disabled={loading} />
           </div>
         </div>
       </div>

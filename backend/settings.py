@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'corsheaders',                               # CORS
     'drf_yasg', 
     'authentication',
+    'userprofile',  # User profile management
 ]
 
 MIDDLEWARE = [

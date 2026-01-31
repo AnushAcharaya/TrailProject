@@ -1,5 +1,6 @@
 // ProfileTab.jsx
 import React, { useEffect, useState } from "react";
+import { updateProfile } from "../../services/profileApi";
 
 const BRAND = {
   primary: "#2E7D32",
@@ -15,9 +16,6 @@ const BRAND = {
 
 const ProfileTab = ({ user, onUpdate }) => {
   const [form, setForm] = useState({
-    name: "",
-    username: "",
-    phone: "",
     location: "",
     bio: "",
     gender: "",
@@ -25,18 +23,17 @@ const ProfileTab = ({ user, onUpdate }) => {
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [status, setStatus] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
       setForm({
-        name: user.name || "",
-        username: user.username || "",
-        phone: user.phone || "",
         location: user.location || "",
         bio: user.bio || "",
         gender: user.gender || "",
       });
-      setImagePreview(user.profile_image || null);
+      setImagePreview(user.profile_image_url || null);
     }
   }, [user]);
 
@@ -52,14 +49,40 @@ const ProfileTab = ({ user, onUpdate }) => {
     }
   };
 
-  const handleSave = () => {
-    const updatedData = { ...form };
+  const handleSave = async () => {
+    setLoading(true);
+    setError(null);
+    setStatus(null);
+    
+    const profileData = {
+      bio: form.bio,
+      location: form.location,
+      gender: form.gender,
+    };
+    
+    // Add image file if selected
     if (profileImage) {
-      updatedData.profile_image = imagePreview;
+      profileData.profile_image = profileImage;
     }
-    onUpdate(updatedData);
-    setStatus("saved");
-    setTimeout(() => setStatus(null), 2000);
+    
+    const result = await updateProfile(profileData);
+    
+    if (result.success) {
+      onUpdate(result.data);
+      setStatus("Profile updated successfully!");
+      setProfileImage(null); // Clear selected file
+      setTimeout(() => setStatus(null), 3000);
+    } else {
+      const errorMsg = result.error?.bio?.[0] || 
+                       result.error?.location?.[0] || 
+                       result.error?.gender?.[0] || 
+                       result.error?.profile_image?.[0] ||
+                       result.error?.message || 
+                       "Failed to update profile.";
+      setError(errorMsg);
+    }
+    
+    setLoading(false);
   };
 
   // helper to attach same hover/focus styles to all inputs
@@ -98,7 +121,7 @@ const ProfileTab = ({ user, onUpdate }) => {
         Profile information
       </h3>
       <p className="text-xs mb-4" style={{ color: BRAND.textLight }}>
-        This is demo-only. Changes are stored in component state, not a server.
+        Update your profile information. Fields from registration are read-only.
       </p>
 
       {/* Profile Photo Upload */}
@@ -158,78 +181,53 @@ const ProfileTab = ({ user, onUpdate }) => {
         </div>
       </div>
 
+      {/* Read-only fields from registration */}
+      <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: "#F5F5F5", border: `1px solid ${BRAND.border}` }}>
+        <p className="text-xs font-medium mb-2" style={{ color: BRAND.textMedium }}>
+          Registration Information (Read-only)
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div>
+            <span style={{ color: BRAND.textLight }}>Full Name:</span>
+            <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.full_name || "N/A"}</span>
+          </div>
+          <div>
+            <span style={{ color: BRAND.textLight }}>Username:</span>
+            <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.username || "N/A"}</span>
+          </div>
+          <div>
+            <span style={{ color: BRAND.textLight }}>Email:</span>
+            <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.email || "N/A"}</span>
+          </div>
+          <div>
+            <span style={{ color: BRAND.textLight }}>Phone:</span>
+            <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.phone || "N/A"}</span>
+          </div>
+          <div>
+            <span style={{ color: BRAND.textLight }}>Role:</span>
+            <span className="ml-2 font-medium capitalize" style={{ color: BRAND.textDark }}>{user?.role || "N/A"}</span>
+          </div>
+          <div>
+            <span style={{ color: BRAND.textLight }}>Address:</span>
+            <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.address || "N/A"}</span>
+          </div>
+          {user?.role === 'farmer' && user?.farm_name && (
+            <div>
+              <span style={{ color: BRAND.textLight }}>Farm Name:</span>
+              <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user.farm_name}</span>
+            </div>
+          )}
+          {user?.role === 'vet' && user?.specialization && (
+            <div>
+              <span style={{ color: BRAND.textLight }}>Specialization:</span>
+              <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user.specialization}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Editable fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label
-            className="block text-xs font-medium mb-1"
-            style={{ color: BRAND.textMedium }}
-          >
-            Full name
-          </label>
-          <input
-            type="text"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full rounded-md px-3 py-2 text-sm outline-none transition-all duration-200"
-            style={{
-              border: `1px solid ${BRAND.border}`,
-              backgroundColor: "#FFFFFF",
-            }}
-            placeholder="John Doe"
-            onFocus={attachInteractiveStyles}
-            onBlur={resetInteractiveStyles}
-            onMouseEnter={hoverOn}
-            onMouseLeave={hoverOff}
-          />
-        </div>
-
-        <div>
-          <label
-            className="block text-xs font-medium mb-1"
-            style={{ color: BRAND.textMedium }}
-          >
-            Username
-          </label>
-          <input
-            type="text"
-            value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
-            className="w-full rounded-md px-3 py-2 text-sm outline-none transition-all duration-200"
-            style={{
-              border: `1px solid ${BRAND.border}`,
-              backgroundColor: "#FFFFFF",
-            }}
-            placeholder="johnny_dev"
-            onFocus={attachInteractiveStyles}
-            onBlur={resetInteractiveStyles}
-            onMouseEnter={hoverOn}
-            onMouseLeave={hoverOff}
-          />
-        </div>
-
-        <div>
-          <label
-            className="block text-xs font-medium mb-1"
-            style={{ color: BRAND.textMedium }}
-          >
-            Phone
-          </label>
-          <input
-            type="text"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            className="w-full rounded-md px-3 py-2 text-sm outline-none transition-all duration-200"
-            style={{
-              border: `1px solid ${BRAND.border}`,
-              backgroundColor: "#FFFFFF",
-            }}
-            placeholder="+977-98xxxxxxx"
-            onFocus={attachInteractiveStyles}
-            onBlur={resetInteractiveStyles}
-            onMouseEnter={hoverOn}
-            onMouseLeave={hoverOff}
-          />
-        </div>
 
         <div>
           <label
@@ -333,30 +331,42 @@ const ProfileTab = ({ user, onUpdate }) => {
         />
       </div>
 
+      {/* Error message */}
+      {error && (
+        <div className="mb-3 p-3 rounded-md text-xs" style={{ backgroundColor: "#FFEBEE", color: "#C62828", border: "1px solid #FFCDD2" }}>
+          {error}
+        </div>
+      )}
+
+      {/* Success message */}
+      {status && (
+        <div className="mb-3 p-3 rounded-md text-xs" style={{ backgroundColor: "#C8E6C9", color: BRAND.primaryDark, border: `1px solid ${BRAND.primaryLight}` }}>
+          {status}
+        </div>
+      )}
+
       <div className="flex items-center gap-3">
         <button
           onClick={handleSave}
-          className="text-sm px-4 py-2 rounded-md transition-all duration-200 shadow-sm"
+          disabled={loading}
+          className="text-sm px-4 py-2 rounded-md transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
             backgroundImage: `linear-gradient(90deg, ${BRAND.primary}, ${BRAND.primaryLight})`,
             color: "#FFFFFF",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-1px)";
-            e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.15)";
+            if (!loading) {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.15)";
+            }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "translateY(0)";
             e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
           }}
         >
-          Save changes
+          {loading ? "Saving..." : "Save changes"}
         </button>
-        {status === "saved" && (
-          <span className="text-xs" style={{ color: BRAND.primaryDark }}>
-            Saved locally
-          </span>
-        )}
       </div>
     </div>
   );

@@ -32,9 +32,9 @@ const ProfileCard = ({ user }) => {
     >
       {/* Avatar */}
       <div className="relative inline-block">
-        {user?.profile_image ? (
+        {user?.profile_image_url ? (
           <img
-            src={user.profile_image}
+            src={user.profile_image_url}
             className="w-28 h-28 mx-auto rounded-full object-cover border-4 border-white shadow"
             alt="profile"
           />
@@ -58,10 +58,10 @@ const ProfileCard = ({ user }) => {
         className="text-xl font-semibold mt-3"
         style={{ color: BRAND.textDark }}
       >
-        {user?.name || "Loading..."}
+        {user?.full_name || "Loading..."}
       </h2>
       <h4
-        className="text-sm font-semibold mt-1"
+        className="text-sm font-semibold mt-1 capitalize"
         style={{ color: BRAND.primary }}
       >
         {user?.role || "Loading..."}
@@ -76,7 +76,7 @@ const ProfileCard = ({ user }) => {
         </p>
       )}
       <p className="mt-2 text-sm" style={{ color: BRAND.textMedium }}>
-        {user?.bio}
+        {user?.bio || "No bio yet"}
       </p>
 
       {/* Info */}
@@ -85,11 +85,11 @@ const ProfileCard = ({ user }) => {
         <p>{user?.phone}</p>
         <div className="flex items-center justify-center gap-2">
           <FaMapMarkerAlt style={{ color: "#E53935" }} />
-          <span>{user?.location}</span>
+          <span>{user?.location || "No location set"}</span>
         </div>
         <div className="flex items-center justify-center gap-2">
           <FaCalendarAlt style={{ color: BRAND.primaryLight }} />
-          <span>Joined {user?.joined_at}</span>
+          <span>Joined {user?.date_joined ? new Date(user.date_joined).toLocaleDateString() : "N/A"}</span>
         </div>
       </div>
     </div>

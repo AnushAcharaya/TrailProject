@@ -1,5 +1,6 @@
 // PasswordTab.jsx
 import React, { useState } from "react";
+import { changePassword } from "../../services/profileApi";
 
 const BRAND = {
   primary: "#2E7D32",
@@ -21,6 +22,7 @@ const PasswordTab = () => {
   });
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const validatePassword = () => {
     if (data.new_password.length < 8) {
@@ -35,16 +37,40 @@ const PasswordTab = () => {
     return null;
   };
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
     const err = validatePassword();
     if (err) {
       setError(err);
       setStatus("");
       return;
     }
+    
+    setLoading(true);
     setError("");
-    setStatus("Password validation passed (demo only, not sent to server).");
-    setTimeout(() => setStatus(""), 2500);
+    setStatus("");
+    
+    const result = await changePassword(data);
+    
+    if (result.success) {
+      setStatus(result.message || "Password changed successfully!");
+      // Clear form
+      setData({
+        old_password: "",
+        new_password: "",
+        confirm_password: "",
+      });
+      setTimeout(() => setStatus(""), 3000);
+    } else {
+      const errorMsg = result.error?.old_password?.[0] || 
+                       result.error?.new_password?.[0] || 
+                       result.error?.confirm_password?.[0] ||
+                       result.error?.error ||
+                       result.error?.message || 
+                       "Failed to change password.";
+      setError(errorMsg);
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -61,7 +87,7 @@ const PasswordTab = () => {
         Change password
       </h3>
       <p className="text-xs mb-4" style={{ color: BRAND.textLight }}>
-        This is a frontend-only demo. No real password change will happen.
+        Update your password. Make sure it's at least 8 characters long.
       </p>
 
       <div className="space-y-3 mb-3">
@@ -217,21 +243,24 @@ const PasswordTab = () => {
 
       <button
         onClick={handlePasswordChange}
-        className="text-sm px-4 py-2 rounded-md transition-all duration-200 shadow-sm"
+        disabled={loading}
+        className="text-sm px-4 py-2 rounded-md transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         style={{
           backgroundImage: `linear-gradient(90deg, ${BRAND.primary}, ${BRAND.primaryLight})`,
           color: "#FFFFFF",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-1px)";
-          e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.15)";
+          if (!loading) {
+            e.currentTarget.style.transform = "translateY(-1px)";
+            e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.15)";
+          }
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = "translateY(0)";
           e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
         }}
       >
-        Update password
+        {loading ? "Updating..." : "Update password"}
       </button>
     </div>
   );

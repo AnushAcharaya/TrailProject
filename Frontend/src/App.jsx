@@ -17,6 +17,7 @@ import MonitorDeadlines from "./pages/medicalHistory/MonitorDeadlines";
 import AlertsNotifications from "./pages/medicalHistory/AlertNotifications";
 import VaccinationPage from "./pages/vaccination/VaccinationPage";
 import AddVaccinationPage from "./pages/vaccination/AddVaccinationPage";
+import FarmerDashboardPage from "./pages/FarmerDashboard/FarmerDashboardPage";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         <Route path="/medical/alerts" element={<AlertsNotifications />} />
         <Route path="/vaccination" element={<VaccinationPage />} />
         <Route path="/vaccination/add" element={<AddVaccinationPage />} />
+        <Route path="/farmerpage" element={<FarmerDashboardPage />} />
 
       </Routes>
     </Router>

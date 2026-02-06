@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css'
 import AccountCreate from "./pages/CreateAccount";
@@ -18,6 +17,9 @@ import AlertsNotifications from "./pages/medicalHistory/AlertNotifications";
 import VaccinationPage from "./pages/vaccination/VaccinationPage";
 import AddVaccinationPage from "./pages/vaccination/AddVaccinationPage";
 import FarmerDashboardPage from "./pages/FarmerDashboard/FarmerDashboardPage";
+import FarmerAppointments from "./pages/appointments/FarmerAppointments";
+import VetAppointments from "./pages/appointments/VetAppointments";
+import RequestAppointmentPage from "./pages/appointments/RequestAppointmentPage";
 
 function App() {
   return (
@@ -25,7 +27,7 @@ function App() {
       <Routes>
         
         <Route path="/register" element={<AccountCreate />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />of 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/" element={<Page />} />
         <Route path="/adminpage" element={<AdminPage />} />
@@ -41,6 +43,9 @@ function App() {
         <Route path="/vaccination" element={<VaccinationPage />} />
         <Route path="/vaccination/add" element={<AddVaccinationPage />} />
         <Route path="/farmerpage" element={<FarmerDashboardPage />} />
+        <Route path="/farmerappointment" element={<FarmerAppointments />} />
+        <Route path="/vetappointment" element={<VetAppointments />} />
+        <Route path="/appointments/request" element={<RequestAppointmentPage />} />
 
       </Routes>
     </Router>

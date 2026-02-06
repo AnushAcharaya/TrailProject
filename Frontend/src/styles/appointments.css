@@ -1,0 +1,169 @@
+/* Appointments Subsystem – Shared Styles */
+
+/* Page background */
+.app-page {
+  background-color: #f9fafb;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+/* Page title */
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Search input */
+.app-search {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+}
+
+.app-search:focus {
+  outline: none;
+  ring: 2px solid #10b981;
+  border-color: #10b981;
+}
+
+@media (min-width: 768px) {
+  .app-search {
+    width: 24rem;
+  }
+}
+
+/* Stat cards */
+.stat-card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Table */
+.app-table {
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.app-table thead {
+  background-color: #f9fafb;
+  color: #4b5563;
+}
+
+.app-table th {
+  padding: 1rem;
+  text-align: left;
+}
+
+.app-table td {
+  padding: 1rem;
+}
+
+/* Status badges */
+.badge {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+.badge-green {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.badge-yellow {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.badge-blue {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.badge-red {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: #059669;
+  color: #ffffff;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #047857;
+}
+
+.btn-outline-red {
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.btn-outline-red:hover {
+  background-color: #fef2f2;
+}
+
+.btn-outline-blue {
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.btn-outline-blue:hover {
+  background-color: #eff6ff;
+}
+
+/* Appointment card */
+.app-card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  transition: box-shadow 0.2s;
+  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.app-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Quote box */
+.app-note {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  background-color: #f9fafb;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+}

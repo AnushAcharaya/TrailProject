@@ -20,6 +20,13 @@ import FarmerDashboardPage from "./pages/FarmerDashboard/FarmerDashboardPage";
 import FarmerAppointments from "./pages/appointments/FarmerAppointments";
 import VetAppointments from "./pages/appointments/VetAppointments";
 import RequestAppointmentPage from "./pages/appointments/RequestAppointmentPage";
+import Dashboard from "./pages/insurance/farmerSideInsurance/Dashboard";
+import InsurancePlans from "./pages/insurance/farmerSideInsurance/InsurancePlan";
+import EnrollPage from "./pages/insurance/farmerSideInsurance/Enroll";
+import SubmitClaimPage from "./pages/insurance/farmerSideInsurance/SubmitClaim";
+import TrackClaimPage from "./pages/insurance/farmerSideInsurance/TrackClaim";
+import ReviewDashboardPage from "./pages/insurance/vetSideInsurance/ReviewDashboard";
+import VerifyClaimPage from "./pages/insurance/vetSideInsurance/VerifyClaim";
 
 function App() {
   return (
@@ -46,6 +53,13 @@ function App() {
         <Route path="/farmerappointment" element={<FarmerAppointments />} />
         <Route path="/vetappointment" element={<VetAppointments />} />
         <Route path="/appointments/request" element={<RequestAppointmentPage />} />
+        <Route path="/farmerinsurancedashboard" element={<Dashboard />} />
+        <Route path="/farmerinsuranceplan" element={<InsurancePlans />} />
+        <Route path="/farmerinsuranceenroll" element={<EnrollPage />} />
+        <Route path="/farmerinsurancesubmitclaim" element={<SubmitClaimPage />} />
+        <Route path="/farmerinsurancetrackclaim" element={<TrackClaimPage />} />
+        <Route path="/vetinsurancereviewdashboard" element={<ReviewDashboardPage />} />
+        <Route path="/vetinsuranceverifyclaim" element={<VerifyClaimPage />} />
 
       </Routes>
     </Router>

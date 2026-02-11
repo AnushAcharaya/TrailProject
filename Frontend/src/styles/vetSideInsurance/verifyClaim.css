@@ -1,0 +1,112 @@
+/* Vet Verify Claim Styles - Tailwind v4 Compatible */
+
+/* Custom utility classes */
+.glass-card {
+  backdrop-filter: blur(24px);
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.section-card {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px);
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2rem;
+  transition: all 0.3s;
+}
+
+.section-card:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  transform: translateY(-0.25rem);
+}
+
+.profile-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: #ecfdf5;
+  border: 1px solid #d1fae5;
+  margin-bottom: 1rem;
+  transition: all 0.2s;
+}
+
+.profile-detail:last-child {
+  margin-bottom: 0;
+}
+
+.profile-detail:hover {
+  background-color: #d1fae5;
+}
+
+.profile-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: #a7f3d0;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #047857;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(to right, #ecfdf5, #f0fdf4);
+  border: 1px solid #d1fae5;
+  margin-bottom: 0.75rem;
+  transition: all 0.2s;
+}
+
+.history-item:last-child {
+  margin-bottom: 0;
+}
+
+.history-item:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.decision-btn {
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.2s;
+  height: 4rem;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-approve {
+  background: linear-gradient(to right, #22c55e, #10b981);
+  color: white;
+}
+
+.btn-approve:hover {
+  background: linear-gradient(to right, #16a34a, #059669);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-0.25rem);
+}
+
+.btn-reject {
+  background: linear-gradient(to right, #f87171, #fb7185);
+  color: white;
+}
+
+.btn-reject:hover {
+  background: linear-gradient(to right, #ef4444, #f43f5e);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-0.25rem);
+}

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { GiCow } from "react-icons/gi";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
-const LivestockCard = ({ livestock, index, onDelete }) => {
+const LivestockCard = ({ livestock, onDelete }) => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleDeleteClick = () => {
@@ -12,7 +12,7 @@ const LivestockCard = ({ livestock, index, onDelete }) => {
   };
 
   const confirmDelete = () => {
-    onDelete(index);
+    onDelete(livestock.id);
     setShowConfirm(false);
   };
 
@@ -24,9 +24,9 @@ const LivestockCard = ({ livestock, index, onDelete }) => {
     <div className="livestock-card">
       {/* Image/Icon at top center */}
       <div className="card-image-container">
-        {livestock.imagePreview ? (
+        {livestock.image_preview ? (
           <img
-            src={livestock.imagePreview}
+            src={livestock.image_preview}
             alt="Livestock"
             className="card-livestock-image"
           />
@@ -38,17 +38,17 @@ const LivestockCard = ({ livestock, index, onDelete }) => {
       </div>
 
       {/* Title */}
-      <h3 className="card-title">{livestock.livestockType}</h3>
+      <h3 className="card-title">{livestock.species_name}</h3>
 
       {/* Two-column layout for info */}
       <div className="card-info-grid">
         <div className="info-item">
           <span className="info-label">Tag ID:</span>
-          <span className="info-value">{livestock.tagId}</span>
+          <span className="info-value">{livestock.tag_id}</span>
         </div>
         <div className="info-item">
           <span className="info-label">Breed:</span>
-          <span className="info-value">{livestock.breed || "N/A"}</span>
+          <span className="info-value">{livestock.breed_name || "N/A"}</span>
         </div>
         <div className="info-item">
           <span className="info-label">Age:</span>
@@ -64,13 +64,13 @@ const LivestockCard = ({ livestock, index, onDelete }) => {
         </div>
         <div className="info-item">
           <span className="info-label">Health:</span>
-          <span className="info-value">{livestock.healthStatus || "N/A"}</span>
+          <span className="info-value">{livestock.health_status || "N/A"}</span>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="card-actions">
-        <Link to={`/livestock/edit/${index}`} className="edit-btn">
+        <Link to={`/livestock/edit/${livestock.id}`} className="edit-btn">
           Edit
         </Link>
         <button onClick={handleDeleteClick} className="delete-btn">

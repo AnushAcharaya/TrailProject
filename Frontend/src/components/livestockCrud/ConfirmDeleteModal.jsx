@@ -22,15 +22,15 @@ const ConfirmDeleteModal = ({ livestock, onConfirm, onCancel }) => {
         <div className="livestock-info">
           <div className="info-row">
             <span className="label">Tag ID:</span>
-            <span className="value">{livestock.tagId || "N/A"}</span>
+            <span className="value">{livestock.tag_id || "N/A"}</span>
           </div>
           <div className="info-row">
             <span className="label">Species:</span>
-            <span className="value">{livestock.livestockType || "N/A"}</span>
+            <span className="value">{livestock.species_name || "N/A"}</span>
           </div>
           <div className="info-row">
             <span className="label">Breed:</span>
-            <span className="value">{livestock.breed || "N/A"}</span>
+            <span className="value">{livestock.breed_name || "N/A"}</span>
           </div>
         </div>
 

@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/v1/auth/', include('authentication.urls')),
     path('api/v1/profile/', include('userprofile.urls')),  # User profile management
     path('auth/', include('social_django.urls', namespace='social')),
+    path('api/v1/livestock/', include('livestockcrud.urls')),  # Livestock CRUD
 
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-ui'),

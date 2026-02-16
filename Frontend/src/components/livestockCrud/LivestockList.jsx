@@ -4,8 +4,8 @@ import LivestockCard from "./LivestockCard";
 const LivestockList = ({ livestockData, onDelete }) => {
   return (
     <div className="livestock-list">
-      {livestockData.map((item, index) => (
-        <LivestockCard key={index} livestock={item} index={index} onDelete={onDelete} />
+      {livestockData.map((item) => (
+        <LivestockCard key={item.id} livestock={item} onDelete={onDelete} />
       ))}
     </div>
   );

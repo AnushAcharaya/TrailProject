@@ -27,6 +27,11 @@ import SubmitClaimPage from "./pages/insurance/farmerSideInsurance/SubmitClaim";
 import TrackClaimPage from "./pages/insurance/farmerSideInsurance/TrackClaim";
 import ReviewDashboardPage from "./pages/insurance/vetSideInsurance/ReviewDashboard";
 import VerifyClaimPage from "./pages/insurance/vetSideInsurance/VerifyClaim";
+import AnimalListPage from "./pages/profileTransfer/farmerSide/AnimalList";
+import SendTransfersPage from "./pages/profileTransfer/farmerSide/SendTransfer";
+import ReceivedRequestsPage from "./pages/profileTransfer/receiverSide/ReceivedRequest";
+import AdminDashboardPage from "./pages/profileTransfer/adminSide/AdminDashboard";
+import ReviewTransferPage from "./pages/profileTransfer/adminSide/ReviewTransfer";
 
 function App() {
   return (
@@ -60,6 +65,11 @@ function App() {
         <Route path="/farmerinsurancetrackclaim" element={<TrackClaimPage />} />
         <Route path="/vetinsurancereviewdashboard" element={<ReviewDashboardPage />} />
         <Route path="/vetinsuranceverifyclaim" element={<VerifyClaimPage />} />
+        <Route path="/profile-transfer/farmer/animals" element={<AnimalListPage />} />
+        <Route path="/profile-transfer/farmer/sent" element={<SendTransfersPage />} />
+        <Route path="/profile-transfer/receiver/requests" element={<ReceivedRequestsPage />} />
+        <Route path="/profile-transfer/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/profile-transfer/admin/review" element={<ReviewTransferPage />} />
 
       </Routes>
     </Router>

@@ -16,6 +16,7 @@ import MonitorDeadlines from "./pages/medicalHistory/MonitorDeadlines";
 import AlertsNotifications from "./pages/medicalHistory/AlertNotifications";
 import VaccinationPage from "./pages/vaccination/VaccinationPage";
 import AddVaccinationPage from "./pages/vaccination/AddVaccinationPage";
+import EditVaccinationPage from "./pages/vaccination/EditVaccinationPage";
 import FarmerDashboardPage from "./pages/FarmerDashboard/FarmerDashboardPage";
 import FarmerAppointments from "./pages/appointments/FarmerAppointments";
 import VetAppointments from "./pages/appointments/VetAppointments";
@@ -57,6 +58,7 @@ function App() {
         <Route path="/medical/alerts" element={<AlertsNotifications />} />
         <Route path="/vaccination" element={<VaccinationPage />} />
         <Route path="/vaccination/add" element={<AddVaccinationPage />} />
+        <Route path="/vaccination/edit/:id" element={<EditVaccinationPage />} />
         <Route path="/farmerpage" element={<FarmerDashboardPage />} />
         <Route path="/farmerappointment" element={<FarmerAppointments />} />
         <Route path="/vetappointment" element={<VetAppointments />} />

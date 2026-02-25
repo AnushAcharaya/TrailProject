@@ -1,11 +1,13 @@
 // src/components/LivestockCard.jsx
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GiCow } from "react-icons/gi";
+import { FaSyringe } from "react-icons/fa";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 const LivestockCard = ({ livestock, onDelete }) => {
   const [showConfirm, setShowConfirm] = useState(false);
+  const navigate = useNavigate();
 
   const handleDeleteClick = () => {
     setShowConfirm(true);
@@ -18,6 +20,13 @@ const LivestockCard = ({ livestock, onDelete }) => {
 
   const cancelDelete = () => {
     setShowConfirm(false);
+  };
+
+  const handleAddVaccine = () => {
+    // Navigate to add vaccination page with this livestock pre-selected
+    navigate('/vaccination/add', { 
+      state: { preSelectedLivestock: livestock.tag_id } 
+    });
   };
 
   return (
@@ -70,6 +79,10 @@ const LivestockCard = ({ livestock, onDelete }) => {
 
       {/* Action Buttons */}
       <div className="card-actions">
+        <button onClick={handleAddVaccine} className="btn bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded flex items-center gap-2">
+          <FaSyringe size={14} />
+          Add Vaccine
+        </button>
         <Link to={`/livestock/edit/${livestock.id}`} className="edit-btn">
           Edit
         </Link>

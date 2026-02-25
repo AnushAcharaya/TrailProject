@@ -1,48 +1,93 @@
 // src/pages/vaccination/VaccinationPage.jsx
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaSyringe, FaCalendar, FaClock, FaCheck, FaChevronRight } from "react-icons/fa";
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import FarmerLayout from "../../components/farmerDashboard/FarmerLayout";
 import VaccinationTabs from "../../components/vaccination/VaccinationTabs";
 import VaccinationCard from "../../components/vaccination/VaccinationCard";
+import VaccinationSearchBar from "../../components/vaccination/VaccinationSearchBar";
+import { getAllVaccinations, getVaccinationCounts, getUpcomingVaccinations, getOverdueVaccinations, getCompletedVaccinations } from "../../services/vaccinationApi";
 import "./../../styles/vaccination.css";
 
 const VaccinationPage = () => {
   const [activeTab, setActiveTab] = useState("upcoming");
   const [vaccinations, setVaccinations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [counts, setCounts] = useState({ upcoming: 0, completed: 0, overdue: 0 });
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // Determine if user is a farmer or vet based on the referrer or user role
-  const isFarmer = location.state?.from === 'farmer' || 
-                   localStorage.getItem('userRole') === 'farmer' ||
-                   document.referrer.includes('/farmerpage');
-
-  // Load from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("vaccinations");
-    if (saved) {
-      setVaccinations(JSON.parse(saved));
+  // Determine if user is a farmer or vet based on the user role
+  const getUserRole = () => {
+    try {
+      const profile = JSON.parse(localStorage.getItem('profile') || '{}');
+      return profile.role || localStorage.getItem('userRole') || 'farmer';
+    } catch {
+      return localStorage.getItem('userRole') || 'farmer';
     }
-  }, []);
-
-  const filteredVaccinations = vaccinations.filter((v) => {
-    const today = new Date();
-    const dueDate = new Date(v.nextDueDate);
-    const daysDiff = Math.floor((dueDate - today) / (1000 * 60 * 60 * 24));
-
-    if (activeTab === "upcoming") return daysDiff >= 0;
-    if (activeTab === "completed") return false; // Placeholder
-    if (activeTab === "overdue") return daysDiff < 0;
-    return true;
-  });
-
-  const counts = {
-    upcoming: vaccinations.filter(v => new Date(v.nextDueDate) >= new Date()).length,
-    completed: 2,
-    overdue: vaccinations.filter(v => new Date(v.nextDueDate) < new Date()).length,
   };
+  
+  const isFarmer = getUserRole() === 'farmer';
+
+  // Load vaccinations from API
+  useEffect(() => {
+    fetchVaccinations();
+    fetchCounts();
+  }, [activeTab]);
+
+  const fetchVaccinations = async () => {
+    setLoading(true);
+    let result;
+    
+    if (activeTab === "upcoming") {
+      result = await getUpcomingVaccinations();
+    } else if (activeTab === "overdue") {
+      result = await getOverdueVaccinations();
+    } else if (activeTab === "completed") {
+      result = await getCompletedVaccinations();
+    } else {
+      result = await getAllVaccinations();
+    }
+    
+    if (result.success) {
+      setVaccinations(result.data);
+    } else {
+      console.error('Failed to fetch vaccinations:', result.error);
+    }
+    setLoading(false);
+  };
+
+  const fetchCounts = async () => {
+    const result = await getVaccinationCounts();
+    if (result.success) {
+      setCounts({
+        upcoming: result.data.upcoming || 0,
+        completed: result.data.completed || 0,
+        overdue: result.data.overdue || 0,
+      });
+    }
+  };
+
+  // Filter vaccinations based on search term
+  const filteredVaccinations = vaccinations.filter((vaccination) => {
+    if (!searchTerm) return true;
+    
+    const search = searchTerm.toLowerCase();
+    const vaccineName = vaccination.vaccine_name?.toLowerCase() || "";
+    const vaccineType = vaccination.vaccine_type?.toLowerCase() || "";
+    const tagId = vaccination.livestock?.tag_id?.toLowerCase() || "";
+    const speciesName = vaccination.livestock?.species_name?.toLowerCase() || "";
+    const status = vaccination.status?.toLowerCase() || "";
+    
+    return (
+      vaccineName.includes(search) ||
+      vaccineType.includes(search) ||
+      tagId.includes(search) ||
+      speciesName.includes(search) ||
+      status.includes(search)
+    );
+  });
 
   // Choose the appropriate layout
   const Layout = isFarmer ? FarmerLayout : VetLayout;
@@ -84,6 +129,13 @@ const VaccinationPage = () => {
       <div className="vaccination-page">
         {/* Breadcrumbs */}
         {breadcrumbs}
+
+        {/* Search Bar */}
+        <VaccinationSearchBar 
+          searchTerm={searchTerm} 
+          onSearchChange={setSearchTerm}
+          allVaccinations={vaccinations}
+        />
 
         <div className="page-header">
           <div className="flex items-center gap-2">
@@ -129,13 +181,17 @@ const VaccinationPage = () => {
         </div>
 
         {/* Tabs */}
-        <VaccinationTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <VaccinationTabs activeTab={activeTab} onTabChange={setActiveTab} counts={counts} />
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredVaccinations.length > 0 ? (
-            filteredVaccinations.map((v, i) => (
-              <VaccinationCard key={i} vaccination={v} />
+          {loading ? (
+            <div className="col-span-full text-center py-10">
+              <p className="text-gray-600">Loading vaccinations...</p>
+            </div>
+          ) : filteredVaccinations.length > 0 ? (
+            filteredVaccinations.map((v) => (
+              <VaccinationCard key={v.id} vaccination={v} onRefresh={fetchVaccinations} />
             ))
           ) : (
             <div className="col-span-full empty-state">  

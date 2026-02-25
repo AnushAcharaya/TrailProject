@@ -4,13 +4,16 @@ from .models import Vaccination
 from livestockcrud.models import Livestock
 
 class LivestockSerializer(serializers.ModelSerializer):
+    species_name = serializers.CharField(source='species.name', read_only=True)
+    breed_name = serializers.CharField(source='breed.name', read_only=True)
+    
     class Meta:
         model = Livestock
-        fields = ['id', 'tag_id', 'species', 'breed']
+        fields = ['id', 'tag_id', 'species_name', 'breed_name']
 
 class VaccinationSerializer(serializers.ModelSerializer):
     livestock = LivestockSerializer(read_only=True)
-    livestock_tag = serializers.CharField(write_only=True, source='livestock.tag_id')
+    livestock_tag = serializers.CharField(write_only=True)
     status = serializers.SerializerMethodField()
     days_until_due = serializers.SerializerMethodField()
     status_display = serializers.SerializerMethodField()
@@ -42,8 +45,19 @@ class VaccinationSerializer(serializers.ModelSerializer):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
+    def update(self, instance, validated_data):
+        livestock_tag = validated_data.pop('livestock_tag', None)
+        if livestock_tag:
+            livestock = Livestock.objects.get(tag_id=livestock_tag)
+            validated_data['livestock'] = livestock
+        return super().update(instance, validated_data)
+
     def get_status(self, obj):
-        return obj.get_status()
+        status = obj.get_status()
+        # Only treat due_today as completed (when user marks it as completed)
+        if status == 'due_today':
+            return 'completed'
+        return status
 
     def get_days_until_due(self, obj):
         return obj.days_until_due()

@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register(r'', views.VaccinationViewSet)
+router.register(r'', views.VaccinationViewSet, basename='vaccination')
 
 urlpatterns = [
     path('', include(router.urls)),

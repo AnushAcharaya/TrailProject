@@ -1,23 +1,20 @@
-// src/components/vaccination/AddVaccinationForm.jsx
+// src/components/vaccination/EditVaccinationForm.jsx
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaSyringe } from "react-icons/fa";
 import { getAllLivestock } from "../../services/livestockCrudApi";
-import { createVaccination } from "../../services/vaccinationApi";
+import { getVaccinationById, updateVaccination } from "../../services/vaccinationApi";
 import "./../../styles/vaccination.css";
 
-const AddVaccinationForm = () => {
+const EditVaccinationForm = ({ vaccinationId }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const preSelectedLivestock = location.state?.preSelectedLivestock;
-  
   const [livestockList, setLivestockList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
   
   const [formData, setFormData] = useState({
-    livestock: preSelectedLivestock || "",
+    livestock: "",
     vaccineName: "",
     vaccineType: "",
     dateGiven: "",
@@ -25,22 +22,40 @@ const AddVaccinationForm = () => {
     notes: "",
   });
 
-  // Fetch livestock on component mount
+  // Fetch livestock and vaccination data on component mount
   useEffect(() => {
-    fetchLivestock();
-  }, []);
+    fetchData();
+  }, [vaccinationId]);
 
-  const fetchLivestock = async () => {
+  const fetchData = async () => {
     setLoading(true);
-    const result = await getAllLivestock();
     
-    if (result.success) {
-      const data = result.data.results || result.data;
+    // Fetch livestock list
+    const livestockResult = await getAllLivestock();
+    if (livestockResult.success) {
+      const data = livestockResult.data.results || livestockResult.data;
       setLivestockList(Array.isArray(data) ? data : []);
-    } else {
-      console.error('Failed to fetch livestock:', result.error);
-      setLivestockList([]);
     }
+
+    // Fetch vaccination data
+    const vaccinationResult = await getVaccinationById(vaccinationId);
+    if (vaccinationResult.success) {
+      const v = vaccinationResult.data;
+      setFormData({
+        livestock: v.livestock?.tag_id || "",
+        vaccineName: v.vaccine_name || "",
+        vaccineType: v.vaccine_type || "",
+        dateGiven: v.date_given || "",
+        nextDueDate: v.next_due_date || "",
+        notes: v.notes || "",
+      });
+    } else {
+      setNotification({ 
+        type: 'error', 
+        message: 'Failed to load vaccination data.' 
+      });
+    }
+    
     setLoading(false);
   };
 
@@ -53,21 +68,32 @@ const AddVaccinationForm = () => {
     setSubmitting(true);
     setNotification(null);
 
-    const result = await createVaccination(formData);
+    const result = await updateVaccination(vaccinationId, formData);
     
     if (result.success) {
-      setNotification({ type: 'success', message: 'Vaccination record created successfully!' });
+      setNotification({ 
+        type: 'success', 
+        message: 'Vaccination record updated successfully!' 
+      });
       setTimeout(() => {
         navigate('/vaccination');
       }, 2000);
     } else {
       const errorMessage = typeof result.error === 'object' 
         ? Object.entries(result.error).map(([key, value]) => `${key}: ${value}`).join(', ')
-        : result.error?.message || 'Failed to create vaccination record.';
+        : result.error?.message || 'Failed to update vaccination record.';
       setNotification({ type: 'error', message: errorMessage });
       setSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="bg-white p-6 rounded-lg border border-light max-w-2xl mx-auto">
+        <p className="text-center text-gray-600">Loading vaccination data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg border border-light max-w-2xl mx-auto">
@@ -76,8 +102,8 @@ const AddVaccinationForm = () => {
           <FaSyringe className="text-green-700" size={24} />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-body">Add Vaccination Record</h2>
-          <p className="text-sm text-muted">Record a new vaccination for your livestock</p>
+          <h2 className="text-xl font-semibold text-body">Edit Vaccination Record</h2>
+          <p className="text-sm text-muted">Update vaccination details</p>
         </div>
       </div>
 
@@ -95,24 +121,20 @@ const AddVaccinationForm = () => {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-body mb-1">Livestock *</label>
-            {loading ? (
-              <p className="text-sm text-gray-500">Loading livestock...</p>
-            ) : (
-              <select
-                name="livestock"
-                value={formData.livestock}
-                onChange={handleChange}
-                required
-                className="w-full p-2 border border-light rounded"
-              >
-                <option value="">Select livestock</option>
-                {livestockList.map((animal) => (
-                  <option key={animal.id} value={animal.tag_id}>
-                    {animal.tag_id} - {animal.species_name}
-                  </option>
-                ))}
-              </select>
-            )}
+            <select
+              name="livestock"
+              value={formData.livestock}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border border-light rounded"
+            >
+              <option value="">Select livestock</option>
+              {livestockList.map((animal) => (
+                <option key={animal.id} value={animal.tag_id}>
+                  {animal.tag_id} - {animal.species_name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -195,7 +217,7 @@ const AddVaccinationForm = () => {
               className="bg-primary text-white px-4 py-2 rounded hover:bg-green-800 disabled:bg-gray-400"
               disabled={submitting}
             >
-              {submitting ? 'Saving...' : 'Save Vaccination'}
+              {submitting ? 'Updating...' : 'Update Vaccination'}
             </button>
           </div>
         </div>
@@ -204,4 +226,4 @@ const AddVaccinationForm = () => {
   );
 };
 
-export default AddVaccinationForm;
+export default EditVaccinationForm;

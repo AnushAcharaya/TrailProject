@@ -1,21 +1,8 @@
 // src/pages/vaccination/AddVaccinationPage.jsx
-import { useNavigate } from "react-router-dom";
 import AddVaccinationForm from "../../components/vaccination/AddVaccinationForm";
 import "../../styles/vaccination.css";
 
 const AddVaccinationPage = () => {
-  const navigate = useNavigate();
-
-  const handleSave = (data) => {
-    const existing = JSON.parse(localStorage.getItem("vaccinations")) || [];
-    const newVaccination = {
-      ...data,
-      id: Date.now().toString()
-    };
-    localStorage.setItem("vaccinations", JSON.stringify([...existing, newVaccination]));
-    navigate("/vaccination");
-  };
-
   return (
     <div className="vaccination-bg min-h-screen px-8 py-6">
       <div className="mb-6">
@@ -27,7 +14,7 @@ const AddVaccinationPage = () => {
         </p>
       </div>
 
-      <AddVaccinationForm onSubmit={handleSave} />
+      <AddVaccinationForm />
     </div>
   );
 };

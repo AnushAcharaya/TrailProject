@@ -32,9 +32,9 @@ const ProfileCard = ({ user }) => {
     >
       {/* Avatar */}
       <div className="relative inline-block">
-        {user?.profile_image_url ? (
+        {user?.profile_image_url || user?.profile_image ? (
           <img
-            src={user.profile_image_url}
+            src={user.profile_image_url || `http://localhost:8000${user.profile_image}`}
             className="w-28 h-28 mx-auto rounded-full object-cover border-4 border-white shadow"
             alt="profile"
           />

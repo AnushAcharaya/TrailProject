@@ -41,15 +41,31 @@ const getAuthHeadersMultipart = () => {
  */
 export const getUserProfile = async () => {
   try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('[profileApi] No authentication token found');
+      return {
+        success: false,
+        error: { message: 'No authentication token found', status: 401 }
+      };
+    }
+    
+    console.log('[profileApi] Fetching user profile...');
     const response = await profileApi.get('/', {
       headers: getAuthHeadersJSON(),
     });
+    console.log('[profileApi] Profile fetched successfully:', response.data.data);
     return { success: true, data: response.data.data };
   } catch (error) {
-    console.error('Get profile error:', error);
+    console.error('[profileApi] Get profile error:', error);
+    console.error('[profileApi] Error response:', error.response);
     return {
       success: false,
-      error: error.response?.data || { message: 'Failed to fetch profile.' }
+      error: {
+        message: error.response?.data?.message || error.response?.data?.detail || 'Failed to fetch profile.',
+        status: error.response?.status,
+        data: error.response?.data
+      }
     };
   }
 };
@@ -67,6 +83,7 @@ export const getUserProfile = async () => {
  */
 export const updateProfile = async (profileData) => {
   try {
+    console.log('[profileApi] Updating profile with data:', profileData);
     const formData = new FormData();
     
     // Append text fields if they exist
@@ -82,6 +99,7 @@ export const updateProfile = async (profileData) => {
     
     // Append image file if provided
     if (profileData.profile_image instanceof File) {
+      console.log('[profileApi] Including profile image file:', profileData.profile_image.name);
       formData.append('profile_image', profileData.profile_image);
     }
     
@@ -89,9 +107,11 @@ export const updateProfile = async (profileData) => {
       headers: getAuthHeadersMultipart(),
     });
     
+    console.log('[profileApi] Profile updated successfully:', response.data.data);
     return { success: true, data: response.data.data };
   } catch (error) {
-    console.error('Update profile error:', error);
+    console.error('[profileApi] Update profile error:', error);
+    console.error('[profileApi] Error response:', error.response);
     return {
       success: false,
       error: error.response?.data?.errors || error.response?.data || { message: 'Failed to update profile.' }

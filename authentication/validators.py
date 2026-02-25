@@ -2,7 +2,7 @@ import os
 from django.core.exceptions import ValidationError
 
 ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png']
-MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024  # 2 MB
+MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 
 
 def validate_image_extension(value):
@@ -13,4 +13,4 @@ def validate_image_extension(value):
 
 def validate_image_size(value):
     if value.size > MAX_IMAGE_SIZE_BYTES:
-        raise ValidationError('Image file too large ( > 2MB ).')
+        raise ValidationError('Image file too large ( > 10MB ).')

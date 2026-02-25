@@ -20,12 +20,14 @@ const AddTreatmentRecord = () => {
 
   return (
     <div className="bg-app-bg min-h-screen p-6">
-      <PageHeader
-        title="Add Treatment Record"
-        subtitle="Record medical treatments for your livestock"
-      />
+      <div className="max-w-3xl mx-auto">
+        <PageHeader
+          title="Add Treatment Record"
+          subtitle="Record medical treatments for your livestock"
+        />
 
-      <TreatmentForm onSubmit={handleSave} />
+        <TreatmentForm onSubmit={handleSave} />
+      </div>
     </div>
   );
 };

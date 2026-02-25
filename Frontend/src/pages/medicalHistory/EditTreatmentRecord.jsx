@@ -45,12 +45,14 @@ const EditTreatmentRecord = () => {
 
   return (
     <div className="bg-app-bg min-h-screen p-6">
-      <PageHeader
-        title="Edit Treatment Record"
-        subtitle="Update medical treatment information"
-      />
+      <div className="max-w-3xl mx-auto">
+        <PageHeader
+          title="Edit Treatment Record"
+          subtitle="Update medical treatment information"
+        />
 
-      <TreatmentForm initialData={initialData} onSubmit={handleUpdate} isEdit={true} />
+        <TreatmentForm initialData={initialData} onSubmit={handleUpdate} isEdit={true} />
+      </div>
     </div>
   );
 };

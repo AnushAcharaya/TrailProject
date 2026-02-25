@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserPlus, Upload, LogIn, Mail, CheckCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { registerUser, verifyEmailOTP, resendEmailOTP } from "../services/api";
 
 const CreateAccount = () => {

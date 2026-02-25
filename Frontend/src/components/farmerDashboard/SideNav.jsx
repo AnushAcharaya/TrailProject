@@ -1,105 +1,76 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaCalendarCheck } from 'react-icons/fa';
 import "../../styles/farmerdashboard.css";
 
 const SideNav = () => {
   const navigate = useNavigate();
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const location = useLocation();
 
   const menuItems = [
-    { name: "Dashboard", icon: "📊" },
-    { name: "Livestock", icon: "🐄" },
-    { name: "Vaccination", icon: "💉" },
-    { name: "Medical History", icon: "📋" },
-    { name: "Reports", icon: "📈" },
-    { name: "Profile", icon: "👤" },
+    { name: "Dashboard", icon: FaHome, path: "/farmerpage" },
+    { name: "Vet Appointment", icon: FaCalendarCheck, path: "/farmerappointment" },
+    { name: "Livestock", icon: FaPaw, path: "/livestock" },
+    { name: "Vaccination", icon: FaSyringe, path: "/vaccination", state: { from: 'farmer' } },
+    { name: "Medical History", icon: FaNotesMedical, path: "/medical/history", state: { from: 'farmer' } },
+    { name: "Reports", icon: FaChartLine, path: "/reports" },
+    { name: "Insurance", icon: FaShieldAlt, path: "/farmerinsurancedashboard" },
+    { name: "Profile Transfer", icon: FaExchangeAlt, path: "/profile-transfer/farmer/animals" },
+    { name: "Settings", icon: FaCog, path: "/profile" },
   ];
-
-  const handleMenuClick = (itemName) => {
-    if (itemName === "Profile") {
-      navigate('/profile');
-    }
-    // Add other navigation logic here for other menu items
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/');
+    navigate('/login');
+  };
+
+  const handleNavigation = (item) => {
+    if (item.state) {
+      navigate(item.path, { state: item.state });
+    } else {
+      navigate(item.path);
+    }
   };
 
   return (
-    <>
-      <aside className="w-64 bg-white min-h-screen p-5 flex flex-col">
-        {/* Application Name/Logo at Top */}
-        <div className="mb-8 pb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-700 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-              🌾
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-slate-800">LivestockHub</h1>
-              <p className="text-xs text-slate-500">Livestock Manager</p>
-            </div>
-          </div>
+    <aside className="w-64 bg-emerald-900 min-h-screen flex flex-col py-6 px-4">
+      {/* Application Name/Logo at Top */}
+      <div className="flex items-center space-x-3 mb-8 px-2">
+        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+          <span className="text-emerald-900 font-bold text-lg">F</span>
         </div>
+        <span className="text-white font-bold text-xl">FarmCare</span>
+      </div>
 
-        {/* Navigation Menu */}
-        <nav className="space-y-2 flex-1">
-          {menuItems.map((item, index) => (
-            <div
-              key={index}
-              onClick={() => handleMenuClick(item.name)}
-              className={`px-4 py-3 rounded-lg cursor-pointer sidebar-item flex items-center gap-3 ${
-                item.name === "Dashboard" ? "sidebar-active" : "text-slate-600"
-              }`}
-            >
-              <span className="text-lg">{item.icon}</span>
-              <span>{item.name}</span>
-            </div>
-          ))}
-        </nav>
-
-        {/* Logout Button at Bottom */}
-        <div className="mt-auto pt-4">
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+      {/* Navigation Menu */}
+      <nav className="space-y-2 flex-1">
+        {menuItems.map((item, index) => (
+          <div
+            key={index}
+            onClick={() => handleNavigation(item)}
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+              location.pathname === item.path
+                ? "bg-emerald-700"
+                : "hover:bg-emerald-700"
+            }`}
           >
-            <span className="text-lg">🚪</span>
-            <span>Logout</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Logout Confirmation Modal */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">
-              Confirm Logout
-            </h3>
-            <p className="text-slate-600 mb-6">
-              Are you sure you want to logout?
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowLogoutModal(false)}
-                className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Yes, Logout
-              </button>
-            </div>
+            <item.icon className="text-white text-xl" />
+            <span className="text-white font-medium">{item.name}</span>
           </div>
-        </div>
-      )}
-    </>
+        ))}
+      </nav>
+
+      {/* Logout Button at Bottom */}
+      <div className="mt-auto pt-4 border-t border-emerald-700">
+        <button
+          onClick={handleLogout}
+          className="flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors bg-red-600 hover:bg-red-700 w-full"
+        >
+          <FaSignOutAlt className="text-white text-xl" />
+          <span className="text-white font-medium">Logout</span>
+        </button>
+      </div>
+    </aside>
   );
 };
 

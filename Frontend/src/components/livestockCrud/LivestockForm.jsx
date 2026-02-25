@@ -1,8 +1,8 @@
 // src/components/LivestockForm.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaImage } from "react-icons/fa";
-import { getAllSpecies, getAllBreeds } from "../../services/livestockCrudApi";
+import { FaImage, FaChevronDown } from "react-icons/fa";
+import { getAllSpecies, getAllBreeds, previewNextTagId } from "../../services/livestockCrudApi";
 
 const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
   const navigate = useNavigate();
@@ -19,10 +19,7 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
         color: initialData.color || "",
         weight: initialData.weight || "",
         health_status: initialData.health_status || "",
-        purchase_date: initialData.purchase_date || "",
-        purchase_price: initialData.purchase_price || "",
         remarks: initialData.remarks || "",
-        pen_location: initialData.pen_location || "",
         image: null,
         imagePreview: initialData.image_preview || null,
       };
@@ -36,10 +33,7 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
       color: "",
       weight: "",
       health_status: "",
-      purchase_date: "",
-      purchase_price: "",
       remarks: "",
-      pen_location: "",
       image: null,
       imagePreview: null,
     };
@@ -49,10 +43,18 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
   const [speciesList, setSpeciesList] = useState([]);
   const [breedsList, setBreedsList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [speciesInput, setSpeciesInput] = useState("");
+  const [breedInput, setBreedInput] = useState("");
+  const [showSpeciesDropdown, setShowSpeciesDropdown] = useState(false);
+  const [showBreedDropdown, setShowBreedDropdown] = useState(false);
 
   // Fetch species and breeds on mount
   useEffect(() => {
     fetchSpeciesAndBreeds();
+    // Fetch preview tag ID only when adding new livestock (not editing)
+    if (!isEditing) {
+      fetchPreviewTagId();
+    }
   }, []);
 
   // Fetch breeds when species changes
@@ -69,7 +71,21 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
     const speciesResult = await getAllSpecies();
     
     if (speciesResult.success) {
-      setSpeciesList(speciesResult.data);
+      // Ensure data is an array
+      const speciesData = Array.isArray(speciesResult.data) ? speciesResult.data : [];
+      setSpeciesList(speciesData);
+      console.log('Species loaded:', speciesData);
+      
+      // Set initial species input if editing
+      if (initialData && initialData.species) {
+        const selectedSpecies = speciesData.find(s => s.id === initialData.species);
+        if (selectedSpecies) {
+          setSpeciesInput(selectedSpecies.name);
+        }
+      }
+    } else {
+      console.error('Failed to load species:', speciesResult.error);
+      setSpeciesList([]);
     }
     
     // If editing and has species, fetch breeds for that species
@@ -80,10 +96,32 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
     setLoading(false);
   };
 
+  const fetchPreviewTagId = async () => {
+    const result = await previewNextTagId();
+    if (result.success && result.data.tag_id) {
+      setFormData(prev => ({ ...prev, tag_id: result.data.tag_id }));
+      console.log('Preview Tag ID:', result.data.tag_id);
+    }
+  };
+
   const fetchBreedsBySpecies = async (speciesId) => {
     const breedsResult = await getAllBreeds(speciesId);
     if (breedsResult.success) {
-      setBreedsList(breedsResult.data);
+      // Ensure data is an array
+      const breedsData = Array.isArray(breedsResult.data) ? breedsResult.data : [];
+      setBreedsList(breedsData);
+      console.log('Breeds loaded for species', speciesId, ':', breedsData);
+      
+      // Set initial breed input if editing
+      if (initialData && initialData.breed) {
+        const selectedBreed = breedsData.find(b => b.id === initialData.breed);
+        if (selectedBreed) {
+          setBreedInput(selectedBreed.name);
+        }
+      }
+    } else {
+      console.error('Failed to load breeds:', breedsResult.error);
+      setBreedsList([]);
     }
   };
 
@@ -105,6 +143,87 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
       }
     } else {
       setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  // Handle species input change (for typing/searching)
+  const handleSpeciesInputChange = (e) => {
+    const value = e.target.value;
+    setSpeciesInput(value);
+    setShowSpeciesDropdown(true);
+    
+    // Clear species selection if user is typing
+    if (formData.species) {
+      setFormData({ ...formData, species: "", breed: "" });
+      setBreedsList([]);
+      setBreedInput("");
+    }
+  };
+
+  // Handle species selection from dropdown
+  const handleSpeciesSelect = (species) => {
+    setSpeciesInput(species.name);
+    setFormData({ ...formData, species: species.id, breed: "" });
+    setShowSpeciesDropdown(false);
+    setBreedInput("");
+    fetchBreedsBySpecies(species.id);
+  };
+
+  // Handle breed input change (for typing/searching)
+  const handleBreedInputChange = (e) => {
+    const value = e.target.value;
+    setBreedInput(value);
+    setShowBreedDropdown(true);
+    
+    // Clear breed selection if user is typing
+    if (formData.breed) {
+      setFormData({ ...formData, breed: "" });
+    }
+  };
+
+  // Handle breed selection from dropdown
+  const handleBreedSelect = (breed) => {
+    setBreedInput(breed.name);
+    setFormData({ ...formData, breed: breed.id });
+    setShowBreedDropdown(false);
+  };
+
+  // Filter species based on input
+  const filteredSpecies = speciesList.filter(species =>
+    species.name.toLowerCase().includes(speciesInput.toLowerCase())
+  );
+
+  // Filter breeds based on input
+  const filteredBreeds = breedsList.filter(breed =>
+    breed.name.toLowerCase().includes(breedInput.toLowerCase())
+  );
+
+  // Toggle dropdown for species
+  const toggleSpeciesDropdown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Toggle species dropdown clicked');
+    console.log('Current showSpeciesDropdown:', showSpeciesDropdown);
+    console.log('Species list length:', speciesList.length);
+    console.log('Species list:', speciesList);
+    const newState = !showSpeciesDropdown;
+    setShowSpeciesDropdown(newState);
+    console.log('New showSpeciesDropdown state:', newState);
+  };
+
+  // Toggle dropdown for breed
+  const toggleBreedDropdown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Toggle breed dropdown clicked');
+    console.log('Current showBreedDropdown:', showBreedDropdown);
+    console.log('Breed list length:', breedsList.length);
+    console.log('Breed list:', breedsList);
+    console.log('Has species selected:', !!formData.species);
+    if (formData.species) {
+      const newState = !showBreedDropdown;
+      setShowBreedDropdown(newState);
+      console.log('New showBreedDropdown state:', newState);
     }
   };
 
@@ -130,7 +249,21 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
   // Submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    
+    // Prepare form data with proper species/breed handling
+    const submitData = { ...formData };
+    
+    // If species is not selected but user typed something, use the typed value
+    if (!submitData.species && speciesInput.trim()) {
+      submitData.species = speciesInput.trim();
+    }
+    
+    // If breed is not selected but user typed something, use the typed value
+    if (!submitData.breed && breedInput.trim()) {
+      submitData.breed = breedInput.trim();
+    }
+    
+    onSubmit(submitData);
   };
 
   // Cancel handler
@@ -153,56 +286,128 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
       </h2>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Tag ID */}
+        {/* Tag ID - Auto-generated, Read-only */}
         <div className="flex items-center space-x-3">
           <label className="block text-sm font-medium w-24">Tag ID</label>
           <input
             type="text"
             name="tag_id"
-            value={formData.tag_id}
-            onChange={handleChange}
-            required
-            className="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 hover:border-green-400 transition"
+            value={formData.tag_id || "Auto-generated"}
+            readOnly
+            disabled
+            className="flex-1 border rounded-lg p-2 bg-gray-100 text-gray-600 cursor-not-allowed"
+            placeholder="Will be auto-generated"
           />
         </div>
 
-        {/* Species */}
-        <div className="flex items-center space-x-3">
+        {/* Species - Searchable Dropdown */}
+        <div className="flex items-center space-x-3 relative">
           <label className="block text-sm font-medium w-24">Species</label>
-          <select
-            name="species"
-            value={formData.species}
-            onChange={handleChange}
-            required
-            className="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 hover:border-green-400 transition"
-          >
-            <option value="">Select Species</option>
-            {speciesList.map((species) => (
-              <option key={species.id} value={species.id}>
-                {species.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex-1 relative">
+            <div className="relative">
+              <input
+                type="text"
+                value={speciesInput}
+                onChange={handleSpeciesInputChange}
+                onFocus={() => setShowSpeciesDropdown(true)}
+                onBlur={() => setTimeout(() => setShowSpeciesDropdown(false), 300)}
+                placeholder="Type or select species"
+                required
+                className="w-full border rounded-lg p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-green-500 hover:border-green-400 transition"
+              />
+              <button
+                type="button"
+                onMouseDown={toggleSpeciesDropdown}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-600 transition"
+              >
+                <FaChevronDown className={`transition-transform ${showSpeciesDropdown ? 'rotate-180' : ''}`} />
+              </button>
+            </div>
+            {showSpeciesDropdown && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {speciesList.length > 0 ? (
+                  filteredSpecies.length > 0 ? (
+                    filteredSpecies.map((species) => (
+                      <div
+                        key={species.id}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSpeciesSelect(species);
+                        }}
+                        className="px-4 py-2 hover:bg-green-50 cursor-pointer transition"
+                      >
+                        {species.name}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-gray-500 text-center">
+                      No species found matching "{speciesInput}"
+                    </div>
+                  )
+                ) : (
+                  <div className="px-4 py-2 text-gray-500 text-center">
+                    Loading species...
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Breed */}
-        <div className="flex items-center space-x-3">
+        {/* Breed - Searchable Dropdown */}
+        <div className="flex items-center space-x-3 relative">
           <label className="block text-sm font-medium w-24">Breed</label>
-          <select
-            name="breed"
-            value={formData.breed}
-            onChange={handleChange}
-            required
-            disabled={!formData.species}
-            className="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 hover:border-green-400 transition disabled:bg-gray-100"
-          >
-            <option value="">Select Breed</option>
-            {breedsList.map((breed) => (
-              <option key={breed.id} value={breed.id}>
-                {breed.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex-1 relative">
+            <div className="relative">
+              <input
+                type="text"
+                value={breedInput}
+                onChange={handleBreedInputChange}
+                onFocus={() => setShowBreedDropdown(true)}
+                onBlur={() => setTimeout(() => setShowBreedDropdown(false), 300)}
+                placeholder={formData.species ? "Type or select breed" : "Select species first"}
+                required
+                disabled={!formData.species}
+                className="w-full border rounded-lg p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-green-500 hover:border-green-400 transition disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              <button
+                type="button"
+                onMouseDown={toggleBreedDropdown}
+                disabled={!formData.species}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-green-600 transition disabled:text-gray-300 disabled:cursor-not-allowed"
+              >
+                <FaChevronDown className={`transition-transform ${showBreedDropdown ? 'rotate-180' : ''}`} />
+              </button>
+            </div>
+            {showBreedDropdown && formData.species && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {breedsList.length > 0 ? (
+                  filteredBreeds.length > 0 ? (
+                    filteredBreeds.map((breed) => (
+                      <div
+                        key={breed.id}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleBreedSelect(breed);
+                        }}
+                        className="px-4 py-2 hover:bg-green-50 cursor-pointer transition"
+                      >
+                        {breed.name}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-gray-500 text-center">
+                      No breeds found matching "{breedInput}"
+                    </div>
+                  )
+                ) : (
+                  <div className="px-4 py-2 text-gray-500 text-center">
+                    Loading breeds...
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Date of Birth */}
@@ -274,43 +479,6 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
             <option value="Critical">Critical</option>
             <option value="Deceased">Deceased</option>
           </select>
-        </div>
-
-        {/* Purchase Date */}
-        <div className="flex items-center space-x-3">
-          <label className="block text-sm font-medium w-24">Purchase</label>
-          <input
-            type="date"
-            name="purchase_date"
-            value={formData.purchase_date}
-            onChange={handleChange}
-            className="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 hover:border-green-400 transition"
-          />
-        </div>
-
-        {/* Purchase Price */}
-        <div className="flex items-center space-x-3">
-          <label className="block text-sm font-medium w-24">Price</label>
-          <input
-            type="number"
-            step="0.01"
-            name="purchase_price"
-            value={formData.purchase_price}
-            onChange={handleChange}
-            className="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 hover:border-green-400 transition"
-          />
-        </div>
-
-        {/* Pen Location */}
-        <div className="flex items-center space-x-3">
-          <label className="block text-sm font-medium w-24">Pen Location</label>
-          <input
-            type="text"
-            name="pen_location"
-            value={formData.pen_location}
-            onChange={handleChange}
-            className="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 hover:border-green-400 transition"
-          />
         </div>
 
         {/* Image Upload */}

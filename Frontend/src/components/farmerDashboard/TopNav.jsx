@@ -1,41 +1,31 @@
-import { FiBell, FiUser } from "react-icons/fi";
+import { FaBell } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../../styles/farmerdashboard.css";
 
-const TopNav = () => {
+const TopNav = ({ pageTitle = "Dashboard" }) => {
   const navigate = useNavigate();
 
   return (
-    <header className="flex items-center justify-between bg-white px-6 py-4">
-      {/* Left: Logo */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-green-700 text-white flex items-center justify-center font-bold">
-          FC
-        </div>
-        <div>
-          <h1 className="font-semibold text-slate-800">FarmCare</h1>
-          <p className="text-xs text-slate-500">Livestock Manager</p>
-        </div>
-      </div>
-
-      {/* Right: Icons */}
-      <div className="flex items-center gap-6">
+    <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
+      <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
+      <div className="flex items-center space-x-6">
+        {/* Notification Bell */}
         <div className="relative cursor-pointer">
-          <FiBell size={20} className="text-slate-600" />
-          <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          <FaBell className="text-gray-600 text-xl" />
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
+            3
+          </span>
         </div>
-
+        
+        {/* Profile with Name Below */}
         <div 
-          className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition-colors"
           onClick={() => navigate('/profile')}
+          className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
         >
-          <div className="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center">
-            <FiUser className="text-slate-600" />
+          <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center mb-1">
+            <span className="text-white font-semibold">JD</span>
           </div>
-          <div className="text-sm">
-            <p className="font-medium text-slate-700">John Doe</p>
-            <p className="text-xs text-slate-500">Farm Owner</p>
-          </div>
+          <span className="text-xs text-gray-700 font-medium">John Doe</span>
         </div>
       </div>
     </header>

@@ -33,7 +33,9 @@ const ProfileTab = ({ user, onUpdate }) => {
         bio: user.bio || "",
         gender: user.gender || "",
       });
-      setImagePreview(user.profile_image_url || null);
+      // Use profile_image_url if available (full URL from backend), otherwise construct it
+      const imageUrl = user.profile_image_url || (user.profile_image ? `http://localhost:8000${user.profile_image}` : null);
+      setImagePreview(imageUrl);
     }
   }, [user]);
 
@@ -54,6 +56,8 @@ const ProfileTab = ({ user, onUpdate }) => {
     setError(null);
     setStatus(null);
     
+    console.log('[ProfileTab] Saving profile changes...');
+    
     const profileData = {
       bio: form.bio,
       location: form.location,
@@ -62,17 +66,29 @@ const ProfileTab = ({ user, onUpdate }) => {
     
     // Add image file if selected
     if (profileImage) {
+      console.log('[ProfileTab] Including profile image in update');
       profileData.profile_image = profileImage;
     }
     
     const result = await updateProfile(profileData);
     
     if (result.success) {
+      console.log('[ProfileTab] Profile updated successfully:', result.data);
       onUpdate(result.data);
       setStatus("Profile updated successfully!");
       setProfileImage(null); // Clear selected file
+      
+      // Dispatch event to notify other components (like FarmerLayout/VetLayout)
+      console.log('[ProfileTab] Dispatching profileUpdated event');
+      window.dispatchEvent(new Event('profileUpdated'));
+      
+      // Also trigger storage event as a backup communication method
+      console.log('[ProfileTab] Setting profileUpdateTrigger in localStorage');
+      localStorage.setItem('profileUpdateTrigger', Date.now().toString());
+      
       setTimeout(() => setStatus(null), 3000);
     } else {
+      console.error('[ProfileTab] Profile update failed:', result.error);
       const errorMsg = result.error?.bio?.[0] || 
                        result.error?.location?.[0] || 
                        result.error?.gender?.[0] || 

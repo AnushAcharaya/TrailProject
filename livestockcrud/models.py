@@ -39,11 +39,8 @@ class Livestock(models.Model):
     color = models.CharField(max_length=50, blank=True)
     weight = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     health_status = models.CharField(max_length=20, choices=HEALTH_STATUS_CHOICES, default='Healthy')
-    purchase_date = models.DateField(null=True, blank=True)
-    purchase_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     remarks = models.TextField(blank=True)
     image = models.ImageField(upload_to='livestock_images/%Y/%m/', blank=True, null=True)
-    pen_location = models.CharField(max_length=100, blank=True)
     is_active = models.BooleanField(default=True)
     
     created_at = models.DateTimeField(auto_now_add=True)

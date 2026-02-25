@@ -1,6 +1,13 @@
 import { FaUser, FaPaw, FaCalendar } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const ClaimCard = ({ claim }) => {
+  const navigate = useNavigate();
+
+  const handleReviewClaim = () => {
+    navigate('/vetinsuranceverifyclaim');
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all">
       {/* Header */}
@@ -36,7 +43,10 @@ const ClaimCard = ({ claim }) => {
       </p>
 
       {/* Action Button */}
-      <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-all">
+      <button 
+        onClick={handleReviewClaim}
+        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-all"
+      >
         Review Claim
       </button>
     </div>

@@ -104,20 +104,34 @@ const Login = () => {
         const response = await verifyLoginOTP(formData.email, otpData.emailOtp, '', formData.role);
         
         if (response.success) {
-            // Store tokens and user info
-            localStorage.setItem('token', response.data.access);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            
-            setEmailVerified(true);
-            
-            // Redirect based on role
-            setTimeout(() => {
-                if (formData.role === 'admin') {
-                    navigate('/adminpage');
-                } else {
-                    navigate('/landing');
-                }
-            }, 1500);
+            // Store tokens and user info synchronously
+            try {
+                localStorage.setItem('token', response.data.access);
+                localStorage.setItem('refresh_token', response.data.refresh);
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+                
+                // Verify token was stored
+                const storedToken = localStorage.getItem('token');
+                console.log('Token stored successfully:', storedToken ? 'Yes' : 'No');
+                
+                setEmailVerified(true);
+                
+                // Redirect based on role with a slight delay for UI feedback
+                setTimeout(() => {
+                    if (formData.role === 'admin') {
+                        navigate('/adminpage');
+                    } else if (formData.role === 'vet') {
+                        navigate('/vet/dashboard');
+                    } else if (formData.role === 'farmer') {
+                        navigate('/farmerpage');
+                    } else {
+                        navigate('/landing');
+                    }
+                }, 1500);
+            } catch (error) {
+                console.error('Error storing authentication data:', error);
+                alert('Failed to store authentication data. Please try again.');
+            }
         } else {
             const errorMessage = response.error.error || response.error.message || JSON.stringify(response.error);
             alert(`Verification failed: ${errorMessage}`);

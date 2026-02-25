@@ -29,7 +29,7 @@ class LivestockSerializer(serializers.ModelSerializer):
             'purchase_date', 'purchase_price', 'remarks', 'image', 'image_preview',
             'pen_location', 'is_active', 'user', 'user_name', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'age', 'created_at', 'updated_at', 'user']
+        read_only_fields = ['id', 'tag_id', 'age', 'created_at', 'updated_at', 'user']
         
     def validate_image(self, value):
         if value:

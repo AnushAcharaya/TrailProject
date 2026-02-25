@@ -1,16 +1,17 @@
-import FarmerInsuranceNav from '../../../components/insurance/farmerSideInsurance/FarmerInsuranceNav';
+import FarmerLayout from '../../../components/farmerDashboard/FarmerLayout';
 import TrackClaim from '../../../components/insurance/farmerSideInsurance/trackClaim/TrackClaim';
 import '../../../styles/farmerSideInsurance/trackClaim.css';
 
 const TrackClaimPage = () => {
   return (
-    <div className="track-claim-page">
-      <FarmerInsuranceNav />
-      <div className="page-header">
-        <h1 className="page-title">Track Claims</h1>
+    <FarmerLayout pageTitle="Track Claims">
+      <div className="track-claim-page">
+        <div className="page-header">
+          <h1 className="page-title">Track Claims</h1>
+        </div>
+        <TrackClaim />
       </div>
-      <TrackClaim />
-    </div>
+    </FarmerLayout>
   );
 };
 

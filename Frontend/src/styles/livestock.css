@@ -895,3 +895,147 @@ body:has(.form-page-container) {
   padding: 0;
   overflow-x: hidden;
 }
+
+
+/* ============================================
+   SEARCHABLE DROPDOWN STYLES
+   ============================================ */
+
+/* Dropdown container */
+.searchable-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+/* Dropdown arrow button */
+.dropdown-arrow-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.dropdown-arrow-btn:hover {
+  color: #16a34a;
+}
+
+.dropdown-arrow-btn:disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.dropdown-arrow-btn svg {
+  transition: transform 0.3s ease;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  z-index: 50;
+  width: 100%;
+  margin-top: 0.25rem;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-height: 15rem;
+  overflow-y: auto;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown item */
+.dropdown-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  font-weight: 500;
+}
+
+/* Scrollbar styling for dropdown */
+.dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: #16a34a;
+  border-radius: 4px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #15803d;
+}
+
+/* Input field for searchable dropdown */
+.searchable-input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 2.5rem 0.5rem 0.5rem; /* Extra padding on right for arrow */
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.searchable-input:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+.searchable-input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  color: #9ca3af;
+}
+
+/* Empty state for dropdown */
+.dropdown-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Responsive dropdown */
+@media (max-width: 639px) {
+  .dropdown-item {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .dropdown-menu {
+    max-height: 12rem;
+  }
+}

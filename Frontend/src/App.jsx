@@ -32,6 +32,9 @@ import SendTransfersPage from "./pages/profileTransfer/farmerSide/SendTransfer";
 import ReceivedRequestsPage from "./pages/profileTransfer/receiverSide/ReceivedRequest";
 import AdminDashboardPage from "./pages/profileTransfer/adminSide/AdminDashboard";
 import ReviewTransferPage from "./pages/profileTransfer/adminSide/ReviewTransfer";
+import MainDashboardPage from "./pages/vetDashboard/MainDashboard";
+import FarmerProfilesPage from "./pages/vetDashboard/FarmerProfile";
+import FarmerDetailPage from "./pages/vetDashboard/FarmerDetail";
 
 function App() {
   return (
@@ -70,6 +73,9 @@ function App() {
         <Route path="/profile-transfer/receiver/requests" element={<ReceivedRequestsPage />} />
         <Route path="/profile-transfer/admin/dashboard" element={<AdminDashboardPage />} />
         <Route path="/profile-transfer/admin/review" element={<ReviewTransferPage />} />
+        <Route path="/vet/dashboard" element={<MainDashboardPage />} />
+        <Route path="/vet/farmer-profiles" element={<FarmerProfilesPage />} />
+        <Route path="/vet/farmer-details" element={<FarmerDetailPage />} />
 
       </Routes>
     </Router>

@@ -17,15 +17,24 @@ const LivestockPage = () => {
   }, [location]);
 
   const fetchLivestock = async () => {
+    console.log('[LivestockPage] Fetching livestock...');
     setLoading(true);
     setError(null);
     const result = await getAllLivestock();
     
+    console.log('[LivestockPage] API result:', result);
+    console.log('[LivestockPage] Result success:', result.success);
+    console.log('[LivestockPage] Result data:', result.data);
+    
     if (result.success) {
       // Handle paginated response
       const data = result.data.results || result.data;
+      console.log('[LivestockPage] Extracted data:', data);
+      console.log('[LivestockPage] Is array:', Array.isArray(data));
+      console.log('[LivestockPage] Data length:', data.length);
       setLivestockData(Array.isArray(data) ? data : []);
     } else {
+      console.error('[LivestockPage] Error:', result.error);
       setError(result.error?.message || 'Failed to load livestock');
       setLivestockData([]);
     }

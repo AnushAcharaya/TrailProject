@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'authentication',
     'userprofile',
     'livestockcrud',  
+    'vaccination',
 ]
 
 MIDDLEWARE = [
@@ -198,7 +199,7 @@ REST_FRAMEWORK = {
     'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
@@ -252,3 +253,6 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
     'authentication.pipeline.save_google_user_info',
 )
+
+# Nepal NPR formatting
+USE_L10N = True

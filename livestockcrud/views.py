@@ -31,7 +31,7 @@ class LivestockListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         return Livestock.objects.filter(
-            user=user, is_active=True
+            user=user
         ).select_related('species', 'breed', 'user')
 
     def perform_create(self, serializer):

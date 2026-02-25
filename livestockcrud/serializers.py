@@ -15,7 +15,7 @@ class BreedSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'species', 'species_name']
 
 class LivestockSerializer(serializers.ModelSerializer):
-    age = serializers.ReadOnlyField(source='age')
+    age = serializers.ReadOnlyField()
     image_preview = serializers.SerializerMethodField()
     species_name = serializers.CharField(source='species.name', read_only=True)
     breed_name = serializers.CharField(source='breed.name', read_only=True)
@@ -26,8 +26,8 @@ class LivestockSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'tag_id', 'species', 'species_name', 'breed', 'breed_name',
             'date_of_birth', 'age', 'gender', 'color', 'weight', 'health_status',
-            'purchase_date', 'purchase_price', 'remarks', 'image', 'image_preview',
-            'pen_location', 'is_active', 'user', 'user_name', 'created_at', 'updated_at'
+            'remarks', 'image', 'image_preview',
+            'is_active', 'user', 'user_name', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'tag_id', 'age', 'created_at', 'updated_at', 'user']
         

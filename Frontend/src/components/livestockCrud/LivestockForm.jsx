@@ -68,13 +68,20 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
 
   const fetchSpeciesAndBreeds = async () => {
     setLoading(true);
+    console.log('[LivestockForm] Fetching species...');
     const speciesResult = await getAllSpecies();
+    
+    console.log('[LivestockForm] Species result:', speciesResult);
+    console.log('[LivestockForm] Species result.success:', speciesResult.success);
+    console.log('[LivestockForm] Species result.data:', speciesResult.data);
+    console.log('[LivestockForm] Species result.data is array:', Array.isArray(speciesResult.data));
     
     if (speciesResult.success) {
       // Ensure data is an array
       const speciesData = Array.isArray(speciesResult.data) ? speciesResult.data : [];
+      console.log('[LivestockForm] Setting species list to:', speciesData);
+      console.log('[LivestockForm] Species list length:', speciesData.length);
       setSpeciesList(speciesData);
-      console.log('Species loaded:', speciesData);
       
       // Set initial species input if editing
       if (initialData && initialData.species) {
@@ -84,7 +91,7 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
         }
       }
     } else {
-      console.error('Failed to load species:', speciesResult.error);
+      console.error('[LivestockForm] Failed to load species:', speciesResult.error);
       setSpeciesList([]);
     }
     
@@ -94,6 +101,7 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
     }
     
     setLoading(false);
+    console.log('[LivestockForm] Loading complete. Final species list:', speciesList);
   };
 
   const fetchPreviewTagId = async () => {

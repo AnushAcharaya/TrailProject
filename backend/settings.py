@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'userprofile',
     'livestockcrud',  
     'vaccination',
-    'medical' ,
+    'medical',
+    'appointment.apps.AppointmentConfig',
 ]
 
 MIDDLEWARE = [

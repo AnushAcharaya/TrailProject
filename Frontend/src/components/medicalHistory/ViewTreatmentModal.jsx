@@ -32,11 +32,11 @@ const ViewTreatmentModal = ({ treatment, onClose }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-gray-600">Treatment Name</label>
-                <p className="text-gray-900 mt-1">{treatment.treatmentName || "N/A"}</p>
+                <p className="text-gray-900 mt-1">{treatment.treatment_name || "N/A"}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">Livestock Tag</label>
-                <p className="text-gray-900 mt-1">{treatment.livestockTag || "N/A"}</p>
+                <p className="text-gray-900 mt-1">{treatment.livestock?.tag_id || "N/A"}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">Status</label>
@@ -46,7 +46,7 @@ const ViewTreatmentModal = ({ treatment, onClose }) => {
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">Veterinarian</label>
-                <p className="text-gray-900 mt-1">{treatment.vetName || "N/A"}</p>
+                <p className="text-gray-900 mt-1">{treatment.vet_name || "N/A"}</p>
               </div>
             </div>
           </div>
@@ -63,11 +63,11 @@ const ViewTreatmentModal = ({ treatment, onClose }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-gray-600">Start Date</label>
-                <p className="text-gray-900 mt-1">{treatment.treatmentDate || "N/A"}</p>
+                <p className="text-gray-900 mt-1">{treatment.treatment_date || "N/A"}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">Next Follow-up</label>
-                <p className="text-gray-900 mt-1">{treatment.nextTreatmentDate || "Not scheduled"}</p>
+                <p className="text-gray-900 mt-1">{treatment.next_treatment_date || "Not scheduled"}</p>
               </div>
             </div>
           </div>
@@ -105,18 +105,18 @@ const ViewTreatmentModal = ({ treatment, onClose }) => {
 
                     <div className="border-t border-gray-200 pt-3">
                       <label className="text-xs font-medium text-gray-600">Schedule Type</label>
-                      <p className="text-sm text-gray-900 mt-1 capitalize">{med.scheduleType}</p>
+                      <p className="text-sm text-gray-900 mt-1 capitalize">{med.scheduleType || med.schedule_type}</p>
                       
-                      {med.scheduleType === "interval" ? (
+                      {(med.scheduleType === "interval" || med.schedule_type === "interval") ? (
                         <div className="mt-2 bg-blue-50 rounded p-2">
                           <p className="text-sm text-blue-900">
-                            <span className="font-medium">Schedule:</span> Every {med.intervalHours} hours starting at {med.startTime}
+                            <span className="font-medium">Schedule:</span> Every {med.intervalHours || med.interval_hours} hours starting at {med.startTime || med.start_time}
                           </p>
                         </div>
                       ) : (
                         <div className="mt-2 bg-blue-50 rounded p-2">
                           <p className="text-sm text-blue-900">
-                            <span className="font-medium">Times:</span> {med.exactTimes?.slice(0, med.frequency).join(", ")}
+                            <span className="font-medium">Times:</span> {(med.exactTimes || med.exact_times)?.slice(0, med.frequency).join(", ")}
                           </p>
                         </div>
                       )}

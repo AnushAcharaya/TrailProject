@@ -13,7 +13,7 @@ from .serializers import (
     ForgotPasswordTokenSerializer,
     ResetPasswordSerializer
 )
-from .tasks import send_reset_token_email, send_verification_email, send_sms_otp
+from .email_utils import send_email_sync, send_sms_sync
 from rest_framework_simplejwt.tokens import RefreshToken
 import random
 
@@ -69,11 +69,10 @@ class ResendVerificationView(APIView):
             return Response({'success': False, 'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
         token = EmailVerificationToken.objects.create(user=user)
         
-        # Use Celery task for better email delivery
-        from .tasks import send_verification_email
+        # Send email synchronously
         subject = 'Verify your email'
         message = f'Your email verification code is: {token.code}\n\nThis code will expire in 10 minutes.'
-        send_verification_email.delay(user.email, subject, message)
+        send_email_sync(user.email, subject, message)
         
         return Response({'success': True, 'message': 'Verification email resent.'})
 
@@ -200,7 +199,11 @@ class ForgotPasswordEmailView(APIView):
             return Response({"error": "No user registered with this email"}, status=status.HTTP_400_BAD_REQUEST)
 
         token_obj = PasswordResetToken.objects.create(user=user)
-        send_reset_token_email(user, token_obj.token)
+        
+        # Send password reset email synchronously
+        subject = "Password Reset Request"
+        message = f"Hello {user.full_name},\n\nUse the following token to reset your password: {token_obj.token}\n\nThis token is valid for 30 minutes."
+        send_email_sync(user.email, subject, message)
 
         return Response({"message": "Reset token sent to your email"}, status=status.HTTP_200_OK)
 
@@ -342,10 +345,10 @@ class SendLoginOTPView(APIView):
         # Create login OTP
         login_otp = LoginOTP.objects.create(user=user)
         
-        # Send email OTP
+        # Send email OTP synchronously
         subject = 'Login Verification Code'
         message = f'Your login verification code is: {login_otp.email_code}\n\nThis code will expire in 10 minutes.'
-        send_verification_email.delay(user.email, subject, message)
+        send_email_sync(user.email, subject, message)
         
         # Send phone OTP for farmer/vet
         if role in ['farmer', 'vet']:
@@ -354,12 +357,12 @@ class SendLoginOTPView(APIView):
             
             if enable_sms:
                 otp_message = f'Your login verification code is: {login_otp.phone_code}'
-                send_sms_otp.delay(user.phone, otp_message)
+                send_sms_sync(user.phone, otp_message)
             else:
                 # For development: Send phone OTP via email
                 subject = 'Phone Login Verification Code'
                 message = f'Your phone login verification code is: {login_otp.phone_code}\n\n(SMS disabled in development mode)'
-                send_verification_email.delay(user.email, subject, message)
+                send_email_sync(user.email, subject, message)
         
         return Response({'success': True, 'message': 'OTP sent successfully'}, status=status.HTTP_200_OK)
 

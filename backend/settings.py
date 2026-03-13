@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'userprofile',
     'livestockcrud',  
     'vaccination',
+    'medical' ,
 ]
 
 MIDDLEWARE = [
@@ -169,8 +170,14 @@ SWAGGER_SETTINGS = {
 }
 
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# Celery Configuration
+# For development: execute tasks synchronously without Redis
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+
+# For production: use Redis as broker (uncomment when Redis is available)
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

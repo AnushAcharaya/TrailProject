@@ -4,26 +4,32 @@ import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/medicalHistory/PageHeader";
 import DeadlineMonitor from "../../components/medicalHistory/DeadlineMonitor";
 import TreatmentCard from "../../components/medicalHistory/TreatmentCard";
+import { getTreatmentCounts, getAllTreatments, deleteTreatment } from "../../services/medicalApi";
 import "../../styles/medicalHistory.css";
 
 const MonitorDeadlines = () => {
-  const [treatments, setTreatments] = useState([]);
   const [overdueTreatments, setOverdueTreatments] = useState([]);
   const [dueSoonTreatments, setDueSoonTreatments] = useState([]);
   const [onTrackTreatments, setOnTrackTreatments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadTreatments();
   }, []);
 
-  const loadTreatments = () => {
-    const saved = localStorage.getItem("treatments");
-    if (saved) {
-      const allTreatments = JSON.parse(saved);
+  const loadTreatments = async () => {
+    setIsLoading(true);
+    const result = await getAllTreatments();
+    setIsLoading(false);
+    
+    if (result.success) {
+      // Handle paginated response - extract results array
+      const allTreatments = result.data.results || result.data;
+      const treatmentsArray = Array.isArray(allTreatments) ? allTreatments : [];
       
       // Filter treatments that have a next follow-up date
-      const treatmentsWithFollowUp = allTreatments.filter(t => t.nextTreatmentDate);
+      const treatmentsWithFollowUp = treatmentsArray.filter(t => t.next_treatment_date);
       
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -33,7 +39,7 @@ const MonitorDeadlines = () => {
       const onTrack = [];
       
       treatmentsWithFollowUp.forEach(treatment => {
-        const followUpDate = new Date(treatment.nextTreatmentDate);
+        const followUpDate = new Date(treatment.next_treatment_date);
         followUpDate.setHours(0, 0, 0, 0);
         
         const diffTime = followUpDate - today;
@@ -51,10 +57,11 @@ const MonitorDeadlines = () => {
         }
       });
       
-      setTreatments(allTreatments);
       setOverdueTreatments(overdue);
       setDueSoonTreatments(dueSoon);
       setOnTrackTreatments(onTrack);
+    } else {
+      console.error("Failed to load treatments:", result.error);
     }
   };
 
@@ -63,10 +70,13 @@ const MonitorDeadlines = () => {
     navigate("/medical/edit");
   };
 
-  const handleDelete = (treatment) => {
-    const updated = treatments.filter(t => t.id !== treatment.id);
-    localStorage.setItem("treatments", JSON.stringify(updated));
-    loadTreatments();
+  const handleDelete = async (treatment) => {
+    const result = await deleteTreatment(treatment.id);
+    if (result.success) {
+      loadTreatments();
+    } else {
+      alert("Failed to delete treatment: " + (result.error?.detail || result.error));
+    }
   };
 
   const handleView = (treatment) => {
@@ -81,11 +91,17 @@ const MonitorDeadlines = () => {
         subtitle="Track upcoming and overdue follow-up appointments"
       />
 
-      <DeadlineMonitor 
-        overdue={overdueTreatments.length} 
-        dueSoon={dueSoonTreatments.length} 
-        onTrack={onTrackTreatments.length} 
-      />
+      {isLoading ? (
+        <div className="text-center py-8 text-gray-600">
+          Loading deadlines...
+        </div>
+      ) : (
+        <>
+          <DeadlineMonitor 
+            overdue={overdueTreatments.length} 
+            dueSoon={dueSoonTreatments.length} 
+            onTrack={onTrackTreatments.length} 
+          />
 
       {/* Overdue Treatments */}
       {overdueTreatments.length > 0 && (
@@ -168,13 +184,15 @@ const MonitorDeadlines = () => {
         </div>
       )}
 
-      {/* Empty State */}
-      {overdueTreatments.length === 0 && dueSoonTreatments.length === 0 && onTrackTreatments.length === 0 && (
-        <div className="empty-state">
-          <div>⏰</div>
-          <p>No treatment follow-ups scheduled</p>
-          <p className="text-sm text-muted mt-2">Add follow-up dates to treatments to track deadlines</p>
-        </div>
+          {/* Empty State */}
+          {overdueTreatments.length === 0 && dueSoonTreatments.length === 0 && onTrackTreatments.length === 0 && (
+            <div className="empty-state">
+              <div>⏰</div>
+              <p>No treatment follow-ups scheduled</p>
+              <p className="text-sm text-muted mt-2">Add follow-up dates to treatments to track deadlines</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

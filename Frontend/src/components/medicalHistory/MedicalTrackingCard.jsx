@@ -27,7 +27,7 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
 
   // Load saved progress from localStorage
   const loadProgress = () => {
-    const saved = localStorage.getItem(`treatment_${treatment.livestockTag}_progress`);
+    const saved = localStorage.getItem(`treatment_${treatment.livestock?.tag_id}_progress`);
     if (saved) {
       const progress = JSON.parse(saved);
       return progress;
@@ -43,7 +43,7 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
       treatmentDay: day,
       customTimes: customTimes
     };
-    localStorage.setItem(`treatment_${treatment.livestockTag}_progress`, JSON.stringify(progress));
+    localStorage.setItem(`treatment_${treatment.livestock?.tag_id}_progress`, JSON.stringify(progress));
   };
 
   // Initialize doses for current date
@@ -51,7 +51,7 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
     const todayStr = formatDate(currentDate);
 
     // Calculate treatment end date
-    const startDate = new Date(treatment.treatmentDate);
+    const startDate = new Date(treatment.treatment_date);
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + treatment.medicines[0].duration);
 
@@ -60,7 +60,7 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
     setTreatmentDay(daysSinceStart);
 
     // If current date is outside treatment window → exit
-    if (todayStr < treatment.treatmentDate || todayStr > formatDate(endDate)) {
+    if (todayStr < treatment.treatment_date || todayStr > formatDate(endDate)) {
       setDoses([]);
       return;
     }
@@ -87,8 +87,9 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
               : false,
           });
         });
-      } else if (med.scheduleType === "exact") {
-        med.exactTimes.slice(0, med.frequency).forEach((time) => {
+      } else if (med.scheduleType === "exact" || med.schedule_type === "exact") {
+        const exactTimes = med.exactTimes || med.exact_times || [];
+        exactTimes.slice(0, med.frequency).forEach((time) => {
           const doseId = `${med.name}-${time}-${todayStr}`;
           allDoses.push({
             id: doseId,
@@ -99,11 +100,14 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
               : false,
           });
         });
-      } else if (med.scheduleType === "interval") {
-        let currentTime = timeToDateTime(med.startTime, currentDate);
+      } else {
+        // interval schedule
+        const startTime = med.startTime || med.start_time || "08:00";
+        const intervalHours = med.intervalHours || med.interval_hours || 8;
+        let currentTime = timeToDateTime(startTime, currentDate);
         for (let i = 0; i < med.frequency; i++) {
           if (i > 0) {
-            currentTime = new Date(currentTime.getTime() + med.intervalHours * 60 * 60 * 1000);
+            currentTime = new Date(currentTime.getTime() + intervalHours * 60 * 60 * 1000);
           }
           const timeStr = currentTime.toTimeString().slice(0, 5);
           const doseId = `${med.name}-${timeStr}-${todayStr}`;
@@ -230,7 +234,7 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
   const isToday = formatDate(currentDate) === formatDate(new Date());
   
   // Check if we can move to next day
-  const startDate = new Date(treatment.treatmentDate);
+  const startDate = new Date(treatment.treatment_date || treatment.treatmentDate);
   const endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + treatment.medicines[0].duration);
   const canMoveToNextDay = allTakenToday && currentDate < endDate;

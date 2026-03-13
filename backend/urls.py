@@ -24,6 +24,7 @@ urlpatterns = [
     path('auth/', include('social_django.urls', namespace='social')),
     path('api/v1/livestock/', include('livestockcrud.urls')),
     path('api/v1/vaccination/', include('vaccination.urls')),  # Vaccination CRUD
+    path('api/v1/medical/', include('medical.urls')),  # Medical history
 
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-ui'),

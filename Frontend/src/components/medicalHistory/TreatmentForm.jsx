@@ -1,9 +1,13 @@
 // src/components/medicalHistory/TreatmentForm.jsx
 import { useState, useEffect } from "react";
 import PrimaryButton from "./PrimaryButton";
+import { getAllLivestock } from "../../services/livestockCrudApi";
 import "./../../styles/medicalHistory.css";
 
 const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
+  console.log('[TreatmentForm] initialData:', initialData);
+  console.log('[TreatmentForm] initialData.medicines:', initialData?.medicines);
+  
   const [formData, setFormData] = useState({
     livestockTag: initialData?.livestockTag || "",
     treatmentName: initialData?.treatmentName || "",
@@ -26,20 +30,32 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
       },
     ],
   });
+  
+  console.log('[TreatmentForm] formData.medicines:', formData.medicines);
 
   const [livestockList, setLivestockList] = useState([]);
   const [filteredLivestock, setFilteredLivestock] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState(initialData?.livestockTag || "");
+  const [isLoadingLivestock, setIsLoadingLivestock] = useState(true);
 
   useEffect(() => {
-    // Load livestock from localStorage
-    const saved = localStorage.getItem("livestock");
-    if (saved) {
-      const livestock = JSON.parse(saved);
-      setLivestockList(livestock);
-      setFilteredLivestock(livestock);
-    }
+    // Fetch livestock from API
+    const fetchLivestock = async () => {
+      setIsLoadingLivestock(true);
+      const result = await getAllLivestock();
+      if (result.success) {
+        // Handle paginated response
+        const livestock = result.data.results || result.data;
+        setLivestockList(livestock);
+        setFilteredLivestock(livestock);
+      } else {
+        console.error("Failed to load livestock:", result.error);
+      }
+      setIsLoadingLivestock(false);
+    };
+    
+    fetchLivestock();
   }, []);
 
   const handleLivestockSearch = (value) => {
@@ -50,18 +66,18 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
       setFilteredLivestock(livestockList);
     } else {
       const filtered = livestockList.filter(animal => 
-        animal.tagNumber?.toLowerCase().includes(value.toLowerCase()) ||
-        animal.name?.toLowerCase().includes(value.toLowerCase()) ||
-        animal.breed?.toLowerCase().includes(value.toLowerCase())
+        animal.tag_id?.toLowerCase().includes(value.toLowerCase()) ||
+        animal.breed_name?.toLowerCase().includes(value.toLowerCase()) ||
+        animal.species_name?.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredLivestock(filtered);
     }
   };
 
   const handleLivestockSelect = (animal) => {
-    const displayText = `${animal.tagNumber} - ${animal.name || animal.breed || 'Unknown'}`;
+    const displayText = `${animal.tag_id} - ${animal.breed_name} (${animal.species_name})`;
     setSearchTerm(displayText);
-    setFormData({ ...formData, livestockTag: displayText });
+    setFormData({ ...formData, livestockTag: animal.tag_id });
     setShowDropdown(false);
   };
 
@@ -138,12 +154,11 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
                   className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                 >
                   <div className="font-medium text-gray-900">
-                    Tag: {animal.tagNumber}
+                    Tag: {animal.tag_id}
                   </div>
                   <div className="text-sm text-gray-600">
-                    {animal.name && <span>Name: {animal.name} | </span>}
-                    <span>Breed: {animal.breed || 'N/A'}</span>
-                    {animal.age && <span> | Age: {animal.age}</span>}
+                    <span>Breed: {animal.breed_name} ({animal.species_name})</span>
+                    {animal.age && <span> | Age: {animal.age} years</span>}
                   </div>
                 </div>
               ))}

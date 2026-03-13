@@ -22,12 +22,12 @@ drf-yasg
 # CORS (for frontend React / mobile apps)
 django-cors-headers
 
-# Optional — Use Celery for async tasks (emails, SMS, notifications)
-# celery
-# redis
+# Celery for async tasks (emails, SMS, notifications)
+celery
+redis
 
 # Optional — For better password hashing
 # argon2-cffi
 
-# Optional — If you plan to use Django Filters
-# django-filter
+# Django Filters (required by medical app)
+django-filter

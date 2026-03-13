@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/medicalHistory/PageHeader";
 import AlertCard from "../../components/medicalHistory/AlertCard";
 import TreatmentCard from "../../components/medicalHistory/TreatmentCard";
+import { getAllTreatments } from "../../services/medicalApi";
 import "../../styles/medicalHistory.css";
 
 const AlertsNotifications = () => {
@@ -19,13 +20,16 @@ const AlertsNotifications = () => {
     loadAlerts();
   }, []);
 
-  const loadAlerts = () => {
-    const saved = localStorage.getItem("treatments");
-    if (saved) {
-      const allTreatments = JSON.parse(saved);
+  const loadAlerts = async () => {
+    const result = await getAllTreatments();
+    
+    if (result.success) {
+      // Handle paginated response - extract results array
+      const allTreatments = result.data.results || result.data;
+      const treatmentsArray = Array.isArray(allTreatments) ? allTreatments : [];
       
       // Filter treatments that have a next follow-up date
-      const treatmentsWithFollowUp = allTreatments.filter(t => t.nextTreatmentDate);
+      const treatmentsWithFollowUp = treatmentsArray.filter(t => t.next_treatment_date);
       
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -37,7 +41,7 @@ const AlertsNotifications = () => {
       const overdue = [];
       
       treatmentsWithFollowUp.forEach(treatment => {
-        const followUpDate = new Date(treatment.nextTreatmentDate);
+        const followUpDate = new Date(treatment.next_treatment_date);
         followUpDate.setHours(0, 0, 0, 0);
         
         const diffTime = followUpDate - today;

@@ -1,26 +1,43 @@
 // src/components/medicalHistory/TreatmentCard.jsx
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import "./../../styles/medicalHistory.css";
-import StatusBadge from "./StatusBadge";
 
 const TreatmentCard = ({ treatment, onEdit, onDelete, onView }) => {
+  // Debug: Log medicines data
+  console.log('[TreatmentCard] Treatment:', treatment.treatment_name);
+  console.log('[TreatmentCard] Full treatment object:', treatment);
+  console.log('[TreatmentCard] Medicines array:', treatment.medicines);
+  console.log('[TreatmentCard] Medicines is array?', Array.isArray(treatment.medicines));
+  console.log('[TreatmentCard] Medicines length:', treatment.medicines?.length);
+  if (treatment.medicines && treatment.medicines.length > 0) {
+    console.log('[TreatmentCard] First medicine:', treatment.medicines[0]);
+    console.log('[TreatmentCard] Medicine names:', treatment.medicines.map(m => m.name));
+  }
+  
   return (
     <div className="treatment-card">
       <div className="flex justify-between items-start mb-2">
-        <div>
-          <h3 className="font-semibold text-body">{treatment.treatmentName || "N/A"}</h3>
-          <p className="text-sm text-muted">Livestock: {treatment.livestockTag || "N/A"}</p>
+        <div className="flex-1">
+          <h3 className="font-semibold text-body">{treatment.treatment_name || "N/A"}</h3>
+          <p className="text-sm text-muted">Livestock: {treatment.livestock?.tag_id || "N/A"}</p>
         </div>
-        <StatusBadge status={treatment.status || "In Progress"} />
+        <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+          {treatment.status || "In Progress"}
+        </span>
       </div>
       
       <div className="mt-2 space-y-1">
         <p className="text-sm"><strong>Diagnosis:</strong> {treatment.diagnosis || "N/A"}</p>
-        <p className="text-sm"><strong>Medicines:</strong> {treatment.medicines?.map(m => m.name).join(", ") || "N/A"}</p>
-        <p className="text-sm text-muted">Vet: {treatment.vetName || "N/A"}</p>
+        <p className="text-sm">
+          <strong>Medicines:</strong>{" "}
+          {treatment.medicines && treatment.medicines.length > 0
+            ? treatment.medicines.map(m => m.name).join(", ")
+            : "N/A"}
+        </p>
+        <p className="text-sm text-muted">Vet: {treatment.vet_name || "N/A"}</p>
         <p className="text-sm text-muted">
-          Start: {treatment.treatmentDate || "N/A"}
-          {treatment.nextTreatmentDate && ` | Next: ${treatment.nextTreatmentDate}`}
+          Start: {treatment.treatment_date || "N/A"}
+          {treatment.next_treatment_date && ` | Next: ${treatment.next_treatment_date}`}
         </p>
       </div>
 

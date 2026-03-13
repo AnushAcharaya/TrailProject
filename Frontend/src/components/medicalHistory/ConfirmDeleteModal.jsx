@@ -39,15 +39,15 @@ const ConfirmDeleteModal = ({ treatment, onConfirm, onCancel }) => {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-sm font-medium text-gray-700">Treatment:</span>
-              <span className="text-sm text-gray-900">{treatment.treatmentName}</span>
+              <span className="text-sm text-gray-900">{treatment.treatment_name}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm font-medium text-gray-700">Livestock:</span>
-              <span className="text-sm text-gray-900">{treatment.livestockTag}</span>
+              <span className="text-sm text-gray-900">{treatment.livestock?.tag_id || "N/A"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm font-medium text-gray-700">Date:</span>
-              <span className="text-sm text-gray-900">{treatment.treatmentDate}</span>
+              <span className="text-sm text-gray-900">{treatment.treatment_date}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm font-medium text-gray-700">Status:</span>

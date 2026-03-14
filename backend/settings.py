@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'medical',
     'appointment',
     'insurance',
+    'profileTransfer',
 ]
 
 MIDDLEWARE = [

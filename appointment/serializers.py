@@ -8,22 +8,24 @@ User = get_user_model()
 
 class UserBasicSerializer(serializers.ModelSerializer):
     """Basic user info for appointments"""
-    full_name = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = User
-        fields = ['id', 'email', 'full_name', 'phone_number']
+        fields = ['id', 'email', 'username', 'full_name', 'phone']
     
     def get_full_name(self, obj):
-        return obj.get_full_name() if hasattr(obj, 'get_full_name') else obj.email
+        """Get full name or fallback to username"""
+        full_name = obj.get_full_name() if hasattr(obj, 'get_full_name') else ''
+        return full_name if full_name else obj.username
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
     farmer_details = UserBasicSerializer(source='farmer', read_only=True)
     veterinarian_details = UserBasicSerializer(source='veterinarian', read_only=True)
     
-    # Write-only fields for creating appointments
-    veterinarian_id = serializers.IntegerField(write_only=True, required=False)
+    # Write-only fields for creating appointments - accept either ID or username
+    veterinarian_id = serializers.CharField(write_only=True, required=True)
     
     class Meta:
         model = Appointment
@@ -32,27 +34,33 @@ class AppointmentSerializer(serializers.ModelSerializer):
             'veterinarian_details', 'animal_type', 'reason', 'preferred_date',
             'preferred_time', 'status', 'vet_notes', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['farmer', 'created_at', 'updated_at']
+        read_only_fields = ['farmer', 'veterinarian', 'created_at', 'updated_at']
     
     def create(self, validated_data):
         # Set farmer from request user
         validated_data['farmer'] = self.context['request'].user
         
-        # Get veterinarian from veterinarian_id
-        vet_id = validated_data.pop('veterinarian_id', None)
-        if vet_id:
+        # Get veterinarian from veterinarian_id (can be ID or username)
+        vet_identifier = validated_data.pop('veterinarian_id', None)
+        if vet_identifier:
             try:
-                veterinarian = User.objects.get(id=vet_id, user_type='vet')
+                # Try to get by ID first (if it's numeric)
+                if str(vet_identifier).isdigit():
+                    veterinarian = User.objects.get(id=int(vet_identifier), role='vet')
+                else:
+                    # Otherwise try by username
+                    veterinarian = User.objects.get(username=vet_identifier, role='vet')
                 validated_data['veterinarian'] = veterinarian
             except User.DoesNotExist:
-                raise serializers.ValidationError({"veterinarian_id": "Invalid veterinarian ID"})
+                raise serializers.ValidationError({"veterinarian_id": "Invalid veterinarian ID or username"})
         
         return super().create(validated_data)
     
     def validate(self, data):
-        # Ensure veterinarian is provided for new appointments
-        if not self.instance and 'veterinarian_id' not in data and 'veterinarian' not in data:
-            raise serializers.ValidationError({"veterinarian": "Veterinarian is required"})
+        # Ensure veterinarian_id is provided for new appointments
+        if not self.instance:
+            if 'veterinarian_id' not in data and 'veterinarian' not in data:
+                raise serializers.ValidationError({"veterinarian_id": "Veterinarian is required"})
         
         return data
 

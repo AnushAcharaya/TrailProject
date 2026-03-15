@@ -11,6 +11,36 @@ const api = axios.create({
   },
 });
 
+// Add request interceptor to include JWT token
+// Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)
+api.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle 401 errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid - clear storage and redirect to login
+      sessionStorage.clear();
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Registration API
 export const registerUser = async (formData) => {
   try {
@@ -148,7 +178,8 @@ export const verifyLoginOTP = async (email, emailCode, phoneCode, role) => {
 // Admin APIs
 export const fetchAllUsers = async () => {
   try {
-    const token = localStorage.getItem('token');
+    // Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     const response = await api.get('/admin/users/', {
       headers: {
         'Content-Type': 'application/json',
@@ -166,7 +197,8 @@ export const fetchAllUsers = async () => {
 
 export const approveUser = async (userId) => {
   try {
-    const token = localStorage.getItem('token');
+    // Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     const response = await api.post(`/admin/users/${userId}/approve/`, {}, {
       headers: {
         'Content-Type': 'application/json',
@@ -184,7 +216,8 @@ export const approveUser = async (userId) => {
 
 export const declineUser = async (userId) => {
   try {
-    const token = localStorage.getItem('token');
+    // Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     const response = await api.post(`/admin/users/${userId}/decline/`, {}, {
       headers: {
         'Content-Type': 'application/json',

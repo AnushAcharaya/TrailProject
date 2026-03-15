@@ -10,7 +10,8 @@ const profileApi = axios.create({
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
+  // Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)
+  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
   return {
     'Authorization': `Bearer ${token}`,
   };
@@ -18,7 +19,7 @@ const getAuthHeaders = () => {
 
 // Helper function to get auth headers for JSON
 const getAuthHeadersJSON = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
   return {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -27,7 +28,7 @@ const getAuthHeadersJSON = () => {
 
 // Helper function to get auth headers for multipart/form-data
 const getAuthHeadersMultipart = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
   return {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'multipart/form-data',
@@ -41,7 +42,7 @@ const getAuthHeadersMultipart = () => {
  */
 export const getUserProfile = async () => {
   try {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     if (!token) {
       console.error('[profileApi] No authentication token found');
       return {
@@ -52,7 +53,12 @@ export const getUserProfile = async () => {
     
     console.log('[profileApi] Fetching user profile...');
     const response = await profileApi.get('/', {
-      headers: getAuthHeadersJSON(),
+      headers: {
+        ...getAuthHeadersJSON(),
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      },
     });
     console.log('[profileApi] Profile fetched successfully:', response.data.data);
     return { success: true, data: response.data.data };
@@ -216,3 +222,56 @@ export const uploadProfileImage = async (imageFile) => {
 };
 
 export default profileApi;
+
+
+/**
+ * Get All Vets
+ * Retrieves all vet profiles for farmers to view and book appointments
+ * Returns list of vets with their profile information including photo, name, address, and specialization
+ */
+export const getAllVets = async () => {
+  try {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if (!token) {
+      console.error('[profileApi] No authentication token found');
+      return {
+        success: false,
+        error: { message: 'No authentication token found', status: 401 }
+      };
+    }
+
+    console.log('[profileApi] Fetching all vet profiles...');
+    
+    const response = await profileApi.get('/vets/', {
+      headers: getAuthHeaders()
+    });
+
+    console.log('[profileApi] Vets retrieved successfully:', response.data);
+    
+    return {
+      success: true,
+      data: response.data.data // Array of vet profiles
+    };
+  } catch (error) {
+    console.error('[profileApi] Error fetching vets:', error);
+    
+    if (error.response) {
+      return {
+        success: false,
+        error: {
+          message: error.response.data.error || 'Failed to fetch vets',
+          status: error.response.status,
+          details: error.response.data
+        }
+      };
+    }
+    
+    return {
+      success: false,
+      error: {
+        message: error.message || 'Network error occurred',
+        status: 0
+      }
+    };
+  }
+};

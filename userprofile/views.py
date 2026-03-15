@@ -198,3 +198,31 @@ class DeleteProfileImageView(APIView):
                 'success': False,
                 'error': 'Profile not found'
             }, status=status.HTTP_404_NOT_FOUND)
+
+
+class GetAllVetsView(APIView):
+    """
+    GET: Retrieve all vet profiles for farmers to view and book appointments.
+    Returns list of vets with their profile information.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        from authentication.models import CustomUser
+        
+        # Get all users with role 'vet' and status 'approved'
+        vets = CustomUser.objects.filter(role='vet', status='approved')
+        
+        # Get or create profiles for all vets
+        vet_profiles = []
+        for vet in vets:
+            profile, created = UserProfile.objects.get_or_create(user=vet)
+            vet_profiles.append(profile)
+        
+        serializer = UserProfileSerializer(vet_profiles, many=True, context={'request': request})
+        
+        return Response({
+            'success': True,
+            'message': f'Retrieved {len(vet_profiles)} vet profiles',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)

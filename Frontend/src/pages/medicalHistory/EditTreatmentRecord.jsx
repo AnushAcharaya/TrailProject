@@ -32,6 +32,32 @@ const EditTreatmentRecord = () => {
       if (result.success) {
         const treatment = result.data;
         // Convert backend snake_case to frontend camelCase for form
+        // Convert backend snake_case to frontend camelCase for form
+        const medicines = treatment.medicines && treatment.medicines.length > 0
+          ? treatment.medicines.map(med => ({
+              name: med.name,
+              dosage: med.dosage,
+              frequency: med.frequency,
+              duration: med.duration,
+              scheduleType: med.schedule_type,
+              startTime: med.start_time,
+              intervalHours: med.interval_hours,
+              exactTimes: med.exact_times || []
+            }))
+          : [
+              // Default medicine object if none exist
+              {
+                name: "",
+                dosage: "",
+                frequency: 1,
+                duration: 3,
+                scheduleType: "interval",
+                startTime: "08:00",
+                intervalHours: 5,
+                exactTimes: ["08:00", "13:00", "18:00"],
+              }
+            ];
+
         setInitialData({
           livestockTag: treatment.livestock?.tag_id || "",
           treatmentName: treatment.treatment_name || "",
@@ -40,16 +66,7 @@ const EditTreatmentRecord = () => {
           treatmentDate: treatment.treatment_date || "",
           nextTreatmentDate: treatment.next_treatment_date || "",
           status: treatment.status || "In Progress",
-          medicines: treatment.medicines?.map(med => ({
-            name: med.name,
-            dosage: med.dosage,
-            frequency: med.frequency,
-            duration: med.duration,
-            scheduleType: med.schedule_type,
-            startTime: med.start_time,
-            intervalHours: med.interval_hours,
-            exactTimes: med.exact_times || []
-          })) || []
+          medicines: medicines
         });
       } else {
         console.error("Failed to load treatment:", result.error);

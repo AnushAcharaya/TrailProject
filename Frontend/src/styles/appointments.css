@@ -167,3 +167,106 @@
   padding: 0.75rem;
   border-radius: 0.25rem;
 }
+
+
+/* Vet Profile Cards */
+.vet-profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.vet-profile-card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.vet-profile-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.vet-profile-image-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.vet-profile-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #059669;
+}
+
+.vet-profile-info {
+  text-align: center;
+}
+
+.vet-profile-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vet-profile-detail {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vet-profile-bio {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  text-align: left;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.btn-appoint-vet {
+  background-color: #059669;
+  color: #ffffff;
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.btn-appoint-vet:hover {
+  background-color: #047857;
+}
+
+/* Section Headers */
+.section-header {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}

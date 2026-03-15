@@ -106,13 +106,32 @@ const Login = () => {
         if (response.success) {
             // Store tokens and user info synchronously
             try {
+                // Use sessionStorage instead of localStorage to keep tabs independent
+                sessionStorage.setItem('token', response.data.access);
+                sessionStorage.setItem('refresh_token', response.data.refresh);
+                sessionStorage.setItem('user', JSON.stringify(response.data.user));
+                
+                // Also store in localStorage as backup (but sessionStorage takes priority)
                 localStorage.setItem('token', response.data.access);
                 localStorage.setItem('refresh_token', response.data.refresh);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
                 
+                // Clear any cached profile data from previous user
+                localStorage.removeItem('cachedProfile');
+                sessionStorage.removeItem('cachedProfile');
+                
+                // Create a unique tab ID for this session
+                const tabId = Date.now() + '_' + Math.random();
+                sessionStorage.setItem('tabId', tabId);
+                
+                // Trigger profile refresh event for layouts (only for this tab)
+                window.dispatchEvent(new Event('userLoggedIn'));
+                
                 // Verify token was stored
-                const storedToken = localStorage.getItem('token');
-                console.log('Token stored successfully:', storedToken ? 'Yes' : 'No');
+                const storedToken = sessionStorage.getItem('token');
+                console.log('[Login] Token stored successfully:', storedToken ? 'Yes' : 'No');
+                console.log('[Login] User logged in:', response.data.user.username, 'Role:', response.data.user.role);
+                console.log('[Login] Tab ID:', tabId);
                 
                 setEmailVerified(true);
                 

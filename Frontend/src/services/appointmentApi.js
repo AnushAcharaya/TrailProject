@@ -1,7 +1,25 @@
 // Frontend/src/services/appointmentApi.js
-import api from './api';
+import axios from 'axios';
 
-const BASE_URL = '/api/v1/appointments';
+// Create a separate axios instance for appointments (not using the auth base URL)
+const appointmentApi = axios.create({
+  baseURL: 'http://localhost:8000/api/v1',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add token to requests
+appointmentApi.interceptors.request.use((config) => {
+  // Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)
+  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+const BASE_URL = '';
 
 /**
  * Appointment API Service
@@ -18,7 +36,7 @@ const BASE_URL = '/api/v1/appointments';
  */
 export const getAppointments = async (params = {}) => {
   try {
-    const response = await api.get(`${BASE_URL}/appointments/`, { params });
+    const response = await appointmentApi.get(`${BASE_URL}/appointments/`, { params });
     return response.data;
   } catch (error) {
     console.error('Error fetching appointments:', error);
@@ -33,7 +51,7 @@ export const getAppointments = async (params = {}) => {
  */
 export const getAppointmentById = async (id) => {
   try {
-    const response = await api.get(`${BASE_URL}/appointments/${id}/`);
+    const response = await appointmentApi.get(`${BASE_URL}/appointments/${id}/`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching appointment ${id}:`, error);
@@ -48,7 +66,7 @@ export const getAppointmentById = async (id) => {
  */
 export const getAppointmentStats = async () => {
   try {
-    const response = await api.get(`${BASE_URL}/appointments/stats/`);
+    const response = await appointmentApi.get(`${BASE_URL}/appointments/stats/`);
     return response.data;
   } catch (error) {
     console.error('Error fetching appointment stats:', error);
@@ -63,7 +81,7 @@ export const getAppointmentStats = async () => {
  */
 export const searchAppointments = async (query) => {
   try {
-    const response = await api.get(`${BASE_URL}/appointments/`, {
+    const response = await appointmentApi.get(`${BASE_URL}/appointments/`, {
       params: { search: query }
     });
     return response.data;
@@ -87,7 +105,7 @@ export const searchAppointments = async (query) => {
  */
 export const createAppointment = async (appointmentData) => {
   try {
-    const response = await api.post(`${BASE_URL}/appointments/`, appointmentData);
+    const response = await appointmentApi.post(`${BASE_URL}/appointments/`, appointmentData);
     return response.data;
   } catch (error) {
     console.error('Error creating appointment:', error);
@@ -102,7 +120,7 @@ export const createAppointment = async (appointmentData) => {
  */
 export const cancelAppointment = async (id) => {
   try {
-    const response = await api.post(`${BASE_URL}/appointments/${id}/cancel/`);
+    const response = await appointmentApi.post(`${BASE_URL}/appointments/${id}/cancel/`);
     return response.data;
   } catch (error) {
     console.error(`Error cancelling appointment ${id}:`, error);
@@ -117,7 +135,7 @@ export const cancelAppointment = async (id) => {
  */
 export const getFarmerAppointmentsByStatus = async (status) => {
   try {
-    const response = await api.get(`${BASE_URL}/appointments/`, {
+    const response = await appointmentApi.get(`${BASE_URL}/appointments/`, {
       params: { status }
     });
     return response.data;
@@ -136,7 +154,7 @@ export const getFarmerAppointmentsByStatus = async (status) => {
  */
 export const approveAppointment = async (id) => {
   try {
-    const response = await api.post(`${BASE_URL}/appointments/${id}/approve/`);
+    const response = await appointmentApi.post(`${BASE_URL}/appointments/${id}/approve/`);
     return response.data;
   } catch (error) {
     console.error(`Error approving appointment ${id}:`, error);
@@ -152,7 +170,7 @@ export const approveAppointment = async (id) => {
  */
 export const declineAppointment = async (id, vetNotes = '') => {
   try {
-    const response = await api.post(`${BASE_URL}/appointments/${id}/decline/`, {
+    const response = await appointmentApi.post(`${BASE_URL}/appointments/${id}/decline/`, {
       vet_notes: vetNotes
     });
     return response.data;
@@ -170,7 +188,7 @@ export const declineAppointment = async (id, vetNotes = '') => {
  */
 export const completeAppointment = async (id, vetNotes = '') => {
   try {
-    const response = await api.post(`${BASE_URL}/appointments/${id}/complete/`, {
+    const response = await appointmentApi.post(`${BASE_URL}/appointments/${id}/complete/`, {
       vet_notes: vetNotes
     });
     return response.data;
@@ -190,7 +208,7 @@ export const completeAppointment = async (id, vetNotes = '') => {
  */
 export const updateAppointmentStatus = async (id, updateData) => {
   try {
-    const response = await api.patch(`${BASE_URL}/appointments/${id}/update_status/`, updateData);
+    const response = await appointmentApi.patch(`${BASE_URL}/appointments/${id}/update_status/`, updateData);
     return response.data;
   } catch (error) {
     console.error(`Error updating appointment ${id} status:`, error);
@@ -205,7 +223,7 @@ export const updateAppointmentStatus = async (id, updateData) => {
  */
 export const getVetAppointmentsByStatus = async (status) => {
   try {
-    const response = await api.get(`${BASE_URL}/appointments/`, {
+    const response = await appointmentApi.get(`${BASE_URL}/appointments/`, {
       params: { status }
     });
     return response.data;
@@ -225,7 +243,7 @@ export const getVetAppointmentsByStatus = async (status) => {
  */
 export const getAppointmentsByDateRange = async (dateFrom, dateTo) => {
   try {
-    const response = await api.get(`${BASE_URL}/appointments/`, {
+    const response = await appointmentApi.get(`${BASE_URL}/appointments/`, {
       params: {
         date_from: dateFrom,
         date_to: dateTo
@@ -245,7 +263,7 @@ export const getAppointmentsByDateRange = async (dateFrom, dateTo) => {
  */
 export const getAppointmentsByAnimalType = async (animalType) => {
   try {
-    const response = await api.get(`${BASE_URL}/appointments/`, {
+    const response = await appointmentApi.get(`${BASE_URL}/appointments/`, {
       params: { animal_type: animalType }
     });
     return response.data;
@@ -264,7 +282,7 @@ export const getAppointmentsByAnimalType = async (animalType) => {
 export const getSortedAppointments = async (ordering, descending = false) => {
   try {
     const orderParam = descending ? `-${ordering}` : ordering;
-    const response = await api.get(`${BASE_URL}/appointments/`, {
+    const response = await appointmentApi.get(`${BASE_URL}/appointments/`, {
       params: { ordering: orderParam }
     });
     return response.data;
@@ -277,17 +295,41 @@ export const getSortedAppointments = async (ordering, descending = false) => {
 // ==================== UTILITY FUNCTIONS ====================
 
 /**
+ * Convert 12-hour time format to 24-hour format
+ * @param {string} time12h - Time in 12-hour format (e.g., "01:00 PM")
+ * @returns {string} Time in 24-hour format (e.g., "13:00")
+ */
+const convertTo24Hour = (time12h) => {
+  if (!time12h) return '';
+  
+  const [time, period] = time12h.split(' ');
+  let [hours, minutes] = time.split(':');
+  
+  hours = parseInt(hours);
+  
+  if (period === 'PM' && hours !== 12) {
+    hours += 12;
+  } else if (period === 'AM' && hours === 12) {
+    hours = 0;
+  }
+  
+  return `${hours.toString().padStart(2, '0')}:${minutes}`;
+};
+
+/**
  * Format appointment data for API submission
  * @param {Object} formData - Form data from frontend
  * @returns {Object} Formatted data for API
  */
 export const formatAppointmentData = (formData) => {
+  const preferredTime = formData.preferredTime || formData.preferred_time;
+  
   return {
-    veterinarian_id: parseInt(formData.veterinarian || formData.veterinarian_id),
+    veterinarian_id: formData.veterinarian || formData.veterinarian_id,
     animal_type: formData.animalType || formData.animal_type,
     reason: formData.reason,
     preferred_date: formData.preferredDate || formData.preferred_date,
-    preferred_time: formData.preferredTime || formData.preferred_time,
+    preferred_time: convertTo24Hour(preferredTime),
   };
 };
 

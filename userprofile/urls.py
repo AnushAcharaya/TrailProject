@@ -4,7 +4,8 @@ from .views import (
     UpdateProfileView,
     UpdatePreferencesView,
     ChangePasswordView,
-    DeleteProfileImageView
+    DeleteProfileImageView,
+    GetAllVetsView
 )
 
 app_name = 'userprofile'
@@ -24,4 +25,7 @@ urlpatterns = [
     
     # Delete profile image (DELETE)
     path('delete-image/', DeleteProfileImageView.as_view(), name='delete-profile-image'),
+    
+    # Get all vets (GET) - for farmers to view and book appointments
+    path('vets/', GetAllVetsView.as_view(), name='get-all-vets'),
 ]

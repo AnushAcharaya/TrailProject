@@ -11,8 +11,8 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
 
   const fetchProfile = useCallback(async () => {
     try {
-      // Check if token exists before making the request
-      const token = localStorage.getItem('token');
+      // Check if token exists before making the request (prioritize sessionStorage)
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       if (!token) {
         console.error('No authentication token found');
         // Redirect to login if no token
@@ -25,13 +25,16 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
       
       if (result.success) {
         console.log('[FarmerLayout] Profile loaded successfully:', result.data);
-        console.log('[FarmerLayout] Setting profile data - Name:', result.data.full_name, 'Image:', result.data.profile_image_url || result.data.profile_image);
+        console.log('[FarmerLayout] Full Name:', result.data.full_name);
+        console.log('[FarmerLayout] Profile Image URL:', result.data.profile_image_url);
+        console.log('[FarmerLayout] Profile Image:', result.data.profile_image);
         setProfileData(result.data);
       } else {
         console.error('[FarmerLayout] Failed to fetch profile:', result.error);
         // If unauthorized, redirect to login
         if (result.error?.status === 401 || result.error?.message?.includes('401')) {
           console.error('Unauthorized - redirecting to login');
+          sessionStorage.clear();
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           navigate('/login');
@@ -48,59 +51,57 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
     fetchProfile();
   }, [fetchProfile]);
 
-  // Also refetch when navigating back to dashboard pages
+  // Listen for login events to force profile refresh (only for this tab)
   useEffect(() => {
-    // Refetch profile when location changes (user navigates)
-    if (location.pathname.startsWith('/farmerpage') || 
-        location.pathname.startsWith('/livestock') ||
-        location.pathname.startsWith('/vaccination')) {
-      console.log('[FarmerLayout] Location changed, refetching profile...');
+    const handleUserLogin = () => {
+      console.log('[FarmerLayout] User login event detected, clearing old profile and fetching new');
+      setProfileData(null);
+      setLoading(true);
       fetchProfile();
-    }
-  }, [location.pathname, fetchProfile]);
+    };
 
-  // Listen for profile updates from other components
+    // Only listen to events in this window, not from other tabs
+    window.addEventListener('userLoggedIn', handleUserLogin);
+    
+    return () => {
+      window.removeEventListener('userLoggedIn', handleUserLogin);
+    };
+  }, [fetchProfile]);
+
+  // Listen for profile updates from other components (same tab only)
   useEffect(() => {
     const handleProfileUpdate = () => {
       console.log('[FarmerLayout] Profile update event received, refetching profile...');
-      setLoading(true); // Show loading state during refetch
+      setLoading(true);
       fetchProfile();
     };
 
-    // Listen for custom event
+    // Listen for custom event (same tab only)
     window.addEventListener('profileUpdated', handleProfileUpdate);
     console.log('[FarmerLayout] Event listener registered for profileUpdated');
     
-    // Also listen for storage changes as backup
-    const handleStorageChange = (e) => {
-      if (e.key === 'profileUpdateTrigger') {
-        console.log('[FarmerLayout] Storage event received for profile update');
-        handleProfileUpdate();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Listen for storage changes in same tab (storage event doesn't fire in same tab)
-    const checkStorageInterval = setInterval(() => {
-      const trigger = localStorage.getItem('profileUpdateTrigger');
-      if (trigger && trigger !== window.lastProfileUpdateTrigger) {
-        console.log('[FarmerLayout] Detected profile update via localStorage polling');
-        window.lastProfileUpdateTrigger = trigger;
-        handleProfileUpdate();
-      }
-    }, 500); // Check every 500ms
-    
     return () => {
       window.removeEventListener('profileUpdated', handleProfileUpdate);
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(checkStorageInterval);
       console.log('[FarmerLayout] Event listeners removed');
     };
   }, [fetchProfile]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    console.log('[FarmerLayout] Logging out - clearing all data');
+    // Clear profile state immediately
+    setProfileData(null);
+    setLoading(true);
+    
+    // Clear ALL localStorage data to prevent any caching
+    localStorage.clear();
+    
+    // Also clear sessionStorage
+    sessionStorage.clear();
+    
+    // Dispatch logout event
+    window.dispatchEvent(new Event('userLoggedOut'));
+    
+    // Navigate to login
     navigate('/login');
   };
 
@@ -330,8 +331,13 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                 </div>
               ) : profileData?.profile_image_url || profileData?.profile_image ? (
                 <img 
-                  src={profileData.profile_image_url || `http://localhost:8000${profileData.profile_image}`}
+                  src={profileData.profile_image_url || profileData.profile_image}
                   alt="Profile" 
+                  onError={(e) => {
+                    console.error('[FarmerLayout] Image failed to load:', e.target.src);
+                    e.target.style.display = 'none';
+                  }}
+                  onLoad={() => console.log('[FarmerLayout] Image loaded successfully')}
                   className={`w-10 h-10 rounded-full object-cover mb-1 border-2 ${
                     location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer') ? 'border-white' : 'border-emerald-600'
                   }`}

@@ -20,11 +20,11 @@ class AppointmentPermission(permissions.BasePermission):
             return True
         
         # Farmers can create and list
-        if request.user.user_type == 'farmer':
+        if request.user.role == 'farmer':
             return view.action in ['create', 'list', 'retrieve', 'stats', 'cancel']
         
         # Vets can list, retrieve, and manage
-        if request.user.user_type == 'vet':
+        if request.user.role == 'vet':
             return view.action in ['list', 'retrieve', 'update', 'partial_update', 
                                    'stats', 'update_status', 'approve', 'decline', 'complete']
         
@@ -36,11 +36,11 @@ class AppointmentPermission(permissions.BasePermission):
             return True
         
         # Farmers can only access their own appointments
-        if request.user.user_type == 'farmer':
+        if request.user.role == 'farmer':
             return obj.farmer == request.user
         
         # Vets can only access appointments assigned to them
-        if request.user.user_type == 'vet':
+        if request.user.role == 'vet':
             return obj.veterinarian == request.user
         
         return False

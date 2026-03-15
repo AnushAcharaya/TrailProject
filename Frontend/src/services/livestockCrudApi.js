@@ -11,7 +11,8 @@ const livestockApi = axios.create({
 // Add request interceptor to include JWT token
 livestockApi.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    // Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

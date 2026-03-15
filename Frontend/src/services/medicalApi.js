@@ -9,8 +9,9 @@ const medicalApi = axios.create({
 // Add request interceptor to include JWT token
 medicalApi.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    console.log('[MedicalAPI] Token from localStorage:', token ? 'exists' : 'missing');
+    // Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    console.log('[MedicalAPI] Token from sessionStorage/localStorage:', token ? 'exists' : 'missing');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

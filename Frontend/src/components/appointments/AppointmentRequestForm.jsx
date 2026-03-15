@@ -1,9 +1,22 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiCalendar, FiUser, FiFileText, FiClock } from "react-icons/fi";
 import { MdPets } from "react-icons/md";
+import { getAllVets } from "../../services/profileApi";
+import { createAppointment, formatAppointmentData } from "../../services/appointmentApi";
 import "../../styles/appointments.css";
 
 const AppointmentRequestForm = () => {
+  const navigate = useNavigate();
+  const [vets, setVets] = useState([]);
+  const [isLoadingVets, setIsLoadingVets] = useState(true);
+  const [vetSearchQuery, setVetSearchQuery] = useState("");
+  const [showVetDropdown, setShowVetDropdown] = useState(false);
+  const [selectedVet, setSelectedVet] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  
   const [formData, setFormData] = useState({
     veterinarian: "",
     animalType: "",
@@ -11,6 +24,66 @@ const AppointmentRequestForm = () => {
     preferredDate: "",
     preferredTime: "",
   });
+
+  // Load vets and check for pre-selected vet from card
+  useEffect(() => {
+    loadVets();
+    
+    // Check if vet was selected from card
+    const preSelectedVetName = localStorage.getItem("selectedVetName");
+    const preSelectedVetId = localStorage.getItem("selectedVetId");
+    
+    if (preSelectedVetName && preSelectedVetId) {
+      setVetSearchQuery(preSelectedVetName);
+      setFormData(prev => ({ ...prev, veterinarian: preSelectedVetId }));
+      setSelectedVet({ full_name: preSelectedVetName, username: preSelectedVetId });
+      
+      // Clear from localStorage after using
+      localStorage.removeItem("selectedVetName");
+      localStorage.removeItem("selectedVetId");
+    }
+  }, []);
+
+  const loadVets = async () => {
+    setIsLoadingVets(true);
+    const result = await getAllVets();
+    
+    if (result.success) {
+      setVets(result.data);
+    } else {
+      console.error("Failed to load vets:", result.error);
+    }
+    
+    setIsLoadingVets(false);
+  };
+
+  // Filter vets based on search query
+  const filteredVets = vets.filter(vet => {
+    const query = vetSearchQuery.toLowerCase();
+    return (
+      vet.full_name?.toLowerCase().includes(query) ||
+      vet.username?.toLowerCase().includes(query) ||
+      vet.specialization?.toLowerCase().includes(query)
+    );
+  });
+
+  const handleVetSearch = (value) => {
+    setVetSearchQuery(value);
+    setShowVetDropdown(true);
+    
+    // Clear selection if user is typing
+    if (selectedVet) {
+      setSelectedVet(null);
+      setFormData(prev => ({ ...prev, veterinarian: "" }));
+    }
+  };
+
+  const handleVetSelect = (vet) => {
+    setSelectedVet(vet);
+    setVetSearchQuery(vet.full_name || vet.username);
+    setFormData(prev => ({ ...prev, veterinarian: vet.username }));
+    setShowVetDropdown(false);
+  };
 
   const timeSlots = [
     "09:00 AM",
@@ -38,18 +111,55 @@ const AppointmentRequestForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Add API call here
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      // Format data for API
+      const appointmentData = formatAppointmentData(formData);
+      
+      // Create appointment
+      const response = await createAppointment(appointmentData);
+      
+      console.log("Appointment created successfully:", response);
+      setSuccess(true);
+      
+      // Show success message and redirect after 2 seconds
+      setTimeout(() => {
+        navigate('/appointments', { state: { appointmentCreated: true } });
+      }, 2000);
+      
+    } catch (err) {
+      console.error("Error creating appointment:", err);
+      setError(err.response?.data?.message || err.response?.data?.detail || "Failed to create appointment. Please try again.");
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
-    window.history.back();
+    navigate('/appointments');
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+      {/* Success Message */}
+      {success && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-green-800 font-medium">
+            ✓ Appointment request submitted successfully! Redirecting...
+          </p>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800">{error}</p>
+        </div>
+      )}
+
       {/* Select Veterinarian */}
       <div className="bg-white rounded-xl p-6 mb-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
@@ -60,18 +170,70 @@ const AppointmentRequestForm = () => {
             Select Veterinarian <span className="text-red-500">*</span>
           </label>
         </div>
-        <select
-          name="veterinarian"
-          value={formData.veterinarian}
-          onChange={handleChange}
-          required
-          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-700"
-        >
-          <option value="">Choose a veterinarian</option>
-          <option value="dr-smith">Dr. John Smith</option>
-          <option value="dr-jones">Dr. Sarah Jones</option>
-          <option value="dr-wilson">Dr. Michael Wilson</option>
-        </select>
+        
+        {/* Searchable Vet Input */}
+        <div className="relative">
+          <input
+            type="text"
+            value={vetSearchQuery}
+            onChange={(e) => handleVetSearch(e.target.value)}
+            onFocus={() => setShowVetDropdown(true)}
+            placeholder="Search veterinarian by name or specialization..."
+            required
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-700"
+          />
+          
+          {/* Vet Dropdown */}
+          {showVetDropdown && !isLoadingVets && filteredVets.length > 0 && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              {filteredVets.map((vet) => (
+                <div
+                  key={vet.username}
+                  onClick={() => handleVetSelect(vet)}
+                  className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                >
+                  <div className="font-medium text-gray-900">
+                    {vet.full_name || vet.username}
+                  </div>
+                  {vet.specialization && (
+                    <div className="text-sm text-gray-600">
+                      Specialization: {vet.specialization}
+                    </div>
+                  )}
+                  {vet.address && (
+                    <div className="text-xs text-gray-500">
+                      {vet.address}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* No Results Message */}
+          {showVetDropdown && !isLoadingVets && vetSearchQuery && filteredVets.length === 0 && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
+              <p className="text-gray-500 text-sm">No veterinarians found matching "{vetSearchQuery}"</p>
+            </div>
+          )}
+          
+          {/* Loading Message */}
+          {isLoadingVets && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
+              <p className="text-gray-500 text-sm">Loading veterinarians...</p>
+            </div>
+          )}
+        </div>
+        
+        {/* Selected Vet Info */}
+        {selectedVet && (
+          <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-sm text-green-800">
+              <span className="font-medium">Selected:</span> {selectedVet.full_name || selectedVet.username}
+              {selectedVet.specialization && ` - ${selectedVet.specialization}`}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Animal Type and Reason */}
@@ -182,15 +344,17 @@ const AppointmentRequestForm = () => {
         <button
           type="button"
           onClick={handleCancel}
-          className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+          disabled={isSubmitting}
+          className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+          disabled={isSubmitting || success}
+          className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Request Appointment
+          {isSubmitting ? "Submitting..." : "Request Appointment"}
         </button>
       </div>
     </form>

@@ -40,13 +40,13 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         user = self.request.user
         
         # Farmers see their own appointments
-        if user.user_type == 'farmer':
+        if user.role == 'farmer':
             return Appointment.objects.filter(farmer=user).select_related(
                 'farmer', 'veterinarian'
             )
         
         # Vets see appointments assigned to them
-        elif user.user_type == 'vet':
+        elif user.role == 'vet':
             return Appointment.objects.filter(veterinarian=user).select_related(
                 'farmer', 'veterinarian'
             )
@@ -62,9 +62,9 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         """Get appointment statistics for the current user"""
         user = request.user
         
-        if user.user_type == 'farmer':
+        if user.role == 'farmer':
             queryset = Appointment.objects.filter(farmer=user)
-        elif user.user_type == 'vet':
+        elif user.role == 'vet':
             queryset = Appointment.objects.filter(veterinarian=user)
         else:
             queryset = Appointment.objects.all()

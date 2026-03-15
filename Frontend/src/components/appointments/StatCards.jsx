@@ -1,12 +1,36 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { FiClock, FiAlertCircle, FiCheckCircle, FiXCircle } from "react-icons/fi";
+import { getAppointmentStats } from "../../services/appointmentApi";
 import "../../styles/appointments.css";
 
 const StatCards = () => {
-  const stats = [
+  const [stats, setStats] = useState({
+    upcoming: 0,
+    pending: 0,
+    completed: 0,
+    cancelled: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      const data = await getAppointmentStats();
+      setStats(data);
+    } catch (error) {
+      console.error("Failed to load appointment stats:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const statCards = [
     { 
       label: "Upcoming", 
-      value: 2, 
+      value: stats.upcoming, 
       color: "green",
       icon: <FiClock size={24} />,
       bgColor: "bg-green-100",
@@ -14,7 +38,7 @@ const StatCards = () => {
     },
     { 
       label: "Pending", 
-      value: 1, 
+      value: stats.pending, 
       color: "yellow",
       icon: <FiAlertCircle size={24} />,
       bgColor: "bg-yellow-100",
@@ -22,7 +46,7 @@ const StatCards = () => {
     },
     { 
       label: "Completed", 
-      value: 12, 
+      value: stats.completed, 
       color: "blue",
       icon: <FiCheckCircle size={24} />,
       bgColor: "bg-blue-100",
@@ -30,7 +54,7 @@ const StatCards = () => {
     },
     { 
       label: "Cancelled", 
-      value: 3, 
+      value: stats.cancelled, 
       color: "red",
       icon: <FiXCircle size={24} />,
       bgColor: "bg-red-100",
@@ -38,9 +62,21 @@ const StatCards = () => {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="stat-card animate-pulse">
+            <div className="h-16 bg-gray-200 rounded"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-      {stats.map((stat, i) => (
+      {statCards.map((stat, i) => (
         <div key={i} className="stat-card">
           <div className="flex items-center justify-between mb-3">
             <p className="stat-label">{stat.label}</p>

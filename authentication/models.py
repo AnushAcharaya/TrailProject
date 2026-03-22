@@ -76,9 +76,15 @@ class PhoneOTP(models.Model):
 
 class PasswordResetToken(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='password_reset_tokens', on_delete=models.CASCADE)
-    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    token = models.CharField(max_length=6, blank=True)  # 6-digit code
     created_at = models.DateTimeField(auto_now_add=True)
     used = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            import random
+            self.token = str(random.randint(100000, 999999))
+        super().save(*args, **kwargs)
 
     def is_valid(self):
         # Token valid for 30 minutes

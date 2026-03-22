@@ -233,4 +233,58 @@ export const declineUser = async (userId) => {
   }
 };
 
+// Password Reset APIs
+export const forgotPassword = async (email) => {
+  try {
+    const response = await api.post('/forgot-password/', { email }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data || { message: 'Failed to send reset token.' }
+    };
+  }
+};
+
+export const verifyResetToken = async (email, token) => {
+  try {
+    const response = await api.post('/verify-token/', { email, token }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data || { message: 'Invalid or expired token.' }
+    };
+  }
+};
+
+export const resetPassword = async (email, token, newPassword, confirmPassword) => {
+  try {
+    const response = await api.post('/reset-password/', {
+      email,
+      token,
+      new_password: newPassword,
+      confirm_password: confirmPassword,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data || { message: 'Failed to reset password.' }
+    };
+  }
+};
+
 export default api;

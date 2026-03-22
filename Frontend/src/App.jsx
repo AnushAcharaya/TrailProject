@@ -26,8 +26,7 @@ import InsurancePlans from "./pages/insurance/farmerSideInsurance/InsurancePlan"
 import EnrollPage from "./pages/insurance/farmerSideInsurance/Enroll";
 import SubmitClaimPage from "./pages/insurance/farmerSideInsurance/SubmitClaim";
 import TrackClaimPage from "./pages/insurance/farmerSideInsurance/TrackClaim";
-import ReviewDashboardPage from "./pages/insurance/vetSideInsurance/ReviewDashboard";
-import VerifyClaimPage from "./pages/insurance/vetSideInsurance/VerifyClaim";
+import AdminInsurancePage from "./pages/insurance/adminSideInsurance/AdminInsurance";
 import AnimalListPage from "./pages/profileTransfer/farmerSide/AnimalList";
 import SendTransfersPage from "./pages/profileTransfer/farmerSide/SendTransfer";
 import ReceivedRequestsPage from "./pages/profileTransfer/receiverSide/ReceivedRequest";
@@ -36,6 +35,7 @@ import ReviewTransferPage from "./pages/profileTransfer/adminSide/ReviewTransfer
 import MainDashboardPage from "./pages/vetDashboard/MainDashboard";
 import FarmerProfilesPage from "./pages/vetDashboard/FarmerProfile";
 import FarmerDetailPage from "./pages/vetDashboard/FarmerDetail";
+import ReportsPage from "./pages/reports/ReportsPage";
 
 function App() {
   return (
@@ -43,7 +43,7 @@ function App() {
       <Routes>
         
         <Route path="/register" element={<AccountCreate />} />
-        <Route path="/login" element={<LoginPage />} />of 
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/" element={<Page />} />
         <Route path="/adminpage" element={<AdminPage />} />
@@ -68,8 +68,8 @@ function App() {
         <Route path="/farmerinsuranceenroll" element={<EnrollPage />} />
         <Route path="/farmerinsurancesubmitclaim" element={<SubmitClaimPage />} />
         <Route path="/farmerinsurancetrackclaim" element={<TrackClaimPage />} />
-        <Route path="/vetinsurancereviewdashboard" element={<ReviewDashboardPage />} />
-        <Route path="/vetinsuranceverifyclaim" element={<VerifyClaimPage />} />
+        <Route path="/farmerinsurancetrackclaim/:claimId" element={<TrackClaimPage />} />
+        <Route path="/admin/insurance" element={<AdminInsurancePage />} />
         <Route path="/profile-transfer/farmer/animals" element={<AnimalListPage />} />
         <Route path="/profile-transfer/farmer/sent" element={<SendTransfersPage />} />
         <Route path="/profile-transfer/receiver/requests" element={<ReceivedRequestsPage />} />
@@ -78,6 +78,7 @@ function App() {
         <Route path="/vet/dashboard" element={<MainDashboardPage />} />
         <Route path="/vet/farmer-profiles" element={<FarmerProfilesPage />} />
         <Route path="/vet/farmer-details" element={<FarmerDetailPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
 
       </Routes>
     </Router>

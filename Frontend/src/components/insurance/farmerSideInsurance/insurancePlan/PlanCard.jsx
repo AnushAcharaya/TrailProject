@@ -2,8 +2,27 @@ import CoverageList from './CoverageList';
 import { FaShieldAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
-const PlanCard = ({ name, price, months, coverages }) => {
+const PlanCard = ({ name, price, months, coverages, id }) => {
   const navigate = useNavigate();
+
+  const handleEnroll = () => {
+    // Extract coverage text from objects
+    const coverageTexts = coverages.map(c => c.text);
+    
+    // Pass the selected plan data to the enrollment page
+    navigate('/farmerinsuranceenroll', {
+      state: {
+        preSelectedPlan: {
+          id,
+          name,
+          price,
+          description: coverageTexts.join(', '),
+          coverages: coverageTexts,
+          fullDescription: `${name} - ${coverageTexts.join(', ')}`
+        }
+      }
+    });
+  };
 
   return (
     <div className="plan-card">
@@ -29,7 +48,7 @@ const PlanCard = ({ name, price, months, coverages }) => {
         </button>
         <button 
           className="btn-enroll"
-          onClick={() => navigate('/farmerinsuranceenroll')}
+          onClick={handleEnroll}
         >
           Enroll
         </button>

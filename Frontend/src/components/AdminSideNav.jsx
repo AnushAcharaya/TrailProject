@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Users, CheckCircle, BarChart2, Settings, HelpCircle, X, LogOut, AlertTriangle } from "lucide-react";
+import { Users, CheckCircle, BarChart2, Settings, HelpCircle, X, LogOut, AlertTriangle, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function SideNav({ isOpen, toggleSidebar }) {
@@ -89,6 +89,12 @@ export default function SideNav({ isOpen, toggleSidebar }) {
           </a>
           <a className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors">
             <CheckCircle size={18} /> Account Verifications
+          </a>
+          <a 
+            onClick={() => navigate('/admin/insurance')}
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors cursor-pointer"
+          >
+            <Shield size={18} /> Insurance
           </a>
           <a className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors">
             <BarChart2 size={18} /> Analytics

@@ -1,7 +1,7 @@
 import { FaChevronDown } from 'react-icons/fa';
 import PlanDetails from './PlanDetails';
 
-const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack }) => {
+const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected }) => {
   const planOptions = [
     {
       id: 1,
@@ -40,30 +40,51 @@ const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack }) => {
   return (
     <div className="form-card">
       <h2 className="form-title">Select Plan</h2>
-      <p className="form-subtitle">Choose an insurance plan that best fits your needs.</p>
+      <p className="form-subtitle">
+        {preSelected 
+          ? 'Your selected plan is shown below. You can change it if needed.'
+          : 'Choose an insurance plan that best fits your needs.'}
+      </p>
 
-      <div className="relative">
-        <select
-          className="dropdown-select"
-          value={plan?.id || ''}
-          onChange={(e) => {
-            const selected = planOptions.find(
-              (p) => p.id === parseInt(e.target.value)
-            );
-            onPlanSelect(selected);
-          }}
-        >
-          <option value="">Select plan...</option>
-          {planOptions.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name} - ${item.price}/12 months
-            </option>
-          ))}
-        </select>
-        <FaChevronDown className="absolute right-4 top-3.5 text-gray-400 pointer-events-none" />
-      </div>
+      {preSelected && plan ? (
+        <div className="pre-selected-plan">
+          <div className="selected-badge">
+            <span>✓ Selected from Plans</span>
+          </div>
+          <PlanDetails plan={plan} />
+          <button 
+            className="btn-change-plan"
+            onClick={() => onPlanSelect(null)}
+          >
+            Change Plan
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="relative">
+            <select
+              className="dropdown-select"
+              value={plan?.id || ''}
+              onChange={(e) => {
+                const selected = planOptions.find(
+                  (p) => p.id === parseInt(e.target.value)
+                );
+                onPlanSelect(selected);
+              }}
+            >
+              <option value="">Select plan...</option>
+              {planOptions.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name} - ${item.price}/12 months
+                </option>
+              ))}
+            </select>
+            <FaChevronDown className="absolute right-4 top-3.5 text-gray-400 pointer-events-none" />
+          </div>
 
-      {plan && <PlanDetails plan={plan} />}
+          {plan && <PlanDetails plan={plan} />}
+        </>
+      )}
 
       <div className="btn-container">
         <button className="btn-back" onClick={onBack}>

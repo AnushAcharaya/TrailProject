@@ -1,0 +1,44 @@
+Treatment Records
+Animal Tag: PT00001
+Breed: Saanen
+Species: Goat
+Generated: 3/17/2026, 8:26:04 PM
+
+============================================================
+
+Record 1:
+----------------------------------------
+Date: 3/14/2026
+Diagnosis: Updated diagnosis
+Treatment: N/A
+Veterinarian: N/A
+Notes: N/A
+Status: In Progress
+
+Record 2:
+----------------------------------------
+Date: 3/14/2026
+Diagnosis: normal
+Treatment: N/A
+Veterinarian: N/A
+Notes: N/A
+Status: In Progress
+
+Record 3:
+----------------------------------------
+Date: 3/14/2026
+Diagnosis: sever
+Treatment: N/A
+Veterinarian: N/A
+Notes: N/A
+Status: Completed
+
+Record 4:
+----------------------------------------
+Date: 3/14/2026
+Diagnosis: dangerous
+Treatment: N/A
+Veterinarian: N/A
+Notes: N/A
+Status: In Progress
+

@@ -5,6 +5,7 @@ import '../../../styles/farmerSideInsurance/insurancePlan.css';
 const InsurancePlans = () => {
   const plans = [
     {
+      id: 1,
       name: 'Basic Coverage',
       price: '500',
       months: '12 months',
@@ -14,6 +15,7 @@ const InsurancePlans = () => {
       ]
     },
     {
+      id: 2,
       name: 'Comp Care',
       price: '1200',
       months: '12 months',
@@ -24,6 +26,7 @@ const InsurancePlans = () => {
       ]
     },
     {
+      id: 3,
       name: 'Disease Shield',
       price: '1300',
       months: '6 months',
@@ -35,6 +38,7 @@ const InsurancePlans = () => {
       ]
     },
     {
+      id: 4,
       name: 'Premium Protection',
       price: '2000',
       months: '24 months',
@@ -58,9 +62,10 @@ const InsurancePlans = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {plans.map((plan, index) => (
+            {plans.map((plan) => (
               <PlanCard
-                key={index}
+                key={plan.id}
+                id={plan.id}
                 name={plan.name}
                 price={plan.price}
                 months={plan.months}

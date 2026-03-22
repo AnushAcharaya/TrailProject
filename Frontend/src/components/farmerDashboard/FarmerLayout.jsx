@@ -281,16 +281,6 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                 >
                   Claims
                 </button>
-                <button
-                  onClick={() => navigate('/farmerinsurancetrackclaim')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    location.pathname === '/farmerinsurancetrackclaim'
-                      ? 'bg-white/30 text-white shadow-lg'
-                      : 'hover:bg-white/10 text-emerald-50'
-                  }`}
-                >
-                  Track
-                </button>
               </nav>
             )}
           </div>

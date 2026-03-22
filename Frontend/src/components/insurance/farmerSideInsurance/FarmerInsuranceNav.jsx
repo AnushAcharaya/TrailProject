@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
-  FaHome, FaShieldAlt, FaUserPlus, FaFileAlt, FaSearch, FaUser 
+  FaHome, FaShieldAlt, FaUserPlus, FaFileAlt, FaUser 
 } from 'react-icons/fa';
 
 const FarmerInsuranceNav = () => {
@@ -11,8 +11,7 @@ const FarmerInsuranceNav = () => {
     { path: '/farmerinsurancedashboard', icon: FaHome, label: 'Dashboard' },
     { path: '/farmerinsuranceplan', icon: FaShieldAlt, label: 'Insurance' },
     { path: '/farmerinsuranceenroll', icon: FaUserPlus, label: 'Enroll' },
-    { path: '/farmerinsurancesubmitclaim', icon: FaFileAlt, label: 'Claims' },
-    { path: '/farmerinsurancetrackclaim', icon: FaSearch, label: 'Track' }
+    { path: '/farmerinsurancesubmitclaim', icon: FaFileAlt, label: 'Claims' }
   ];
 
   const isActive = (path) => location.pathname === path;

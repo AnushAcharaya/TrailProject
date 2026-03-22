@@ -1,7 +1,52 @@
 import StatusBadge from './StatusBadge';
 import StatusListItem from './StatusListItem';
 
-const ClaimCard = ({ claimNumber, overallStatus, statuses, incidentDetails }) => {
+const ClaimCard = ({ 
+  claimNumber, 
+  overallStatus, 
+  statuses, 
+  incidentDetails,
+  claimType,
+  claimAmount,
+  incidentDate,
+  incidentLocation,
+  supportingDocument,
+  vaccinationHistory,
+  medicalHistory,
+  vetNotes,
+  adminNotes
+}) => {
+  const getStatusLabel = (status) => {
+    const labels = {
+      'submitted': 'Submitted',
+      'under-review': 'Under Review',
+      'verification': 'Pending Verification',
+      'verified': 'Verified',
+      'approved': 'Approved',
+      'rejected': 'Rejected',
+      'paid': 'Paid'
+    };
+    return labels[status] || 'Submitted';
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatCurrency = (amount) => {
+    if (!amount) return 'N/A';
+    return `NPR ${parseFloat(amount).toLocaleString('en-NP', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
+  };
+
   return (
     <div className="claim-card">
       {/* Header */}
@@ -9,9 +54,9 @@ const ClaimCard = ({ claimNumber, overallStatus, statuses, incidentDetails }) =>
         <div>
           <h3 className="claim-number">CLM-{claimNumber}</h3>
         </div>
-        <div className={`claim-status-badge ${overallStatus === 'under-review' ? 'status-under-review' : 'status-submitted'}`}>
-          {overallStatus === 'under-review' ? 'Under Review' : 'Submitted'}
-          <StatusBadge status={overallStatus === 'under-review' ? 'review' : 'submitted'} />
+        <div className={`claim-status-badge status-${overallStatus}`}>
+          {getStatusLabel(overallStatus)}
+          <StatusBadge status={overallStatus} />
         </div>
       </div>
 
@@ -30,13 +75,100 @@ const ClaimCard = ({ claimNumber, overallStatus, statuses, incidentDetails }) =>
         ))}
       </div>
 
+      {/* Claim Information */}
+      <div className="claim-info-section">
+        <h4 className="section-title">Claim Information</h4>
+        <div className="info-grid">
+          <div className="info-item">
+            <span className="info-label">Claim Type:</span>
+            <span className="info-value">{claimType || 'N/A'}</span>
+          </div>
+          <div className="info-item">
+            <span className="info-label">Claim Amount:</span>
+            <span className="info-value">{formatCurrency(claimAmount)}</span>
+          </div>
+          <div className="info-item">
+            <span className="info-label">Incident Date:</span>
+            <span className="info-value">{formatDate(incidentDate)}</span>
+          </div>
+          <div className="info-item">
+            <span className="info-label">Incident Location:</span>
+            <span className="info-value">{incidentLocation || 'N/A'}</span>
+          </div>
+        </div>
+      </div>
+
       {/* Incident Details */}
       <div className="incident-details">
-        <h4 className="incident-title">Incident Details</h4>
+        <h4 className="incident-title">Incident Description</h4>
         <p className="incident-description">
           {incidentDetails}
         </p>
       </div>
+
+      {/* Supporting Documents */}
+      {(supportingDocument || vaccinationHistory || medicalHistory) && (
+        <div className="documents-section">
+          <h4 className="section-title">Supporting Documents</h4>
+          <div className="documents-list">
+            {supportingDocument && (
+              <div className="document-item">
+                <span className="document-icon">📄</span>
+                <a 
+                  href={`http://localhost:8000${supportingDocument}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="document-link"
+                >
+                  Treatment/Incident Document
+                </a>
+              </div>
+            )}
+            {vaccinationHistory && (
+              <div className="document-item">
+                <span className="document-icon">💉</span>
+                <a 
+                  href={`http://localhost:8000${vaccinationHistory}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="document-link"
+                >
+                  Vaccination History
+                </a>
+              </div>
+            )}
+            {medicalHistory && (
+              <div className="document-item">
+                <span className="document-icon">🏥</span>
+                <a 
+                  href={`http://localhost:8000${medicalHistory}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="document-link"
+                >
+                  Medical History
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Vet Notes */}
+      {vetNotes && (
+        <div className="notes-section">
+          <h4 className="section-title">Veterinarian Notes</h4>
+          <p className="notes-content">{vetNotes}</p>
+        </div>
+      )}
+
+      {/* Admin Notes */}
+      {adminNotes && (
+        <div className="notes-section">
+          <h4 className="section-title">Admin Notes</h4>
+          <p className="notes-content">{adminNotes}</p>
+        </div>
+      )}
     </div>
   );
 };

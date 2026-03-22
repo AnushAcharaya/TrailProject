@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Key, Lock, ArrowLeft, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { forgotPassword, verifyResetToken, resetPassword } from "../services/api";
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1); // 1: Email, 2: Token, 3: New Password
@@ -42,8 +43,10 @@ const ForgotPassword = () => {
     
     if (!formData.token.trim()) {
       newErrors.token = "Token is required";
-    } else if (formData.token.length < 6) {
-      newErrors.token = "Token must be at least 6 characters";
+    } else if (formData.token.length !== 6) {
+      newErrors.token = "Token must be exactly 6 digits";
+    } else if (!/^\d{6}$/.test(formData.token)) {
+      newErrors.token = "Token must contain only numbers";
     }
     
     setErrors(newErrors);
@@ -77,11 +80,14 @@ const ForgotPassword = () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call to send reset token
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const result = await forgotPassword(formData.email);
       
-      console.log("Sending reset token to:", formData.email);
-      setStep(2);
+      if (result.success) {
+        console.log("Reset token sent to:", formData.email);
+        setStep(2);
+      } else {
+        setErrors({ email: result.error.error || "Failed to send reset token. Please try again." });
+      }
     } catch (error) {
       setErrors({ email: "Failed to send reset token. Please try again." });
     } finally {
@@ -97,11 +103,14 @@ const ForgotPassword = () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call to verify token
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const result = await verifyResetToken(formData.email, formData.token);
       
-      console.log("Verifying token:", formData.token);
-      setStep(3);
+      if (result.success) {
+        console.log("Token verified successfully");
+        setStep(3);
+      } else {
+        setErrors({ token: result.error.error || "Invalid or expired token. Please try again." });
+      }
     } catch (error) {
       setErrors({ token: "Invalid or expired token. Please try again." });
     } finally {
@@ -117,11 +126,19 @@ const ForgotPassword = () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call to reset password
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const result = await resetPassword(
+        formData.email,
+        formData.token,
+        formData.newPassword,
+        formData.confirmPassword
+      );
       
-      console.log("Password reset successful for:", formData.email);
-      setStep(4); // Success step
+      if (result.success) {
+        console.log("Password reset successful for:", formData.email);
+        setStep(4); // Success step
+      } else {
+        setErrors({ newPassword: result.error.error || "Failed to reset password. Please try again." });
+      }
     } catch (error) {
       setErrors({ newPassword: "Failed to reset password. Please try again." });
     } finally {
@@ -216,6 +233,8 @@ const ForgotPassword = () => {
                 <label className="label">Reset Token</label>
                 <input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   name="token"
                   value={formData.token}
                   onChange={handleChange}

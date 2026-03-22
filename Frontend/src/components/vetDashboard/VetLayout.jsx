@@ -1,4 +1,4 @@
-import { FaHome, FaUser, FaShieldAlt, FaCalendarAlt, FaCog, FaSignOutAlt, FaBell } from 'react-icons/fa';
+import { FaHome, FaUser, FaCalendarAlt, FaCog, FaSignOutAlt, FaBell } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getUserProfile } from '../../services/profileApi';
@@ -158,17 +158,6 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
           >
             <FaUser className="text-white text-xl" />
             <span className="text-white font-medium">Farmer Profiles</span>
-          </div>
-          <div 
-            onClick={() => navigate('/vetinsurancereviewdashboard')}
-            className={`flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
-              location.pathname === '/vetinsurancereviewdashboard' 
-                ? 'bg-emerald-700' 
-                : 'hover:bg-emerald-700'
-            }`}
-          >
-            <FaShieldAlt className="text-white text-xl" />
-            <span className="text-white font-medium">Insurance Verify</span>
           </div>
           <div 
             onClick={() => navigate('/vetappointment')}

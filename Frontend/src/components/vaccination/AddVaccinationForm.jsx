@@ -12,6 +12,9 @@ const AddVaccinationForm = () => {
   const preSelectedLivestock = location.state?.preSelectedLivestock;
   
   const [livestockList, setLivestockList] = useState([]);
+  const [filteredLivestock, setFilteredLivestock] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
@@ -37,11 +40,36 @@ const AddVaccinationForm = () => {
     if (result.success) {
       const data = result.data.results || result.data;
       setLivestockList(Array.isArray(data) ? data : []);
+      setFilteredLivestock(Array.isArray(data) ? data : []);
     } else {
       console.error('Failed to fetch livestock:', result.error);
       setLivestockList([]);
+      setFilteredLivestock([]);
     }
     setLoading(false);
+  };
+
+  const handleLivestockSearch = (value) => {
+    setSearchTerm(value);
+    setShowDropdown(true);
+    
+    if (value.trim() === "") {
+      setFilteredLivestock(livestockList);
+    } else {
+      const filtered = livestockList.filter(animal => 
+        animal.tag_id?.toLowerCase().includes(value.toLowerCase()) ||
+        animal.breed_name?.toLowerCase().includes(value.toLowerCase()) ||
+        animal.species_name?.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredLivestock(filtered);
+    }
+  };
+
+  const handleLivestockSelect = (animal) => {
+    const displayText = `${animal.tag_id} - ${animal.breed_name || animal.species_name}`;
+    setSearchTerm(displayText);
+    setFormData({ ...formData, livestock: animal.tag_id });
+    setShowDropdown(false);
   };
 
   const handleChange = (e) => {
@@ -93,25 +121,52 @@ const AddVaccinationForm = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="space-y-4">
-          <div>
+          {/* Livestock Search with Autocomplete */}
+          <div className="relative">
             <label className="block text-sm font-medium text-body mb-1">Livestock *</label>
             {loading ? (
               <p className="text-sm text-gray-500">Loading livestock...</p>
             ) : (
-              <select
-                name="livestock"
-                value={formData.livestock}
-                onChange={handleChange}
-                required
-                className="w-full p-2 border border-light rounded"
-              >
-                <option value="">Select livestock</option>
-                {livestockList.map((animal) => (
-                  <option key={animal.id} value={animal.tag_id}>
-                    {animal.tag_id} - {animal.species_name}
-                  </option>
-                ))}
-              </select>
+              <>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => handleLivestockSearch(e.target.value)}
+                  onFocus={() => setShowDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                  placeholder="Search by tag ID, breed, or species..."
+                  required
+                  className="w-full p-2 border border-light rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                
+                {/* Dropdown List */}
+                {showDropdown && filteredLivestock.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredLivestock.map((animal, index) => (
+                      <div
+                        key={index}
+                        onClick={() => handleLivestockSelect(animal)}
+                        className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      >
+                        <div className="font-medium text-gray-900">
+                          Tag: {animal.tag_id}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          <span>Breed: {animal.breed_name || 'N/A'} | Species: {animal.species_name}</span>
+                          {animal.age && <span> | Age: {animal.age} years</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* No Results Message */}
+                {showDropdown && searchTerm && filteredLivestock.length === 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
+                    <p className="text-gray-500 text-sm">No livestock found matching "{searchTerm}"</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

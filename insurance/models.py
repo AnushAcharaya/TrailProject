@@ -109,8 +109,6 @@ class Claim(models.Model):
     STATUS_CHOICES = [
         ('Submitted', 'Submitted'),
         ('Under Review', 'Under Review'),
-        ('Pending Verification', 'Pending Verification'),
-        ('Verified', 'Verified'),
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
         ('Paid', 'Paid'),
@@ -135,13 +133,6 @@ class Claim(models.Model):
         on_delete=models.CASCADE,
         related_name='insurance_claims'
     )
-    veterinarian = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='verified_claims'
-    )
     
     claim_type = models.CharField(max_length=50, choices=CLAIM_TYPE_CHOICES)
     claim_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
@@ -152,11 +143,9 @@ class Claim(models.Model):
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='Submitted')
     
     # Supporting documents
-    supporting_document = models.FileField(upload_to='insurance/claims/', null=True, blank=True)
-    
-    # Vet verification
-    vet_notes = models.TextField(blank=True, null=True)
-    verification_date = models.DateTimeField(null=True, blank=True)
+    incident_image = models.ImageField(upload_to='insurance/claims/images/', null=True, blank=True)
+    vaccination_history = models.FileField(upload_to='insurance/claims/vaccination/', null=True, blank=True)
+    medical_history = models.FileField(upload_to='insurance/claims/medical/', null=True, blank=True)
     
     # Admin decision
     admin_notes = models.TextField(blank=True, null=True)
@@ -176,7 +165,6 @@ class Claim(models.Model):
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['farmer', 'status']),
-            models.Index(fields=['veterinarian', 'status']),
             models.Index(fields=['status']),
             models.Index(fields=['incident_date']),
         ]

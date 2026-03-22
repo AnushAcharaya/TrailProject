@@ -1,6 +1,11 @@
 import { FaShieldAlt } from 'react-icons/fa';
 
 const PlanDetails = ({ plan }) => {
+  // Handle both string arrays and object arrays for coverages
+  const getCoverageText = (coverage) => {
+    return typeof coverage === 'string' ? coverage : coverage.text;
+  };
+
   return (
     <div className="plan-card-mini">
       <div className="details-title">
@@ -16,7 +21,7 @@ const PlanDetails = ({ plan }) => {
             key={idx}
             className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full"
           >
-            {coverage}
+            {getCoverageText(coverage)}
           </span>
         ))}
       </div>

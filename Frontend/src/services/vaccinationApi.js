@@ -169,4 +169,17 @@ export const deleteVaccination = async (id) => {
   }
 };
 
+// Get vaccinations by livestock ID
+export const getVaccinationsByLivestock = async (livestockId) => {
+  try {
+    const response = await vaccinationApi.get(`/?livestock=${livestockId}`);
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data || { message: 'Failed to fetch vaccinations for livestock.' }
+    };
+  }
+};
+
 export default vaccinationApi;

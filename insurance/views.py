@@ -11,9 +11,9 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from .models import InsurancePlan, Enrollment, Claim
 from .serializers import (
     InsurancePlanSerializer, EnrollmentSerializer, ClaimSerializer,
-    ClaimVerificationSerializer, ClaimStatusUpdateSerializer, ClaimStatsSerializer
+    ClaimStatusUpdateSerializer, ClaimStatsSerializer
 )
-from .permissions import IsFarmerOrVet, IsVetOrAdmin, IsFarmer
+from .permissions import IsFarmer
 from .filters import EnrollmentFilter, ClaimFilter
 
 
@@ -35,7 +35,7 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
     ViewSet for livestock insurance enrollments
     """
     serializer_class = EnrollmentSerializer
-    permission_classes = [IsAuthenticated, IsFarmer]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = EnrollmentFilter
     search_fields = ['livestock__name', 'livestock__tag_number', 'plan__name']
@@ -43,17 +43,26 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
     ordering = ['-enrollment_date']
     
     def get_queryset(self):
-        """Filter enrollments by farmer"""
+        """Filter enrollments by user role"""
         user = self.request.user
         if user.role == 'farmer':
             return Enrollment.objects.filter(farmer=user).select_related(
                 'farmer', 'livestock', 'plan'
             )
+        elif user.role == 'admin':
+            # Admin can see all enrollments for review and approval
+            return Enrollment.objects.all().select_related(
+                'farmer', 'livestock', 'plan'
+            )
         return Enrollment.objects.none()
     
     def perform_create(self, serializer):
-        """Set farmer to current user"""
-        serializer.save(farmer=self.request.user)
+        """Set farmer to current user and set status to Pending (awaiting admin approval)"""
+        if self.request.user.role == 'farmer':
+            serializer.save(farmer=self.request.user, status='Pending')
+        else:
+            # Admin can create enrollments for any farmer
+            serializer.save(status='Pending')
     
     @action(detail=False, methods=['get'])
     def active(self, request):
@@ -85,7 +94,7 @@ class ClaimViewSet(viewsets.ModelViewSet):
     ViewSet for insurance claims
     """
     serializer_class = ClaimSerializer
-    permission_classes = [IsAuthenticated, IsFarmerOrVet]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ClaimFilter
     search_fields = ['claim_type', 'incident_location', 'description']
@@ -98,17 +107,11 @@ class ClaimViewSet(viewsets.ModelViewSet):
         
         if user.role == 'farmer':
             return Claim.objects.filter(farmer=user).select_related(
-                'farmer', 'veterinarian', 'enrollment', 'enrollment__livestock', 'enrollment__plan'
-            )
-        elif user.role == 'vet':
-            return Claim.objects.filter(
-                Q(status='Pending Verification') | Q(veterinarian=user)
-            ).select_related(
-                'farmer', 'veterinarian', 'enrollment', 'enrollment__livestock', 'enrollment__plan'
+                'farmer', 'enrollment', 'enrollment__livestock', 'enrollment__plan'
             )
         elif user.role == 'admin':
             return Claim.objects.all().select_related(
-                'farmer', 'veterinarian', 'enrollment', 'enrollment__livestock', 'enrollment__plan'
+                'farmer', 'enrollment', 'enrollment__livestock', 'enrollment__plan'
             )
         
         return Claim.objects.none()
@@ -132,56 +135,6 @@ class ClaimViewSet(viewsets.ModelViewSet):
         claims = self.get_queryset()
         serializer = self.get_serializer(claims, many=True)
         return Response(serializer.data)
-    
-    @action(detail=False, methods=['get'])
-    def pending_verification(self, request):
-        """Get claims pending vet verification"""
-        if request.user.role != 'vet':
-            return Response(
-                {'error': 'Only vets can access this endpoint'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        claims = Claim.objects.filter(status='Pending Verification').select_related(
-            'farmer', 'enrollment', 'enrollment__livestock', 'enrollment__plan'
-        )
-        serializer = self.get_serializer(claims, many=True)
-        return Response(serializer.data)
-    
-    @action(detail=True, methods=['post'])
-    def verify(self, request, pk=None):
-        """Vet verifies a claim"""
-        if request.user.role != 'vet':
-            return Response(
-                {'error': 'Only vets can verify claims'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        claim = self.get_object()
-        
-        if claim.status != 'Pending Verification':
-            return Response(
-                {'error': 'Claim is not pending verification'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        serializer = ClaimVerificationSerializer(data=request.data)
-        if serializer.is_valid():
-            claim.veterinarian = request.user
-            claim.vet_notes = serializer.validated_data['vet_notes']
-            claim.verification_date = timezone.now()
-            
-            if serializer.validated_data['decision'] == 'approve':
-                claim.status = 'Verified'
-            else:
-                claim.status = 'Rejected'
-            
-            claim.save()
-            
-            response_serializer = self.get_serializer(claim)
-            return Response(response_serializer.data)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=True, methods=['post'])
     def update_status(self, request, pk=None):
@@ -221,8 +174,6 @@ class ClaimViewSet(viewsets.ModelViewSet):
         
         if user.role == 'farmer':
             claims = Claim.objects.filter(farmer=user)
-        elif user.role == 'vet':
-            claims = Claim.objects.filter(veterinarian=user)
         elif user.role == 'admin':
             claims = Claim.objects.all()
         else:
@@ -234,7 +185,7 @@ class ClaimViewSet(viewsets.ModelViewSet):
         stats = {
             'total_claims': claims.count(),
             'pending_claims': claims.filter(
-                status__in=['Submitted', 'Under Review', 'Pending Verification']
+                status__in=['Submitted', 'Under Review']
             ).count(),
             'approved_claims': claims.filter(status='Approved').count(),
             'rejected_claims': claims.filter(status='Rejected').count(),

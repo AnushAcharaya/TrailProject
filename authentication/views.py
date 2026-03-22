@@ -188,6 +188,8 @@ class LoginView(generics.GenericAPIView):
 
 
 class ForgotPasswordEmailView(APIView):
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         serializer = ForgotPasswordEmailSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -209,6 +211,8 @@ class ForgotPasswordEmailView(APIView):
 
 
 class VerifyTokenView(APIView):
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         serializer = ForgotPasswordTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -228,6 +232,8 @@ class VerifyTokenView(APIView):
 
 
 class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         serializer = ResetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

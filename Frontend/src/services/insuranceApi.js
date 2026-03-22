@@ -1,5 +1,27 @@
 // Frontend/src/services/insuranceApi.js
-import api from './api';
+import axios from 'axios';
+
+// Create a separate axios instance for insurance API (not under /auth)
+const insuranceApi = axios.create({
+  baseURL: 'http://localhost:8000/api/v1',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add request interceptor to include JWT token
+insuranceApi.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 const BASE_URL = '/insurance';
 
@@ -14,7 +36,7 @@ const BASE_URL = '/insurance';
 export const getInsurancePlans = async () => {
   try {
     console.log('Fetching insurance plans...');
-    const response = await api.get(`${BASE_URL}/plans/`);
+    const response = await insuranceApi.get(`${BASE_URL}/plans/`);
     console.log('Insurance plans fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -31,7 +53,7 @@ export const getInsurancePlans = async () => {
 export const getInsurancePlanById = async (planId) => {
   try {
     console.log(`Fetching insurance plan ${planId}...`);
-    const response = await api.get(`${BASE_URL}/plans/${planId}/`);
+    const response = await insuranceApi.get(`${BASE_URL}/plans/${planId}/`);
     console.log('Insurance plan fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -48,7 +70,7 @@ export const getInsurancePlanById = async (planId) => {
 export const searchInsurancePlans = async (searchTerm) => {
   try {
     console.log(`Searching insurance plans: ${searchTerm}`);
-    const response = await api.get(`${BASE_URL}/plans/`, {
+    const response = await insuranceApi.get(`${BASE_URL}/plans/`, {
       params: { search: searchTerm }
     });
     console.log('Search results:', response.data);
@@ -67,7 +89,7 @@ export const searchInsurancePlans = async (searchTerm) => {
 export const getInsurancePlansByType = async (planType) => {
   try {
     console.log(`Fetching ${planType} insurance plans...`);
-    const response = await api.get(`${BASE_URL}/plans/`, {
+    const response = await insuranceApi.get(`${BASE_URL}/plans/`, {
       params: { plan_type: planType }
     });
     console.log('Plans by type fetched:', response.data);
@@ -89,7 +111,7 @@ export const getInsurancePlansByType = async (planType) => {
 export const getEnrollments = async () => {
   try {
     console.log('Fetching enrollments...');
-    const response = await api.get(`${BASE_URL}/enrollments/`);
+    const response = await insuranceApi.get(`${BASE_URL}/enrollments/`);
     console.log('Enrollments fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -106,7 +128,7 @@ export const getEnrollments = async () => {
 export const getEnrollmentById = async (enrollmentId) => {
   try {
     console.log(`Fetching enrollment ${enrollmentId}...`);
-    const response = await api.get(`${BASE_URL}/enrollments/${enrollmentId}/`);
+    const response = await insuranceApi.get(`${BASE_URL}/enrollments/${enrollmentId}/`);
     console.log('Enrollment fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -123,7 +145,7 @@ export const getEnrollmentById = async (enrollmentId) => {
 export const createEnrollment = async (enrollmentData) => {
   try {
     console.log('Creating enrollment:', enrollmentData);
-    const response = await api.post(`${BASE_URL}/enrollments/`, enrollmentData);
+    const response = await insuranceApi.post(`${BASE_URL}/enrollments/`, enrollmentData);
     console.log('Enrollment created:', response.data);
     return response.data;
   } catch (error) {
@@ -141,7 +163,7 @@ export const createEnrollment = async (enrollmentData) => {
 export const updateEnrollment = async (enrollmentId, enrollmentData) => {
   try {
     console.log(`Updating enrollment ${enrollmentId}:`, enrollmentData);
-    const response = await api.patch(`${BASE_URL}/enrollments/${enrollmentId}/`, enrollmentData);
+    const response = await insuranceApi.patch(`${BASE_URL}/enrollments/${enrollmentId}/`, enrollmentData);
     console.log('Enrollment updated:', response.data);
     return response.data;
   } catch (error) {
@@ -158,7 +180,7 @@ export const updateEnrollment = async (enrollmentId, enrollmentData) => {
 export const deleteEnrollment = async (enrollmentId) => {
   try {
     console.log(`Deleting enrollment ${enrollmentId}...`);
-    const response = await api.delete(`${BASE_URL}/enrollments/${enrollmentId}/`);
+    const response = await insuranceApi.delete(`${BASE_URL}/enrollments/${enrollmentId}/`);
     console.log('Enrollment deleted');
     return response.data;
   } catch (error) {
@@ -174,7 +196,7 @@ export const deleteEnrollment = async (enrollmentId) => {
 export const getActiveEnrollments = async () => {
   try {
     console.log('Fetching active enrollments...');
-    const response = await api.get(`${BASE_URL}/enrollments/active/`);
+    const response = await insuranceApi.get(`${BASE_URL}/enrollments/active/`);
     console.log('Active enrollments fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -191,7 +213,7 @@ export const getActiveEnrollments = async () => {
 export const cancelEnrollment = async (enrollmentId) => {
   try {
     console.log(`Cancelling enrollment ${enrollmentId}...`);
-    const response = await api.post(`${BASE_URL}/enrollments/${enrollmentId}/cancel/`);
+    const response = await insuranceApi.post(`${BASE_URL}/enrollments/${enrollmentId}/cancel/`);
     console.log('Enrollment cancelled:', response.data);
     return response.data;
   } catch (error) {
@@ -208,7 +230,7 @@ export const cancelEnrollment = async (enrollmentId) => {
 export const getEnrollmentsByStatus = async (status) => {
   try {
     console.log(`Fetching enrollments with status: ${status}`);
-    const response = await api.get(`${BASE_URL}/enrollments/`, {
+    const response = await insuranceApi.get(`${BASE_URL}/enrollments/`, {
       params: { status }
     });
     console.log('Enrollments by status fetched:', response.data);
@@ -230,7 +252,7 @@ export const getEnrollmentsByStatus = async (status) => {
 export const getClaims = async () => {
   try {
     console.log('Fetching claims...');
-    const response = await api.get(`${BASE_URL}/claims/`);
+    const response = await insuranceApi.get(`${BASE_URL}/claims/`);
     console.log('Claims fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -247,7 +269,7 @@ export const getClaims = async () => {
 export const getClaimById = async (claimId) => {
   try {
     console.log(`Fetching claim ${claimId}...`);
-    const response = await api.get(`${BASE_URL}/claims/${claimId}/`);
+    const response = await insuranceApi.get(`${BASE_URL}/claims/${claimId}/`);
     console.log('Claim fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -265,24 +287,28 @@ export const createClaim = async (claimData) => {
   try {
     console.log('Creating claim:', claimData);
     
-    // If there's a file, use FormData
-    if (claimData.supporting_document instanceof File) {
-      const formData = new FormData();
-      Object.keys(claimData).forEach(key => {
-        formData.append(key, claimData[key]);
-      });
-      
-      const response = await api.post(`${BASE_URL}/claims/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log('Claim created:', response.data);
-      return response.data;
+    // Always use FormData for claims since we may have file uploads
+    const formData = new FormData();
+    
+    Object.keys(claimData).forEach(key => {
+      const value = claimData[key];
+      // Only append non-null, non-undefined values
+      if (value !== null && value !== undefined) {
+        formData.append(key, value);
+      }
+    });
+    
+    // Log FormData contents for debugging
+    console.log('FormData contents:');
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
     }
     
-    // Otherwise use regular JSON
-    const response = await api.post(`${BASE_URL}/claims/`, claimData);
+    const response = await insuranceApi.post(`${BASE_URL}/claims/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     console.log('Claim created:', response.data);
     return response.data;
   } catch (error) {
@@ -300,7 +326,7 @@ export const createClaim = async (claimData) => {
 export const updateClaim = async (claimId, claimData) => {
   try {
     console.log(`Updating claim ${claimId}:`, claimData);
-    const response = await api.patch(`${BASE_URL}/claims/${claimId}/`, claimData);
+    const response = await insuranceApi.patch(`${BASE_URL}/claims/${claimId}/`, claimData);
     console.log('Claim updated:', response.data);
     return response.data;
   } catch (error) {
@@ -317,7 +343,7 @@ export const updateClaim = async (claimId, claimData) => {
 export const deleteClaim = async (claimId) => {
   try {
     console.log(`Deleting claim ${claimId}...`);
-    const response = await api.delete(`${BASE_URL}/claims/${claimId}/`);
+    const response = await insuranceApi.delete(`${BASE_URL}/claims/${claimId}/`);
     console.log('Claim deleted');
     return response.data;
   } catch (error) {
@@ -333,45 +359,11 @@ export const deleteClaim = async (claimId) => {
 export const getMyClaims = async () => {
   try {
     console.log('Fetching my claims...');
-    const response = await api.get(`${BASE_URL}/claims/my_claims/`);
+    const response = await insuranceApi.get(`${BASE_URL}/claims/my_claims/`);
     console.log('My claims fetched:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching my claims:', error.response?.data || error.message);
-    throw error;
-  }
-};
-
-/**
- * Get claims pending vet verification (Vet only)
- * @returns {Promise} List of claims pending verification
- */
-export const getPendingVerificationClaims = async () => {
-  try {
-    console.log('Fetching claims pending verification...');
-    const response = await api.get(`${BASE_URL}/claims/pending_verification/`);
-    console.log('Pending verification claims fetched:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching pending verification claims:', error.response?.data || error.message);
-    throw error;
-  }
-};
-
-/**
- * Vet verifies a claim
- * @param {number} claimId - Claim ID
- * @param {Object} verificationData - Verification data {vet_notes, decision: 'approve'|'reject'}
- * @returns {Promise} Verified claim
- */
-export const verifyClaim = async (claimId, verificationData) => {
-  try {
-    console.log(`Verifying claim ${claimId}:`, verificationData);
-    const response = await api.post(`${BASE_URL}/claims/${claimId}/verify/`, verificationData);
-    console.log('Claim verified:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error verifying claim:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -385,7 +377,7 @@ export const verifyClaim = async (claimId, verificationData) => {
 export const updateClaimStatus = async (claimId, statusData) => {
   try {
     console.log(`Updating claim ${claimId} status:`, statusData);
-    const response = await api.post(`${BASE_URL}/claims/${claimId}/update_status/`, statusData);
+    const response = await insuranceApi.post(`${BASE_URL}/claims/${claimId}/update_status/`, statusData);
     console.log('Claim status updated:', response.data);
     return response.data;
   } catch (error) {
@@ -401,7 +393,7 @@ export const updateClaimStatus = async (claimId, statusData) => {
 export const getClaimStats = async () => {
   try {
     console.log('Fetching claim statistics...');
-    const response = await api.get(`${BASE_URL}/claims/stats/`);
+    const response = await insuranceApi.get(`${BASE_URL}/claims/stats/`);
     console.log('Claim stats fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -418,7 +410,7 @@ export const getClaimStats = async () => {
 export const getClaimsByStatus = async (status) => {
   try {
     console.log(`Fetching claims with status: ${status}`);
-    const response = await api.get(`${BASE_URL}/claims/by_status/`, {
+    const response = await insuranceApi.get(`${BASE_URL}/claims/by_status/`, {
       params: { status }
     });
     console.log('Claims by status fetched:', response.data);
@@ -437,7 +429,7 @@ export const getClaimsByStatus = async (status) => {
 export const searchClaims = async (searchTerm) => {
   try {
     console.log(`Searching claims: ${searchTerm}`);
-    const response = await api.get(`${BASE_URL}/claims/`, {
+    const response = await insuranceApi.get(`${BASE_URL}/claims/`, {
       params: { search: searchTerm }
     });
     console.log('Search results:', response.data);
@@ -456,7 +448,7 @@ export const searchClaims = async (searchTerm) => {
 export const getClaimsByType = async (claimType) => {
   try {
     console.log(`Fetching claims of type: ${claimType}`);
-    const response = await api.get(`${BASE_URL}/claims/`, {
+    const response = await insuranceApi.get(`${BASE_URL}/claims/`, {
       params: { claim_type: claimType }
     });
     console.log('Claims by type fetched:', response.data);
@@ -476,7 +468,7 @@ export const getClaimsByType = async (claimType) => {
 export const getClaimsByDateRange = async (startDate, endDate) => {
   try {
     console.log(`Fetching claims from ${startDate} to ${endDate}`);
-    const response = await api.get(`${BASE_URL}/claims/`, {
+    const response = await insuranceApi.get(`${BASE_URL}/claims/`, {
       params: {
         incident_date_after: startDate,
         incident_date_before: endDate
@@ -524,7 +516,7 @@ export const formatClaimData = (data) => {
     incident_date: data.incidentDate || data.incident_date,
     incident_location: data.incidentLocation || data.incident_location,
     description: data.description,
-    supporting_document: data.supportingDocument || data.supporting_document || null
+    incident_image: data.incidentImage || data.incident_image || null
   };
 };
 
@@ -544,8 +536,6 @@ export const getStatusColor = (status) => {
     // Claim statuses
     'Submitted': '#3b82f6',
     'Under Review': '#8b5cf6',
-    'Pending Verification': '#f59e0b',
-    'Verified': '#10b981',
     'Approved': '#10b981',
     'Rejected': '#ef4444',
     'Paid': '#059669'
@@ -646,8 +636,6 @@ export default {
   updateClaim,
   deleteClaim,
   getMyClaims,
-  getPendingVerificationClaims,
-  verifyClaim,
   updateClaimStatus,
   getClaimStats,
   getClaimsByStatus,
@@ -665,3 +653,4 @@ export default {
   isExpiringSoon,
   getClaimTypeIcon
 };
+

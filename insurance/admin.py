@@ -86,14 +86,11 @@ class ClaimAdmin(admin.ModelAdmin):
             )
         }),
         ('Supporting Documents', {
-            'fields': ('supporting_document',)
-        }),
-        ('Veterinarian Verification', {
-            'fields': ('veterinarian', 'vet_notes', 'verification_date')
+            'fields': ('incident_image', 'vaccination_history', 'medical_history')
         }),
         ('Admin Decision', {
             'fields': ('admin_notes', 'decision_date', 'approved_amount')
         }),
     )
     
-    readonly_fields = ['verification_date', 'decision_date']
+    readonly_fields = ['decision_date']

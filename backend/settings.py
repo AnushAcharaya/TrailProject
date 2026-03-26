@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'insurance',
     'profileTransfer',
     'friends',
+    'messaging',
 ]
 
 MIDDLEWARE = [

@@ -26,7 +26,7 @@ const TopNav = ({ pageTitle = "Dashboard" }) => {
         {/* Message Icon */}
         <div 
           className="relative cursor-pointer hover:opacity-80 transition-opacity"
-          onClick={() => alert('Messages feature coming soon!')}
+          onClick={() => navigate('/messages')}
         >
           <FaEnvelope className="text-gray-600 text-xl" />
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-xs text-white flex items-center justify-center">

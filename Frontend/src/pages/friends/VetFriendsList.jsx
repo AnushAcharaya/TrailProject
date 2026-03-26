@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import { getFriends, removeFriend } from "../../services/friendsApi";
 import { FaUsers, FaEnvelope, FaUserTimes } from "react-icons/fa";
 
 const VetFriendsList = () => {
+  const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [removingId, setRemovingId] = useState(null);
@@ -57,8 +59,8 @@ const VetFriendsList = () => {
     setRemovingId(null);
   };
 
-  const handleMessage = (friendName) => {
-    showNotification(`Messaging ${friendName} - feature coming soon!`, 'success');
+  const handleMessage = (friendshipId, friendName) => {
+    navigate(`/vet/messages/${friendshipId}`);
   };
 
   return (
@@ -115,7 +117,7 @@ const VetFriendsList = () => {
 
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleMessage(friend.full_name || friend.username)}
+                      onClick={() => handleMessage(friendship.id, friend.full_name || friend.username)}
                       className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium flex items-center justify-center gap-2"
                     >
                       <FaEnvelope />

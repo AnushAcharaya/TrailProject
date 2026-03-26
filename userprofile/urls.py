@@ -5,7 +5,9 @@ from .views import (
     UpdatePreferencesView,
     ChangePasswordView,
     DeleteProfileImageView,
-    GetAllVetsView
+    GetAllVetsView,
+    GetAllFarmersView,
+    GetFarmerProfileView
 )
 
 app_name = 'userprofile'
@@ -28,4 +30,10 @@ urlpatterns = [
     
     # Get all vets (GET) - for farmers to view and book appointments
     path('vets/', GetAllVetsView.as_view(), name='get-all-vets'),
+    
+    # Get all farmers (GET) - for vets to view farmer profiles
+    path('farmers/', GetAllFarmersView.as_view(), name='get-all-farmers'),
+    
+    # Get specific farmer profile (GET) - for vets to view farmer details
+    path('farmers/<str:username>/', GetFarmerProfileView.as_view(), name='get-farmer-profile'),
 ]

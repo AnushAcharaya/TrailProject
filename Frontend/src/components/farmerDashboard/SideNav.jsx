@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaCalendarCheck } from 'react-icons/fa';
+import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaCalendarCheck, FaUserFriends } from 'react-icons/fa';
 import "../../styles/farmerdashboard.css";
 
 const SideNav = () => {
@@ -9,6 +9,7 @@ const SideNav = () => {
   const menuItems = [
     { name: "Dashboard", icon: FaHome, path: "/farmerpage" },
     { name: "Vet Appointment", icon: FaCalendarCheck, path: "/farmerappointment" },
+    { name: "Friends", icon: FaUserFriends, path: "/farmer/friends/list" },
     { name: "Livestock", icon: FaPaw, path: "/livestock" },
     { name: "Vaccination", icon: FaSyringe, path: "/vaccination", state: { from: 'farmer' } },
     { name: "Medical History", icon: FaNotesMedical, path: "/medical/history", state: { from: 'farmer' } },
@@ -44,20 +45,28 @@ const SideNav = () => {
 
       {/* Navigation Menu */}
       <nav className="space-y-2 flex-1">
-        {menuItems.map((item, index) => (
-          <div
-            key={index}
-            onClick={() => handleNavigation(item)}
-            className={`flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
-              location.pathname === item.path
-                ? "bg-emerald-700"
-                : "hover:bg-emerald-700"
-            }`}
-          >
-            <item.icon className="text-white text-xl" />
-            <span className="text-white font-medium">{item.name}</span>
-          </div>
-        ))}
+        {menuItems.map((item, index) => {
+          // Check if current path matches the menu item
+          // For Friends, check if path starts with /farmer/friends
+          const isActive = item.name === "Friends" 
+            ? location.pathname.startsWith('/farmer/friends')
+            : location.pathname === item.path;
+          
+          return (
+            <div
+              key={index}
+              onClick={() => handleNavigation(item)}
+              className={`flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+                isActive
+                  ? "bg-emerald-700"
+                  : "hover:bg-emerald-700"
+              }`}
+            >
+              <item.icon className="text-white text-xl" />
+              <span className="text-white font-medium">{item.name}</span>
+            </div>
+          );
+        })}
       </nav>
 
       {/* Logout Button at Bottom */}

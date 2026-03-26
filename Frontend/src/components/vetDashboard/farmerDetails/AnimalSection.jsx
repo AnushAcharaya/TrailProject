@@ -1,90 +1,76 @@
 import { useNavigate } from 'react-router-dom';
 
-function AnimalSection() {
+function AnimalSection({ animals }) {
   const navigate = useNavigate();
 
-  const animals = [
-    {
-      id: 1,
-      name: 'Ganga',
-      tag: 'TAG-1001',
-      type: 'Cow',
-      age: '4 years',
-      image: '/api/placeholder/300/200',
-      status: 'Healthy'
-    },
-    {
-      id: 2,
-      name: 'Sheru',
-      tag: 'TAG-1002',
-      type: 'Buffalo',
-      age: '3 years',
-      image: '/api/placeholder/300/200',
-      status: 'Needs Checkup'
-    },
-    {
-      id: 3,
-      name: 'Moti',
-      tag: 'TAG-1003',
-      type: 'Goat',
-      age: '1 year',
-      image: '/api/placeholder/300/200',
-      status: 'Healthy'
-    }
-  ];
+  if (!animals) return null;
 
   return (
     <div>
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Animals (3)</h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-4">Animals ({animals.length})</h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {animals.map(animal => (
-          <div key={animal.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-            {/* Image */}
-            <div className="relative">
-              <img 
-                src={animal.image}
-                alt={animal.name}
-                className="w-full h-48 object-cover"
-              />
-              <span className={`absolute top-3 right-3 px-2 py-1 rounded text-xs font-medium ${
-                animal.status === 'Healthy' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-              }`}>
-                {animal.status}
-              </span>
-            </div>
-            
-            {/* Details */}
-            <div className="p-4">
-              <h4 className="text-lg font-bold text-gray-900 mb-1">{animal.name}</h4>
-              <div className="flex items-center space-x-2 text-sm text-gray-600 mb-1">
-                <span>Tag: {animal.tag}</span>
+      {animals.length === 0 ? (
+        <div className="bg-white rounded-lg p-8 text-center text-gray-600">
+          No animals registered for this farmer
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {animals.map(animal => {
+            const imageUrl = animal.image || 
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(animal.tag_id)}&background=10b981&color=fff&size=300`;
+
+            return (
+              <div key={animal.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                {/* Image */}
+                <div className="relative">
+                  <img 
+                    src={imageUrl}
+                    alt={animal.tag_id}
+                    className="w-full h-48 object-cover"
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(animal.tag_id)}&background=10b981&color=fff&size=300`;
+                    }}
+                  />
+                  <span className={`absolute top-3 right-3 px-2 py-1 rounded text-xs font-medium ${
+                    animal.health_status === 'Healthy' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {animal.health_status || 'Unknown'}
+                  </span>
+                </div>
+                
+                {/* Details */}
+                <div className="p-4">
+                  <h4 className="text-lg font-bold text-gray-900 mb-1">Tag: {animal.tag_id}</h4>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 mb-1">
+                    <span>Species: {animal.species_name || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+                    <span>Breed: {animal.breed_name || 'N/A'}</span>
+                    <span>•</span>
+                    <span>Age: {animal.age || 'N/A'}</span>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-2">
+                    <button 
+                      onClick={() => navigate('/vaccination', { state: { animalId: animal.id } })}
+                      className="w-full px-3 py-2 bg-emerald-50 text-emerald-700 text-sm font-medium rounded hover:bg-emerald-100 transition-colors"
+                    >
+                      Vaccinations
+                    </button>
+                    <button 
+                      onClick={() => navigate('/medical/history', { state: { animalId: animal.id } })}
+                      className="w-full px-3 py-2 bg-gray-50 text-gray-700 text-sm font-medium rounded hover:bg-gray-100 transition-colors"
+                    >
+                      Medical History
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
-                <span>Type: {animal.type}</span>
-                <span>•</span>
-                <span>Age: {animal.age}</span>
-              </div>
-              
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-2">
-                <button 
-                  onClick={() => navigate('/vaccination')}
-                  className="w-full px-3 py-2 bg-emerald-50 text-emerald-700 text-sm font-medium rounded hover:bg-emerald-100 transition-colors"
-                >
-                  Vaccinations
-                </button>
-                <button 
-                  onClick={() => navigate('/medical/history')}
-                  className="w-full px-3 py-2 bg-gray-50 text-gray-700 text-sm font-medium rounded hover:bg-gray-100 transition-colors"
-                >
-                  Medical History
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

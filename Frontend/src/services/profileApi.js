@@ -275,3 +275,109 @@ export const getAllVets = async () => {
     };
   }
 };
+
+
+/**
+ * Get All Farmers
+ * Retrieves all farmer profiles for vets to view
+ * Returns list of farmers with their profile information including photo, name, address, and animal count
+ */
+export const getAllFarmers = async () => {
+  try {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if (!token) {
+      console.error('[profileApi] No authentication token found');
+      return {
+        success: false,
+        error: { message: 'No authentication token found', status: 401 }
+      };
+    }
+
+    console.log('[profileApi] Fetching all farmer profiles...');
+    
+    const response = await profileApi.get('/farmers/', {
+      headers: getAuthHeaders()
+    });
+
+    console.log('[profileApi] Farmers retrieved successfully:', response.data);
+    
+    return {
+      success: true,
+      data: response.data.data // Array of farmer profiles
+    };
+  } catch (error) {
+    console.error('[profileApi] Error fetching farmers:', error);
+    
+    if (error.response) {
+      return {
+        success: false,
+        error: {
+          message: error.response.data.error || 'Failed to fetch farmers',
+          status: error.response.status,
+          details: error.response.data
+        }
+      };
+    }
+    
+    return {
+      success: false,
+      error: {
+        message: error.message || 'Network error occurred',
+        status: 0
+      }
+    };
+  }
+};
+
+
+/**
+ * Get Farmer Profile by Username
+ * Retrieves a specific farmer's profile for vets to view
+ * Returns farmer profile with their information
+ */
+export const getFarmerProfile = async (username) => {
+  try {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if (!token) {
+      console.error('[profileApi] No authentication token found');
+      return {
+        success: false,
+        error: { message: 'No authentication token found', status: 401 }
+      };
+    }
+
+    console.log('[profileApi] Fetching farmer profile for:', username);
+    
+    const response = await profileApi.get(`/farmers/${username}/`, {
+      headers: getAuthHeaders()
+    });
+
+    console.log('[profileApi] Farmer profile retrieved successfully:', response.data);
+    
+    return {
+      success: true,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error('[profileApi] Error fetching farmer profile:', error);
+    
+    if (error.response) {
+      return {
+        success: false,
+        error: {
+          message: error.response.data.error || 'Failed to fetch farmer profile',
+          status: error.response.status,
+          details: error.response.data
+        }
+      };
+    }
+    
+    return {
+      success: false,
+      error: {
+        message: error.message || 'Network error occurred',
+        status: 0
+      }
+    };
+  }
+};

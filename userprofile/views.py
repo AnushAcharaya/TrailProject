@@ -226,3 +226,78 @@ class GetAllVetsView(APIView):
             'message': f'Retrieved {len(vet_profiles)} vet profiles',
             'data': serializer.data
         }, status=status.HTTP_200_OK)
+
+
+
+class GetAllFarmersView(APIView):
+    """
+    GET: Retrieve all farmer profiles for vets to view.
+    Returns list of farmers with their profile information and animal count.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        from authentication.models import CustomUser
+        from livestockcrud.models import Livestock
+        from django.db.models import Count
+        
+        # Get all users with role 'farmer' and status 'approved'
+        farmers = CustomUser.objects.filter(role='farmer', status='approved')
+        
+        # Get or create profiles for all farmers and include animal count
+        farmer_profiles = []
+        for farmer in farmers:
+            profile, created = UserProfile.objects.get_or_create(user=farmer)
+            
+            # Count animals for this farmer
+            animal_count = Livestock.objects.filter(user=farmer).count()
+            
+            # Serialize profile
+            profile_data = UserProfileSerializer(profile, context={'request': request}).data
+            profile_data['animal_count'] = animal_count
+            
+            farmer_profiles.append(profile_data)
+        
+        return Response({
+            'success': True,
+            'message': f'Retrieved {len(farmer_profiles)} farmer profiles',
+            'data': farmer_profiles
+        }, status=status.HTTP_200_OK)
+
+
+
+class GetFarmerProfileView(APIView):
+    """
+    GET: Retrieve a specific farmer's profile by username.
+    Returns farmer profile with their information and animal count.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, username):
+        from authentication.models import CustomUser
+        from livestockcrud.models import Livestock
+        
+        try:
+            # Get the farmer user
+            farmer = CustomUser.objects.get(username=username, role='farmer', status='approved')
+        except CustomUser.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'Farmer not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get or create profile
+        profile, created = UserProfile.objects.get_or_create(user=farmer)
+        
+        # Count animals for this farmer
+        animal_count = Livestock.objects.filter(user=farmer).count()
+        
+        # Serialize profile
+        profile_data = UserProfileSerializer(profile, context={'request': request}).data
+        profile_data['animal_count'] = animal_count
+        
+        return Response({
+            'success': True,
+            'message': 'Farmer profile retrieved successfully',
+            'data': profile_data
+        }, status=status.HTTP_200_OK)

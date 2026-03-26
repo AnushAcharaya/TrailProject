@@ -1,18 +1,28 @@
-import { FaHome, FaUser, FaCalendarAlt, FaCog, FaSignOutAlt, FaBell } from 'react-icons/fa';
+import { FaHome, FaUser, FaCalendarAlt, FaCog, FaSignOutAlt, FaBell, FaEnvelope, FaUserFriends } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getUserProfile } from '../../services/profileApi';
+import { getReceivedRequests } from '../../services/friendsApi';
 
 function VetLayout({ children, pageTitle = "Dashboard" }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [friendRequestCount, setFriendRequestCount] = useState(0);
 
   useEffect(() => {
     fetchProfile();
+    loadFriendRequestCount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const loadFriendRequestCount = async () => {
+    const result = await getReceivedRequests();
+    if (result.success) {
+      setFriendRequestCount(result.data.length);
+    }
+  };
 
   // Listen for login events to force profile refresh (only for this tab)
   useEffect(() => {
@@ -171,6 +181,17 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             <span className="text-white font-medium">Appointments</span>
           </div>
           <div 
+            onClick={() => navigate('/vet/friends/list')}
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+              location.pathname.startsWith('/vet/friends') 
+                ? 'bg-emerald-700' 
+                : 'hover:bg-emerald-700'
+            }`}
+          >
+            <FaUserFriends className="text-white text-xl" />
+            <span className="text-white font-medium">Friends</span>
+          </div>
+          <div 
             onClick={() => navigate('/profile')}
             className="flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors hover:bg-emerald-700"
           >
@@ -197,6 +218,30 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
         <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
           <div className="flex items-center space-x-6">
+            {/* Message Icon */}
+            <div 
+              className="relative cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => alert('Messages feature coming soon!')}
+            >
+              <FaEnvelope className="text-gray-600 text-xl" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-xs text-white flex items-center justify-center">
+                5
+              </span>
+            </div>
+
+            {/* Friend Request Icon */}
+            <div 
+              className="relative cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate('/vet/friends/requests')}
+            >
+              <FaUserFriends className="text-gray-600 text-xl" />
+              {friendRequestCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full text-xs text-white flex items-center justify-center">
+                  {friendRequestCount}
+                </span>
+              )}
+            </div>
+
             {/* Notification Bell */}
             <div className="relative cursor-pointer">
               <FaBell className="text-gray-600 text-xl" />

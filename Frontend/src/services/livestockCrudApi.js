@@ -297,3 +297,26 @@ export const createBreed = async (name, speciesId) => {
 };
 
 export default livestockApi;
+
+
+/**
+ * Get livestock for a specific farmer (by username)
+ * For vets to view a farmer's animals
+ */
+export const getLivestockByFarmer = async (username) => {
+  try {
+    console.log('[API] Fetching livestock for farmer:', username);
+    const response = await livestockApi.get('/livestock/', {
+      params: { owner: username }
+    });
+    console.log('[API] Farmer livestock response:', response.data);
+    
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('[API] Get farmer livestock error:', error);
+    return {
+      success: false,
+      error: error.response?.data || { message: 'Failed to fetch farmer livestock.' }
+    };
+  }
+};

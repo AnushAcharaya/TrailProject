@@ -21,6 +21,10 @@ import FarmerDashboardPage from "./pages/FarmerDashboard/FarmerDashboardPage";
 import FarmerAppointments from "./pages/appointments/FarmerAppointments";
 import VetAppointments from "./pages/appointments/VetAppointments";
 import RequestAppointmentPage from "./pages/appointments/RequestAppointmentPage";
+import FriendRequestsPage from "./pages/friends/FriendRequests";
+import FriendsListPage from "./pages/friends/FriendsList";
+import VetFriendRequestsPage from "./pages/friends/VetFriendRequests";
+import VetFriendsListPage from "./pages/friends/VetFriendsList";
 import Dashboard from "./pages/insurance/farmerSideInsurance/Dashboard";
 import InsurancePlans from "./pages/insurance/farmerSideInsurance/InsurancePlan";
 import EnrollPage from "./pages/insurance/farmerSideInsurance/Enroll";
@@ -63,6 +67,10 @@ function App() {
         <Route path="/farmerappointment" element={<FarmerAppointments />} />
         <Route path="/vetappointment" element={<VetAppointments />} />
         <Route path="/appointments/request" element={<RequestAppointmentPage />} />
+        <Route path="/farmer/friends/requests" element={<FriendRequestsPage />} />
+        <Route path="/farmer/friends/list" element={<FriendsListPage />} />
+        <Route path="/vet/friends/requests" element={<VetFriendRequestsPage />} />
+        <Route path="/vet/friends/list" element={<VetFriendsListPage />} />
         <Route path="/farmerinsurancedashboard" element={<Dashboard />} />
         <Route path="/farmerinsuranceplan" element={<InsurancePlans />} />
         <Route path="/farmerinsuranceenroll" element={<EnrollPage />} />

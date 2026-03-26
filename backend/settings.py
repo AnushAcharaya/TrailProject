@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'appointment',
     'insurance',
     'profileTransfer',
+    'friends',
 ]
 
 MIDDLEWARE = [

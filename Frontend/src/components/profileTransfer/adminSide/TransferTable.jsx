@@ -1,7 +1,15 @@
 // components/profile-transfer/admin-side/dashboard/components/TransferTable.jsx
+import { useNavigate } from 'react-router-dom';
 import StatusTag from './StatusTag';
 
-export default function TransferTable({ data }) {
+export default function TransferTable({ data, onUpdate }) {
+  const navigate = useNavigate();
+
+  const handleReview = (transfer) => {
+    // Navigate to review page with transfer ID
+    navigate(`/profile-transfer/admin/review/${transfer.id}`);
+  };
+
   return (
     <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -51,7 +59,10 @@ export default function TransferTable({ data }) {
                   {row.date}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <button className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
+                  <button 
+                    onClick={() => handleReview(row)}
+                    className="text-emerald-600 hover:text-emerald-700 text-sm font-medium transition-colors"
+                  >
                     {row.action} →
                   </button>
                 </td>

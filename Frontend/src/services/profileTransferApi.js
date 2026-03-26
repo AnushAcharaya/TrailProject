@@ -1,5 +1,41 @@
 // Frontend/src/services/profileTransferApi.js
-import api from './api';
+import axios from 'axios';
+
+// Create a separate axios instance for profile transfer with correct base URL
+const profileTransferApi = axios.create({
+  baseURL: 'http://localhost:8000/api/v1',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add request interceptor to include JWT token
+profileTransferApi.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle 401 errors
+profileTransferApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      sessionStorage.clear();
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 const BASE_URL = '/profile-transfer';
 
@@ -22,7 +58,7 @@ const BASE_URL = '/profile-transfer';
 export const getTransfers = async (params = {}) => {
   try {
     console.log('Fetching transfers...');
-    const response = await api.get(`${BASE_URL}/transfers/`, { params });
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/`, { params });
     console.log('Transfers fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -39,7 +75,7 @@ export const getTransfers = async (params = {}) => {
 export const getTransferById = async (transferId) => {
   try {
     console.log(`Fetching transfer ${transferId}...`);
-    const response = await api.get(`${BASE_URL}/transfers/${transferId}/`);
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/${transferId}/`);
     console.log('Transfer fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -68,7 +104,7 @@ export const createTransfer = async (transferData) => {
         formData.append(key, transferData[key]);
       });
       
-      const response = await api.post(`${BASE_URL}/transfers/`, formData, {
+      const response = await profileTransferApi.post(`${BASE_URL}/transfers/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -78,7 +114,7 @@ export const createTransfer = async (transferData) => {
     }
     
     // Otherwise use regular JSON
-    const response = await api.post(`${BASE_URL}/transfers/`, transferData);
+    const response = await profileTransferApi.post(`${BASE_URL}/transfers/`, transferData);
     console.log('Transfer created:', response.data);
     return response.data;
   } catch (error) {
@@ -96,7 +132,7 @@ export const createTransfer = async (transferData) => {
 export const updateTransfer = async (transferId, transferData) => {
   try {
     console.log(`Updating transfer ${transferId}:`, transferData);
-    const response = await api.patch(`${BASE_URL}/transfers/${transferId}/`, transferData);
+    const response = await profileTransferApi.patch(`${BASE_URL}/transfers/${transferId}/`, transferData);
     console.log('Transfer updated:', response.data);
     return response.data;
   } catch (error) {
@@ -113,7 +149,7 @@ export const updateTransfer = async (transferId, transferData) => {
 export const deleteTransfer = async (transferId) => {
   try {
     console.log(`Deleting transfer ${transferId}...`);
-    const response = await api.delete(`${BASE_URL}/transfers/${transferId}/`);
+    const response = await profileTransferApi.delete(`${BASE_URL}/transfers/${transferId}/`);
     console.log('Transfer deleted');
     return response.data;
   } catch (error) {
@@ -134,7 +170,7 @@ export const deleteTransfer = async (transferId) => {
 export const getSentTransfers = async (params = {}) => {
   try {
     console.log('Fetching sent transfers...');
-    const response = await api.get(`${BASE_URL}/transfers/sent/`, { params });
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/sent/`, { params });
     console.log('Sent transfers fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -151,7 +187,7 @@ export const getSentTransfers = async (params = {}) => {
 export const cancelTransfer = async (transferId) => {
   try {
     console.log(`Cancelling transfer ${transferId}...`);
-    const response = await api.post(`${BASE_URL}/transfers/${transferId}/cancel/`);
+    const response = await profileTransferApi.post(`${BASE_URL}/transfers/${transferId}/cancel/`);
     console.log('Transfer cancelled:', response.data);
     return response.data;
   } catch (error) {
@@ -172,7 +208,7 @@ export const cancelTransfer = async (transferId) => {
 export const getReceivedTransfers = async (params = {}) => {
   try {
     console.log('Fetching received transfers...');
-    const response = await api.get(`${BASE_URL}/transfers/received/`, { params });
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/received/`, { params });
     console.log('Received transfers fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -190,7 +226,7 @@ export const getReceivedTransfers = async (params = {}) => {
 export const receiverApproveTransfer = async (transferId, notes = '') => {
   try {
     console.log(`Receiver approving transfer ${transferId}...`);
-    const response = await api.post(`${BASE_URL}/transfers/${transferId}/receiver_approve/`, {
+    const response = await profileTransferApi.post(`${BASE_URL}/transfers/${transferId}/receiver_approve/`, {
       notes
     });
     console.log('Transfer approved by receiver:', response.data);
@@ -210,7 +246,7 @@ export const receiverApproveTransfer = async (transferId, notes = '') => {
 export const receiverRejectTransfer = async (transferId, notes = '') => {
   try {
     console.log(`Receiver rejecting transfer ${transferId}...`);
-    const response = await api.post(`${BASE_URL}/transfers/${transferId}/receiver_reject/`, {
+    const response = await profileTransferApi.post(`${BASE_URL}/transfers/${transferId}/receiver_reject/`, {
       notes
     });
     console.log('Transfer rejected by receiver:', response.data);
@@ -232,7 +268,7 @@ export const receiverRejectTransfer = async (transferId, notes = '') => {
 export const getPendingReviewTransfers = async () => {
   try {
     console.log('Fetching transfers pending admin review...');
-    const response = await api.get(`${BASE_URL}/transfers/pending_review/`);
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/pending_review/`);
     console.log('Pending review transfers fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -250,7 +286,7 @@ export const getPendingReviewTransfers = async () => {
 export const adminApproveTransfer = async (transferId, notes = '') => {
   try {
     console.log(`Admin approving transfer ${transferId}...`);
-    const response = await api.post(`${BASE_URL}/transfers/${transferId}/admin_approve/`, {
+    const response = await profileTransferApi.post(`${BASE_URL}/transfers/${transferId}/admin_approve/`, {
       notes
     });
     console.log('Transfer approved by admin:', response.data);
@@ -270,7 +306,7 @@ export const adminApproveTransfer = async (transferId, notes = '') => {
 export const adminRejectTransfer = async (transferId, notes = '') => {
   try {
     console.log(`Admin rejecting transfer ${transferId}...`);
-    const response = await api.post(`${BASE_URL}/transfers/${transferId}/admin_reject/`, {
+    const response = await profileTransferApi.post(`${BASE_URL}/transfers/${transferId}/admin_reject/`, {
       notes
     });
     console.log('Transfer rejected by admin:', response.data);
@@ -290,7 +326,7 @@ export const adminRejectTransfer = async (transferId, notes = '') => {
 export const completeTransfer = async (transferId) => {
   try {
     console.log(`Completing transfer ${transferId}...`);
-    const response = await api.post(`${BASE_URL}/transfers/${transferId}/complete/`);
+    const response = await profileTransferApi.post(`${BASE_URL}/transfers/${transferId}/complete/`);
     console.log('Transfer completed:', response.data);
     return response.data;
   } catch (error) {
@@ -310,7 +346,7 @@ export const completeTransfer = async (transferId) => {
 export const getTransferStats = async () => {
   try {
     console.log('Fetching transfer statistics...');
-    const response = await api.get(`${BASE_URL}/transfers/stats/`);
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/stats/`);
     console.log('Transfer stats fetched:', response.data);
     return response.data;
   } catch (error) {
@@ -327,7 +363,7 @@ export const getTransferStats = async () => {
 export const searchFarmers = async (searchQuery) => {
   try {
     console.log(`Searching farmers: ${searchQuery}`);
-    const response = await api.get(`${BASE_URL}/transfers/search_farmers/`, {
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/search_farmers/`, {
       params: { q: searchQuery }
     });
     console.log('Farmer search results:', response.data);
@@ -350,7 +386,7 @@ export const searchFarmers = async (searchQuery) => {
 export const getTransfersByStatus = async (status) => {
   try {
     console.log(`Fetching transfers with status: ${status}`);
-    const response = await api.get(`${BASE_URL}/transfers/`, {
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/`, {
       params: { status }
     });
     console.log('Transfers by status fetched:', response.data);
@@ -369,7 +405,7 @@ export const getTransfersByStatus = async (status) => {
 export const getTransfersByLivestock = async (livestockId) => {
   try {
     console.log(`Fetching transfers for livestock ${livestockId}...`);
-    const response = await api.get(`${BASE_URL}/transfers/`, {
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/`, {
       params: { livestock: livestockId }
     });
     console.log('Transfers by livestock fetched:', response.data);
@@ -389,7 +425,7 @@ export const getTransfersByLivestock = async (livestockId) => {
 export const getTransfersByDateRange = async (startDate, endDate) => {
   try {
     console.log(`Fetching transfers from ${startDate} to ${endDate}`);
-    const response = await api.get(`${BASE_URL}/transfers/`, {
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/`, {
       params: {
         created_after: startDate,
         created_before: endDate
@@ -411,7 +447,7 @@ export const getTransfersByDateRange = async (startDate, endDate) => {
 export const searchTransfers = async (searchQuery) => {
   try {
     console.log(`Searching transfers: ${searchQuery}`);
-    const response = await api.get(`${BASE_URL}/transfers/`, {
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/`, {
       params: { search: searchQuery }
     });
     console.log('Transfer search results:', response.data);
@@ -432,7 +468,7 @@ export const getSortedTransfers = async (ordering, descending = false) => {
   try {
     const orderParam = descending ? `-${ordering}` : ordering;
     console.log(`Fetching transfers sorted by: ${orderParam}`);
-    const response = await api.get(`${BASE_URL}/transfers/`, {
+    const response = await profileTransferApi.get(`${BASE_URL}/transfers/`, {
       params: { ordering: orderParam }
     });
     console.log('Sorted transfers fetched:', response.data);
@@ -737,3 +773,4 @@ export default {
   getStatusIcon,
   validateTransferData
 };
+

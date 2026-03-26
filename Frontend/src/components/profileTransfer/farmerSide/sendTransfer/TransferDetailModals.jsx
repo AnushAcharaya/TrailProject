@@ -24,7 +24,11 @@ export default function TransferDetailsModal({ transfer, onClose }) {
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          <AnimalDetail animal={transfer.details.animal} />
+          <AnimalDetail 
+            animal={transfer.details.animal} 
+            recipient={transfer.details.recipient}
+            reason={transfer.details.reason}
+          />
           
           {/* Transfer Info */}
           <div className="bg-emerald-50/50 rounded-2xl p-6 border border-emerald-200/50">
@@ -51,7 +55,7 @@ export default function TransferDetailsModal({ transfer, onClose }) {
             </div>
           </div>
 
-          <ProgressStepper />
+          <ProgressStepper status={transfer.status} />
         </div>
       </div>
     </div>

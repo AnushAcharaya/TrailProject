@@ -9,7 +9,7 @@ User = get_user_model()
 
 class UserBasicSerializer(serializers.ModelSerializer):
     """Basic user info for nested serialization"""
-    full_name = serializers.CharField(source='get_full_name', read_only=True)
+    phone_number = serializers.CharField(source='phone', read_only=True)
     
     class Meta:
         model = User
@@ -21,13 +21,13 @@ class LivestockBasicSerializer(serializers.ModelSerializer):
     """Basic livestock info for nested serialization"""
     species_name = serializers.CharField(source='species.name', read_only=True)
     breed_name = serializers.CharField(source='breed.name', read_only=True)
-    owner_name = serializers.CharField(source='owner.get_full_name', read_only=True)
+    owner_name = serializers.CharField(source='user.full_name', read_only=True)
     
     class Meta:
         model = Livestock
         fields = [
-            'id', 'tag_number', 'name', 'species_name', 'breed_name',
-            'age', 'gender', 'health_status', 'owner', 'owner_name', 'image'
+            'id', 'tag_id', 'species_name', 'breed_name',
+            'age', 'gender', 'health_status', 'user', 'owner_name', 'image'
         ]
         read_only_fields = fields
 
@@ -68,7 +68,7 @@ class TransferSerializer(serializers.ModelSerializer):
         if not self.instance:
             # Check if livestock belongs to sender
             if 'livestock' in data:
-                if data['livestock'].owner != request.user:
+                if data['livestock'].user != request.user:
                     raise serializers.ValidationError(
                         "You can only transfer livestock you own"
                     )

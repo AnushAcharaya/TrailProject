@@ -1,10 +1,14 @@
 import React, { useState } from "react";
-import { Users, CheckCircle, BarChart2, Settings, HelpCircle, X, LogOut, AlertTriangle, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Users, CheckCircle, BarChart2, Settings, HelpCircle, X, LogOut, AlertTriangle, Shield, ArrowRightLeft } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SideNav({ isOpen, toggleSidebar }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Check if we're on a Profile Transfer admin page
+  const isProfileTransferAdmin = location.pathname.startsWith('/profile-transfer/admin');
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -64,8 +68,9 @@ export default function SideNav({ isOpen, toggleSidebar }) {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-16 left-0
-          h-[calc(100vh-4rem)] w-64
+          fixed ${isProfileTransferAdmin ? 'top-0' : 'top-16'}
+          left-0
+          ${isProfileTransferAdmin ? 'h-screen' : 'h-[calc(100vh-4rem)]'} w-64
           bg-white shadow-lg p-6
           flex flex-col gap-6
           z-40
@@ -95,6 +100,12 @@ export default function SideNav({ isOpen, toggleSidebar }) {
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors cursor-pointer"
           >
             <Shield size={18} /> Insurance
+          </a>
+          <a 
+            onClick={() => navigate('/profile-transfer/admin/dashboard')}
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors cursor-pointer"
+          >
+            <ArrowRightLeft size={18} /> Profile Transfer
           </a>
           <a className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors">
             <BarChart2 size={18} /> Analytics

@@ -4,10 +4,55 @@ import { FaTimes } from 'react-icons/fa';
 import AnimalPreview from './AnimalPreview';
 import FarmSearch from './FarmSearch';
 import ReasonTextArea from './ReasonTextArea';
+import { createTransfer } from '../../../../services/profileTransferApi';
 
-export default function TransferModal({ animal, onClose }) {
+export default function TransferModal({ animal, onClose, onTransferSuccess }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [reason, setReason] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleFarmerSelect = (farmer) => {
+    setSelectedFarmer(farmer);
+    setError(null);
+  };
+
+  const handleSubmit = async () => {
+    // Validation
+    if (!selectedFarmer) {
+      setError('Please select a farmer to transfer to');
+      return;
+    }
+
+    if (!reason || reason.trim().length < 10) {
+      setError('Please provide a reason (at least 10 characters)');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Create transfer request
+      await createTransfer({
+        livestock: animal.originalData?.id || animal.id,
+        receiver: selectedFarmer.id,
+        reason: reason.trim()
+      });
+
+      // Success - close modal and refresh
+      if (onTransferSuccess) {
+        onTransferSuccess();
+      }
+      onClose();
+    } catch (err) {
+      console.error('Error creating transfer:', err);
+      setError(err.response?.data?.message || 'Failed to create transfer request');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -30,18 +75,54 @@ export default function TransferModal({ animal, onClose }) {
         {/* Content */}
         <div className="p-6 space-y-4">
           <AnimalPreview animal={animal} />
-          <FarmSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+          
+          <div>
+            <FarmSearch 
+              searchTerm={searchTerm} 
+              onSearchChange={setSearchTerm}
+              onFarmerSelect={handleFarmerSelect}
+            />
+            {selectedFarmer && (
+              <div className="mt-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                <p className="text-sm text-emerald-700">
+                  Selected: <span className="font-semibold">{selectedFarmer.full_name || selectedFarmer.email}</span>
+                </p>
+              </div>
+            )}
+          </div>
+          
           <ReasonTextArea reason={reason} onReasonChange={setReason} />
+
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
         <div className="px-6 pb-6 pt-4 border-t border-emerald-100 bg-emerald-50/50 rounded-b-3xl">
           <div className="flex space-x-3">
-            <button className="flex-1 py-3.5 px-6 bg-white/80 backdrop-blur-sm hover:bg-white border border-emerald-200 text-emerald-700 font-semibold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+            <button 
+              onClick={onClose}
+              disabled={loading}
+              className="flex-1 py-3.5 px-6 bg-white/80 backdrop-blur-sm hover:bg-white border border-emerald-200 text-emerald-700 font-semibold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Cancel
             </button>
-            <button className="flex-1 py-3.5 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5">
-              Continue
+            <button 
+              onClick={handleSubmit}
+              disabled={loading}
+              className="flex-1 py-3.5 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                'Continue'
+              )}
             </button>
           </div>
         </div>

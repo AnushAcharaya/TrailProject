@@ -1,69 +1,98 @@
 // components/profile-transfer/farmer-side/send-transfer/SendTransfers.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TransferItem from './TransferItem';
 import TransferDetailsModal from './TransferDetailModals';
-
-const transfers = [
-  {
-    id: 1,
-    farmer: 'Bella',
-    tag: 'TG-001',
-    avatar: '/api/placeholder/40/40',
-    recipient: 'Grace Wanijku',
-    time: '2024-12-18',
-    status: 'Pending',
-    details: {
-      animal: { name: 'Bella', tag: 'TG-001', breed: 'Cow - Holstein', image: '/api/placeholder/80/80' },
-      recipient: 'Grace Wanijku',
-      reason: 'Selling cow due to downsizing farm operations'
-    }
-  },
-  {
-    id: 2,
-    farmer: 'Rocky',
-    tag: 'TG-002',
-    avatar: '/api/placeholder/40/40',
-    recipient: 'Peter Ochieng',
-    time: '2024-12-26',
-    status: 'Receiver Approved',
-    details: {
-      animal: { name: 'Rocky', tag: 'TG-002', breed: 'Cow - Holstein', image: '/api/placeholder/80/80' },
-      recipient: 'Peter Ochieng',
-      reason: 'Transfer for breeding purposes'
-    }
-  },
-  {
-    id: 3,
-    farmer: 'Dolly',
-    tag: 'TG-003',
-    avatar: '/api/placeholder/40/40',
-    recipient: 'Mary Akinyi',
-    time: '2024-01-05',
-    status: 'Admin Approved',
-    details: {
-      animal: { name: 'Dolly', tag: 'TG-003', breed: 'Cow - Holstein', image: '/api/placeholder/80/80' },
-      recipient: 'Mary Akinyi',
-      reason: 'Sale transaction'
-    }
-  },
-  {
-    id: 4,
-    farmer: 'Rosie',
-    tag: 'TG-004',
-    avatar: '/api/placeholder/40/40',
-    recipient: 'David Kamau',
-    time: '2024-01-10',
-    status: 'Rejected',
-    details: {
-      animal: { name: 'Rosie', tag: 'TG-004', breed: 'Cow - Holstein', image: '/api/placeholder/80/80' },
-      recipient: 'David Kamau',
-      reason: 'Relocation to new farm'
-    }
-  }
-];
+import { getSentTransfers } from '../../../../services/profileTransferApi';
 
 export default function SendTransfers() {
   const [selectedTransfer, setSelectedTransfer] = useState(null);
+  const [transfers, setTransfers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch sent transfers on component mount
+  useEffect(() => {
+    fetchSentTransfers();
+  }, []);
+
+  const fetchSentTransfers = async () => {
+    try {
+      setLoading(true);
+      const response = await getSentTransfers();
+      
+      // Handle paginated response - extract results array
+      const data = response.results || response;
+      
+      // Transform API data to match component format
+      const transformedTransfers = data.map(transfer => {
+        // Handle image URL - prefix with backend URL if it's a relative path
+        const getImageUrl = (imagePath) => {
+          if (!imagePath) return '/api/placeholder/40/40';
+          if (imagePath.startsWith('http')) return imagePath;
+          return `http://localhost:8000${imagePath}`;
+        };
+
+        return {
+          id: transfer.id,
+          farmer: transfer.livestock_details?.species_name || 'Unknown',
+          tag: transfer.livestock_details?.tag_id || 'N/A',
+          avatar: getImageUrl(transfer.livestock_details?.image),
+          recipient: transfer.receiver_details?.full_name || 'Unknown',
+          time: new Date(transfer.created_at).toLocaleDateString(),
+          status: transfer.status,
+          details: {
+            animal: {
+              name: transfer.livestock_details?.species_name || 'Unknown',
+              tag: transfer.livestock_details?.tag_id || 'N/A',
+              breed: `${transfer.livestock_details?.species_name || 'Unknown'} - ${transfer.livestock_details?.breed_name || 'Unknown'}`,
+              image: getImageUrl(transfer.livestock_details?.image)
+            },
+            recipient: transfer.receiver_details?.full_name || 'Unknown',
+            reason: transfer.reason || 'No reason provided'
+          },
+          // Keep original data for reference
+          originalData: transfer
+        };
+      });
+      
+      setTransfers(transformedTransfers);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching sent transfers:', err);
+      setError('Failed to fetch sent transfers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading sent transfers...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={fetchSentTransfers}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -75,21 +104,29 @@ export default function SendTransfers() {
 
       {/* Main Content */}
       <div className="px-6 py-6">
-        <div className="space-y-3">
-          {transfers.map(transfer => (
-            <TransferItem
-              key={transfer.id}
-              transfer={transfer}
-              onClick={() => setSelectedTransfer(transfer)}
-            />
-          ))}
-        </div>
+        {transfers.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No sent transfers found.</p>
+            <p className="text-gray-400 text-sm mt-2">Transfer requests you send will appear here.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {transfers.map(transfer => (
+              <TransferItem
+                key={transfer.id}
+                transfer={transfer}
+                onClick={() => setSelectedTransfer(transfer)}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {selectedTransfer && (
         <TransferDetailsModal
           transfer={selectedTransfer}
           onClose={() => setSelectedTransfer(null)}
+          onUpdate={fetchSentTransfers}
         />
       )}
     </div>

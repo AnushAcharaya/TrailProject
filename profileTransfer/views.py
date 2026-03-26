@@ -43,9 +43,9 @@ class TransferViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = TransferFilter
     search_fields = [
-        'livestock__tag_number', 'livestock__name', 'reason',
-        'sender__email', 'sender__first_name', 'sender__last_name',
-        'receiver__email', 'receiver__first_name', 'receiver__last_name'
+        'livestock__tag_id', 'reason',
+        'sender__email', 'sender__full_name',
+        'receiver__email', 'receiver__full_name'
     ]
     ordering_fields = ['created_at', 'updated_at', 'status']
     ordering = ['-created_at']
@@ -357,13 +357,14 @@ class TransferViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Search farmers (exclude current user)
+        # Search farmers (exclude current user and only show approved farmers)
         farmers = User.objects.filter(
-            role='farmer'
+            role='farmer',
+            status='approved'  # Only show approved farmers
         ).filter(
-            Q(first_name__icontains=search_query) |
-            Q(last_name__icontains=search_query) |
-            Q(email__icontains=search_query)
+            Q(full_name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(phone__icontains=search_query)  # Also search by phone
         ).exclude(
             id=request.user.id
         )[:10]  # Limit to 10 results
@@ -373,10 +374,10 @@ class TransferViewSet(viewsets.ModelViewSet):
         for farmer in farmers:
             results.append({
                 'id': farmer.id,
-                'full_name': farmer.get_full_name(),
+                'full_name': farmer.full_name,  # Use direct full_name field
                 'email': farmer.email,
-                'phone_number': farmer.phone_number or '',
-                'farm_name': getattr(farmer, 'farm_name', None)
+                'phone_number': farmer.phone or '',  # Map phone to phone_number for frontend
+                'farm_name': farmer.farm_name or ''
             })
         
         serializer = FarmerSearchSerializer(results, many=True)

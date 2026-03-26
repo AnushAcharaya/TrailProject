@@ -74,7 +74,7 @@ function App() {
         <Route path="/profile-transfer/farmer/sent" element={<SendTransfersPage />} />
         <Route path="/profile-transfer/receiver/requests" element={<ReceivedRequestsPage />} />
         <Route path="/profile-transfer/admin/dashboard" element={<AdminDashboardPage />} />
-        <Route path="/profile-transfer/admin/review" element={<ReviewTransferPage />} />
+        <Route path="/profile-transfer/admin/review/:transferId" element={<ReviewTransferPage />} />
         <Route path="/vet/dashboard" element={<MainDashboardPage />} />
         <Route path="/vet/farmer-profiles" element={<FarmerProfilesPage />} />
         <Route path="/vet/farmer-details" element={<FarmerDetailPage />} />

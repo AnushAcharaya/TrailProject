@@ -89,7 +89,7 @@ class Transfer(models.Model):
         
         # Livestock must belong to sender
         if self.livestock_id and self.sender_id:
-            if self.livestock.owner_id != self.sender_id:
+            if self.livestock.user_id != self.sender_id:
                 raise ValidationError("You can only transfer livestock you own")
         
         # Check if livestock already has pending transfer
@@ -119,23 +119,23 @@ class Transfer(models.Model):
             if old_transfer.status != 'Completed' and self.status == 'Completed':
                 self.completed_at = timezone.now()
                 # Transfer livestock ownership
-                self.livestock.owner = self.receiver
+                self.livestock.user = self.receiver
                 self.livestock.save()
         
         super().save(*args, **kwargs)
     
     def __str__(self):
-        return f"Transfer #{self.id}: {self.livestock.tag_number} from {self.sender.get_full_name()} to {self.receiver.get_full_name()} ({self.status})"
+        return f"Transfer #{self.id}: {self.livestock.tag_id} from {self.sender.full_name} to {self.receiver.full_name} ({self.status})"
     
     @property
     def animal_tag(self):
         """Get animal tag number"""
-        return self.livestock.tag_number
+        return self.livestock.tag_id
     
     @property
     def animal_name(self):
         """Get animal name"""
-        return self.livestock.name
+        return f"{self.livestock.species.name} - {self.livestock.tag_id}"
     
     @property
     def sender_name(self):

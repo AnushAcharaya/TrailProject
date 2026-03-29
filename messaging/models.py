@@ -6,6 +6,11 @@ User = get_user_model()
 
 
 class Message(models.Model):
+    MESSAGE_TYPES = (
+        ('text', 'Text'),
+        ('appointment_card', 'Appointment Card'),
+    )
+    
     friendship = models.ForeignKey(
         Friendship,
         on_delete=models.CASCADE,
@@ -17,6 +22,7 @@ class Message(models.Model):
         related_name='sent_messages'
     )
     text = models.TextField()
+    message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='text')
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
     

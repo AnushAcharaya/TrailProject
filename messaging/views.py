@@ -57,7 +57,8 @@ class MessageViewSet(viewsets.ModelViewSet):
         message = Message.objects.create(
             friendship=friendship,
             sender=request.user,
-            text=serializer.validated_data['text']
+            text=serializer.validated_data['text'],
+            message_type=serializer.validated_data.get('message_type', 'text')
         )
         
         response_serializer = MessageSerializer(message)

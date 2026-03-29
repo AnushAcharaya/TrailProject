@@ -115,12 +115,23 @@ class Transfer(models.Model):
             if old_transfer.status != 'Admin Approved' and self.status == 'Admin Approved':
                 self.admin_approved_at = timezone.now()
             
-            # Completed - transfer ownership
+            # Completed - transfer ownership and related records
             if old_transfer.status != 'Completed' and self.status == 'Completed':
                 self.completed_at = timezone.now()
+                
                 # Transfer livestock ownership
                 self.livestock.user = self.receiver
                 self.livestock.save()
+                
+                # Transfer all vaccination records
+                from vaccination.models import Vaccination
+                vaccinations = Vaccination.objects.filter(livestock=self.livestock)
+                vaccinations.update(user=self.receiver)
+                
+                # Transfer all treatment records
+                from medical.models import Treatment
+                treatments = Treatment.objects.filter(livestock=self.livestock)
+                treatments.update(user=self.receiver)
         
         super().save(*args, **kwargs)
     

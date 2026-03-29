@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import FarmerLayout from "../../components/farmerDashboard/FarmerLayout";
 import { getFriends } from "../../services/friendsApi";
 import { getMessages, sendMessage } from "../../services/messagesApi";
-import { FaSearch, FaPaperPlane, FaSmile } from "react-icons/fa";
+import { FaSearch, FaPaperPlane, FaSmile, FaCalendarAlt } from "react-icons/fa";
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -180,13 +180,57 @@ const MessagesPage = () => {
                 {/* Messages Container */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
                   {messages.map((message) => {
-                    const isMyMessage = message.sender === currentUserId;
+                    // Ensure both values are numbers for comparison
+                    const isMyMessage = Number(message.sender) === Number(currentUserId);
+                    console.log('Message:', message.id, 'Sender:', message.sender, 'CurrentUser:', currentUserId, 'IsMyMessage:', isMyMessage);
+                    
+                    // Render appointment card
+                    if (message.message_type === 'appointment_card') {
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div className="max-w-[70%]">
+                            <div className="bg-white border-2 border-emerald-500 rounded-lg p-4 shadow-md">
+                              <div className="flex items-center gap-3 mb-3">
+                                <div className="bg-emerald-100 p-2 rounded-full">
+                                  <FaCalendarAlt className="text-emerald-600 text-xl" />
+                                </div>
+                                <div>
+                                  <h4 className="font-semibold text-gray-800">Book an Appointment</h4>
+                                  <p className="text-xs text-gray-500">Schedule a visit with the vet</p>
+                                </div>
+                              </div>
+                              {!isMyMessage && (
+                                <button
+                                  onClick={() => {
+                                    // Store the vet info who sent the appointment card
+                                    localStorage.setItem("selectedVetId", selectedFriend.username);
+                                    localStorage.setItem("selectedVetName", selectedFriend.full_name || selectedFriend.username);
+                                    navigate('/appointments/request');
+                                  }}
+                                  className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition font-medium"
+                                >
+                                  Book Now
+                                </button>
+                              )}
+                            </div>
+                            <p className={`text-xs text-gray-500 mt-1 ${isMyMessage ? 'text-right' : 'text-left'}`}>
+                              {formatMessageTime(message.created_at)}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    // Render regular text message
                     return (
                       <div
                         key={message.id}
                         className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
                       >
-                        <div className={`max-w-[70%] ${isMyMessage ? 'order-2' : 'order-1'}`}>
+                        <div className={`max-w-[70%]`}>
                           <div
                             className={`px-4 py-2 rounded-2xl ${
                               isMyMessage

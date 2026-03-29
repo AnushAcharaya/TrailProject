@@ -67,7 +67,9 @@ function App() {
         <Route path="/vaccination/edit/:id" element={<EditVaccinationPage />} />
         <Route path="/farmerpage" element={<FarmerDashboardPage />} />
         <Route path="/farmerappointment" element={<FarmerAppointments />} />
+        <Route path="/appointments" element={<FarmerAppointments />} />
         <Route path="/vetappointment" element={<VetAppointments />} />
+        <Route path="/vet/appointments" element={<VetAppointments />} />
         <Route path="/appointments/request" element={<RequestAppointmentPage />} />
         <Route path="/farmer/friends/requests" element={<FriendRequestsPage />} />
         <Route path="/farmer/friends/list" element={<FriendsListPage />} />

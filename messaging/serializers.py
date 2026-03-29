@@ -9,11 +9,11 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['id', 'friendship', 'sender', 'sender_username', 'sender_full_name', 
-                  'text', 'created_at', 'is_read']
+                  'text', 'message_type', 'created_at', 'is_read']
         read_only_fields = ['id', 'sender', 'created_at']
 
 
 class MessageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ['friendship', 'text']
+        fields = ['friendship', 'text', 'message_type']

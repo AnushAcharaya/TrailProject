@@ -170,9 +170,9 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             <span className="text-white font-medium">Farmer Profiles</span>
           </div>
           <div 
-            onClick={() => navigate('/vetappointment')}
+            onClick={() => navigate('/vet/appointments')}
             className={`flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
-              location.pathname === '/vetappointment' 
+              location.pathname === '/vet/appointments' 
                 ? 'bg-emerald-700' 
                 : 'hover:bg-emerald-700'
             }`}

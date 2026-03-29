@@ -15,3 +15,12 @@ Backend/media/certificates/*
 
 # Django static files
 Backend/staticfiles/
+
+# Test documentation files
+tests/**/*.md
+tests/**/*_RESULTS.md
+tests/**/*_SUMMARY.md
+tests/**/*_TESTS.md
+
+# Or uncomment below to ignore ALL .md files in the entire project
+# *.md

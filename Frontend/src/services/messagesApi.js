@@ -40,11 +40,12 @@ export const getMessages = async (friendshipId) => {
 };
 
 // Send a message
-export const sendMessage = async (friendshipId, text) => {
+export const sendMessage = async (friendshipId, text, messageType = 'text') => {
   try {
     const response = await messagesApi.post(`${MESSAGES_BASE_URL}/`, {
       friendship: friendshipId,
-      text: text
+      text: text,
+      message_type: messageType
     });
     return { success: true, data: response.data };
   } catch (error) {

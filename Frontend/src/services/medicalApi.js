@@ -77,9 +77,22 @@ export const getAllTreatments = async () => {
 // Get treatment by ID
 export const getTreatmentById = async (id) => {
   try {
+    console.log('[MedicalAPI] ========== GET TREATMENT BY ID ==========');
+    console.log('[MedicalAPI] Fetching treatment ID:', id);
     const response = await medicalApi.get(`${BASE_URL}/${id}/`);
+    console.log('[MedicalAPI] Response data:', response.data);
+    console.log('[MedicalAPI] Medicines field:', response.data.medicines);
+    console.log('[MedicalAPI] Medicines is array?', Array.isArray(response.data.medicines));
+    console.log('[MedicalAPI] Medicines length:', response.data.medicines?.length);
+    if (response.data.medicines && response.data.medicines.length > 0) {
+      console.log('[MedicalAPI] First medicine:', response.data.medicines[0]);
+    } else {
+      console.warn('[MedicalAPI] ⚠️ NO MEDICINES IN RESPONSE!');
+    }
+    console.log('[MedicalAPI] =====================================');
     return { success: true, data: response.data };
   } catch (error) {
+    console.error('[MedicalAPI] Error fetching treatment by ID:', error);
     return { success: false, error: error.response?.data || error.message };
   }
 };
@@ -153,6 +166,20 @@ export const createTreatment = async (treatmentData) => {
 // Update treatment
 export const updateTreatment = async (id, treatmentData) => {
   try {
+    console.log('[MedicalAPI] ========== UPDATE TREATMENT ==========');
+    console.log('[MedicalAPI] Treatment ID:', id);
+    console.log('[MedicalAPI] Input treatmentData:', treatmentData);
+    console.log('[MedicalAPI] treatmentData.medicines:', treatmentData.medicines);
+    console.log('[MedicalAPI] medicines is array?', Array.isArray(treatmentData.medicines));
+    console.log('[MedicalAPI] medicines length:', treatmentData.medicines?.length);
+    
+    // Check if medicines array has valid data
+    if (treatmentData.medicines && treatmentData.medicines.length > 0) {
+      console.log('[MedicalAPI] First medicine object:', treatmentData.medicines[0]);
+      console.log('[MedicalAPI] First medicine name:', treatmentData.medicines[0]?.name);
+      console.log('[MedicalAPI] First medicine dosage:', treatmentData.medicines[0]?.dosage);
+    }
+    
     const formData = new FormData();
     
     formData.append('livestock_tag', treatmentData.livestockTag);
@@ -182,14 +209,36 @@ export const updateTreatment = async (id, treatmentData) => {
         interval_hours: med.intervalHours,
         exact_times: med.exactTimes
       }));
+      console.log('[MedicalAPI] Medicines (snake_case):', medicinesSnakeCase);
+      console.log('[MedicalAPI] Medicines JSON string:', JSON.stringify(medicinesSnakeCase));
       formData.append('medicines', JSON.stringify(medicinesSnakeCase));
+      console.log('[MedicalAPI] ✓ Medicines appended to FormData');
+    } else {
+      console.warn('[MedicalAPI] ⚠️⚠️⚠️ NO MEDICINES TO SEND IN UPDATE! ⚠️⚠️⚠️');
+      console.warn('[MedicalAPI] treatmentData.medicines value:', treatmentData.medicines);
     }
+    
+    // Log FormData contents
+    console.log('[MedicalAPI] FormData contents:');
+    for (let pair of formData.entries()) {
+      if (pair[0] === 'medicines') {
+        console.log(`  ${pair[0]}: ${pair[1].substring(0, 100)}...`);
+      } else {
+        console.log(`  ${pair[0]}: ${pair[1]}`);
+      }
+    }
+    console.log('[MedicalAPI] =====================================');
     
     const response = await medicalApi.put(`${BASE_URL}/${id}/`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
+    console.log('[MedicalAPI] Treatment updated successfully:', response.data);
+    console.log('[MedicalAPI] Response medicines:', response.data.medicines);
+    console.log('[MedicalAPI] Response medicines length:', response.data.medicines?.length);
     return { success: true, data: response.data };
   } catch (error) {
+    console.error('[MedicalAPI] Update treatment error:', error);
+    console.error('[MedicalAPI] Error response:', error.response?.data);
     return { success: false, error: error.response?.data || error.message };
   }
 };

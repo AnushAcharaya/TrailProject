@@ -66,7 +66,7 @@ const AddVaccinationForm = () => {
   };
 
   const handleLivestockSelect = (animal) => {
-    const displayText = `${animal.tag_id} - ${animal.breed_name || animal.species_name}`;
+    const displayText = `Tag: ${animal.tag_id}`;
     setSearchTerm(displayText);
     setFormData({ ...formData, livestock: animal.tag_id });
     setShowDropdown(false);
@@ -133,7 +133,7 @@ const AddVaccinationForm = () => {
                   value={searchTerm}
                   onChange={(e) => handleLivestockSearch(e.target.value)}
                   onFocus={() => setShowDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                  onBlur={() => setTimeout(() => setShowDropdown(false), 300)}
                   placeholder="Search by tag ID, breed, or species..."
                   required
                   className="w-full p-2 border border-light rounded focus:outline-none focus:ring-2 focus:ring-primary"
@@ -144,8 +144,11 @@ const AddVaccinationForm = () => {
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {filteredLivestock.map((animal, index) => (
                       <div
-                        key={index}
-                        onClick={() => handleLivestockSelect(animal)}
+                        key={animal.id || index}
+                        onMouseDown={(e) => {
+                          e.preventDefault(); // Prevent input blur
+                          handleLivestockSelect(animal);
+                        }}
                         className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                       >
                         <div className="font-medium text-gray-900">

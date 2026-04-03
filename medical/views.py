@@ -98,18 +98,64 @@ class TreatmentViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve to add debug logging"""
+        instance = self.get_object()
+        print(f"\n{'='*60}")
+        print(f"[TreatmentViewSet] RETRIEVE - Treatment ID: {instance.id}")
+        print(f"[TreatmentViewSet] Treatment name: {instance.treatment_name}")
+        print(f"[TreatmentViewSet] Medicines count in DB: {instance.medicines.count()}")
+        if instance.medicines.exists():
+            for med in instance.medicines.all():
+                print(f"[TreatmentViewSet]   - {med.name} ({med.dosage})")
+        else:
+            print(f"[TreatmentViewSet]   ⚠️ No medicines found in DB!")
+        print(f"{'='*60}\n")
+        
+        serializer = self.get_serializer(instance)
+        print(f"[TreatmentViewSet] Serialized medicines: {serializer.data.get('medicines', [])}")
+        return Response(serializer.data)
+    
     def update(self, request, *args, **kwargs):
         # Handle medicines JSON string from FormData
         data = request.data.copy()
-        if 'medicines' in data and isinstance(data['medicines'], str):
-            import json
-            data['medicines'] = json.loads(data['medicines'])
+        print(f"\n{'='*60}")
+        print(f"[TreatmentViewSet] UPDATE - Raw request.data:")
+        print(f"[TreatmentViewSet] ALL FIELDS IN REQUEST:")
+        for key in data.keys():
+            print(f"  {key}: {data.get(key)}")
+        print(f"\n[TreatmentViewSet] medicines field: {data.get('medicines')}")
+        print(f"[TreatmentViewSet] medicines type: {type(data.get('medicines'))}")
+        print(f"[TreatmentViewSet] 'medicines' in data: {'medicines' in data}")
+        
+        if 'medicines' in data:
+            if isinstance(data['medicines'], str):
+                import json
+                parsed_medicines = json.loads(data['medicines'])
+                print(f"[TreatmentViewSet] Parsed medicines from JSON string: {parsed_medicines}")
+                print(f"[TreatmentViewSet] Parsed medicines length: {len(parsed_medicines)}")
+                data['medicines'] = parsed_medicines
+            else:
+                print(f"[TreatmentViewSet] Medicines is already a list/dict: {data['medicines']}")
+        else:
+            print(f"[TreatmentViewSet] ⚠️⚠️⚠️ NO 'medicines' FIELD IN REQUEST DATA! ⚠️⚠️⚠️")
+        
+        print(f"[TreatmentViewSet] Final medicines data: {data.get('medicines')}")
+        print(f"{'='*60}\n")
         
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+        
+        # Log what was actually updated
+        updated_treatment = serializer.instance
+        print(f"\n[TreatmentViewSet] Updated treatment ID: {updated_treatment.id}")
+        print(f"[TreatmentViewSet] Medicines count in DB after update: {updated_treatment.medicines.count()}")
+        for med in updated_treatment.medicines.all():
+            print(f"  - {med.name} ({med.dosage})")
+        
         return Response(serializer.data)
     
     @action(detail=False, methods=['get'])

@@ -28,22 +28,32 @@ const EditTreatmentRecord = () => {
         return;
       }
 
+      console.log('[EditTreatmentRecord] Loading treatment ID:', id);
       const result = await getTreatmentById(id);
       if (result.success) {
         const treatment = result.data;
-        // Convert backend snake_case to frontend camelCase for form
+        console.log('[EditTreatmentRecord] Full treatment data:', treatment);
+        console.log('[EditTreatmentRecord] treatment.medicines:', treatment.medicines);
+        console.log('[EditTreatmentRecord] medicines is array?', Array.isArray(treatment.medicines));
+        console.log('[EditTreatmentRecord] medicines length:', treatment.medicines?.length);
+        
         // Convert backend snake_case to frontend camelCase for form
         const medicines = treatment.medicines && treatment.medicines.length > 0
-          ? treatment.medicines.map(med => ({
-              name: med.name,
-              dosage: med.dosage,
-              frequency: med.frequency,
-              duration: med.duration,
-              scheduleType: med.schedule_type,
-              startTime: med.start_time,
-              intervalHours: med.interval_hours,
-              exactTimes: med.exact_times || []
-            }))
+          ? treatment.medicines.map(med => {
+              console.log('[EditTreatmentRecord] Converting medicine:', med);
+              // Convert start_time from "HH:MM:SS" to "HH:MM" for HTML time input
+              const startTime = med.start_time ? med.start_time.substring(0, 5) : "08:00";
+              return {
+                name: med.name,
+                dosage: med.dosage,
+                frequency: med.frequency,
+                duration: med.duration,
+                scheduleType: med.schedule_type,
+                startTime: startTime,
+                intervalHours: med.interval_hours,
+                exactTimes: med.exact_times || []
+              };
+            })
           : [
               // Default medicine object if none exist
               {
@@ -57,6 +67,8 @@ const EditTreatmentRecord = () => {
                 exactTimes: ["08:00", "13:00", "18:00"],
               }
             ];
+
+        console.log('[EditTreatmentRecord] Converted medicines for form:', medicines);
 
         setInitialData({
           livestockTag: treatment.livestock?.tag_id || "",

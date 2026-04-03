@@ -38,6 +38,39 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState(initialData?.livestockTag || "");
   const [isLoadingLivestock, setIsLoadingLivestock] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Update form data when initialData changes - BUT ONLY ONCE!
+  useEffect(() => {
+    if (initialData && !isInitialized) {
+      console.log('[TreatmentForm] FIRST TIME initialData load, updating form');
+      console.log('[TreatmentForm] New medicines:', initialData.medicines);
+      setFormData({
+        livestockTag: initialData.livestockTag || "",
+        treatmentName: initialData.treatmentName || "",
+        diagnosis: initialData.diagnosis || "",
+        vetName: initialData.vetName || "",
+        treatmentDate: initialData.treatmentDate || "",
+        nextTreatmentDate: initialData.nextTreatmentDate || "",
+        status: initialData.status || "In Progress",
+        document: null,
+        medicines: initialData.medicines || [
+          {
+            name: "",
+            dosage: "",
+            frequency: 1,
+            duration: 3,
+            scheduleType: "interval",
+            startTime: "08:00",
+            intervalHours: 5,
+            exactTimes: ["08:00", "13:00", "18:00"],
+          },
+        ],
+      });
+      setSearchTerm(initialData.livestockTag || "");
+      setIsInitialized(true); // Mark as initialized so this doesn't run again
+    }
+  }, [initialData, isInitialized]);
 
   useEffect(() => {
     // Fetch livestock from API
@@ -125,7 +158,41 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    
+    console.log('[TreatmentForm] ========== FORM SUBMIT ==========');
+    console.log('[TreatmentForm] formData.medicines BEFORE validation:', formData.medicines);
+    console.log('[TreatmentForm] medicines count:', formData.medicines.length);
+    
+    // Validate that at least one medicine has all required fields filled
+    const hasValidMedicine = formData.medicines.some(med => 
+      med.name.trim() !== "" && med.dosage.trim() !== ""
+    );
+    
+    console.log('[TreatmentForm] hasValidMedicine:', hasValidMedicine);
+    
+    if (!hasValidMedicine) {
+      alert("Please fill in at least one medicine with name and dosage.");
+      return;
+    }
+    
+    // Filter out empty medicines before submitting
+    const validMedicines = formData.medicines.filter(med => 
+      med.name.trim() !== "" && med.dosage.trim() !== ""
+    );
+    
+    console.log('[TreatmentForm] Valid medicines AFTER filtering:', validMedicines);
+    console.log('[TreatmentForm] Valid medicines count:', validMedicines.length);
+    
+    const dataToSubmit = {
+      ...formData,
+      medicines: validMedicines
+    };
+    
+    console.log('[TreatmentForm] Final dataToSubmit:', dataToSubmit);
+    console.log('[TreatmentForm] dataToSubmit.medicines:', dataToSubmit.medicines);
+    console.log('[TreatmentForm] =====================================');
+    
+    onSubmit(dataToSubmit);
   };
 
   return (

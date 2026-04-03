@@ -33,12 +33,35 @@ const AddVaccinationForm = () => {
     fetchLivestock();
   }, []);
 
+  // Auto-fill livestock if coming from vet dashboard
+  useEffect(() => {
+    const selectedTag = localStorage.getItem('selectedAnimalTag');
+    const selectedId = localStorage.getItem('selectedAnimalId');
+    
+    if (selectedTag && livestockList.length > 0) {
+      // Find the animal in the list
+      const animal = livestockList.find(a => a.tag_id === selectedTag);
+      if (animal) {
+        const displayText = `Tag: ${animal.tag_id}`;
+        setSearchTerm(displayText);
+        setFormData(prev => ({ ...prev, livestock: animal.tag_id }));
+      }
+    }
+  }, [livestockList]); // Run when livestock list is loaded
+
   const fetchLivestock = async () => {
     setLoading(true);
-    const result = await getAllLivestock();
+    
+    // Check if coming from vet dashboard - get farmer's username from localStorage
+    const farmerUsername = localStorage.getItem('selectedFarmerUsername');
+    const params = farmerUsername ? { owner: farmerUsername } : {};
+    
+    console.log('[AddVaccinationForm] Fetching livestock with params:', params);
+    const result = await getAllLivestock(params);
     
     if (result.success) {
       const data = result.data.results || result.data;
+      console.log('[AddVaccinationForm] Fetched livestock:', data);
       setLivestockList(Array.isArray(data) ? data : []);
       setFilteredLivestock(Array.isArray(data) ? data : []);
     } else {
@@ -86,7 +109,15 @@ const AddVaccinationForm = () => {
     if (result.success) {
       setNotification({ type: 'success', message: 'Vaccination record created successfully!' });
       setTimeout(() => {
-        navigate('/vaccination');
+        // Check if coming from vet dashboard
+        const isFromVet = location.state?.from === 'vet';
+        if (isFromVet) {
+          // Navigate back to vet's farmer details page (animals page)
+          navigate('/vet/farmer-details');
+        } else {
+          // Navigate to farmer's vaccination dashboard
+          navigate('/vaccination');
+        }
       }, 2000);
     } else {
       const errorMessage = typeof result.error === 'object' 
@@ -221,9 +252,15 @@ const AddVaccinationForm = () => {
                 name="nextDueDate"
                 value={formData.nextDueDate}
                 onChange={handleChange}
+                min={formData.dateGiven || undefined}
                 required
                 className="w-full p-2 border border-light rounded"
               />
+              {formData.dateGiven && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Must be on or after {new Date(formData.dateGiven).toLocaleDateString()}
+                </p>
+              )}
             </div>
           </div>
 

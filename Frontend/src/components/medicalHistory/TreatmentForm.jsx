@@ -76,10 +76,18 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
     // Fetch livestock from API
     const fetchLivestock = async () => {
       setIsLoadingLivestock(true);
-      const result = await getAllLivestock();
+      
+      // Check if coming from vet dashboard - get farmer's username from localStorage
+      const farmerUsername = localStorage.getItem('selectedFarmerUsername');
+      const params = farmerUsername ? { owner: farmerUsername } : {};
+      
+      console.log('[TreatmentForm] Fetching livestock with params:', params);
+      const result = await getAllLivestock(params);
+      
       if (result.success) {
         // Handle paginated response
         const livestock = result.data.results || result.data;
+        console.log('[TreatmentForm] Fetched livestock:', livestock);
         setLivestockList(livestock);
         setFilteredLivestock(livestock);
       } else {
@@ -90,6 +98,23 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
     
     fetchLivestock();
   }, []);
+
+  // Auto-fill livestock if coming from vet dashboard (only for new forms, not edits)
+  useEffect(() => {
+    if (!isEdit && livestockList.length > 0 && !initialData) {
+      const selectedTag = localStorage.getItem('selectedAnimalTag');
+      
+      if (selectedTag) {
+        // Find the animal in the list
+        const animal = livestockList.find(a => a.tag_id === selectedTag);
+        if (animal) {
+          const displayText = `${animal.tag_id} - ${animal.breed_name} (${animal.species_name})`;
+          setSearchTerm(displayText);
+          setFormData(prev => ({ ...prev, livestockTag: animal.tag_id }));
+        }
+      }
+    }
+  }, [livestockList, isEdit, initialData]); // Run when livestock list is loaded
 
   const handleLivestockSearch = (value) => {
     setSearchTerm(value);

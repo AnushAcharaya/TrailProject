@@ -25,8 +25,15 @@ const AddTreatmentRecord = () => {
     setIsSubmitting(false);
     
     if (result.success) {
-      // Navigate back to medical history page with user context
-      navigate("/medical/history", { state: { from: isFarmer ? 'farmer' : 'vet' } });
+      // Check if coming from vet dashboard
+      const isFromVet = location.state?.from === 'vet';
+      if (isFromVet) {
+        // Navigate back to vet's farmer details page (animals page)
+        navigate("/vet/farmer-details");
+      } else {
+        // Navigate back to farmer's medical history page
+        navigate("/medical/history", { state: { from: 'farmer' } });
+      }
     } else {
       alert("Failed to save treatment: " + (result.error?.detail || JSON.stringify(result.error)));
     }

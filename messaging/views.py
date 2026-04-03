@@ -109,3 +109,21 @@ class MessageViewSet(viewsets.ModelViewSet):
         ).exclude(sender=request.user).update(is_read=True)
         
         return Response({'marked_read': updated})
+    
+    @action(detail=False, methods=['get'])
+    def unread_count(self, request):
+        """Get count of unread messages for the current user"""
+        user = request.user
+        
+        # Get all friendships where user is involved
+        user_friendships = Friendship.objects.filter(
+            Q(user1=user) | Q(user2=user)
+        )
+        
+        # Count unread messages sent to this user
+        unread_count = Message.objects.filter(
+            friendship__in=user_friendships,
+            is_read=False
+        ).exclude(sender=user).count()
+        
+        return Response({'unread_count': unread_count})

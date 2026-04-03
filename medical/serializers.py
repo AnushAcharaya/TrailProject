@@ -41,8 +41,14 @@ class TreatmentSerializer(serializers.ModelSerializer):
         try:
             livestock = Livestock.objects.get(tag_id=value)
             request = self.context.get('request')
-            if request and request.user != livestock.user:
-                raise serializers.ValidationError("You can only treat your own livestock")
+            if request:
+                user = request.user
+                # If user is a vet, allow access to any livestock
+                if user.role == 'vet':
+                    return value
+                # If user is a farmer, only allow their own livestock
+                elif user != livestock.user:
+                    raise serializers.ValidationError("You can only treat your own livestock")
             return value
         except Livestock.DoesNotExist:
             raise serializers.ValidationError("Livestock not found")
@@ -51,7 +57,8 @@ class TreatmentSerializer(serializers.ModelSerializer):
         livestock_tag = validated_data.pop('livestock_tag')
         livestock = Livestock.objects.get(tag_id=livestock_tag)
         validated_data['livestock'] = livestock
-        validated_data['user'] = self.context['request'].user
+        # Store with the livestock owner's user ID (so farmer can see vet's records)
+        validated_data['user'] = livestock.user
         
         medicines_data = validated_data.pop('medicines', [])
         treatment = Treatment.objects.create(**validated_data)

@@ -1,14 +1,52 @@
-function StatsGrid() {
-  const stats = [
-    { value: '6', label: 'Total Farmers', icon: '👨‍🌾', color: 'bg-blue-500' },
-    { value: '10', label: 'Total Animals', icon: '🐄', color: 'bg-cyan-500' },
-    { value: '3', label: 'Pending Treatments', icon: '⚕️', color: 'bg-yellow-500' },
-    { value: '2', label: "Today's Appointments", icon: '📅', color: 'bg-green-500' }
+function StatsGrid({ stats, loading }) {
+  // Loading skeleton
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="bg-white rounded-lg p-6 border border-gray-200 animate-pulse">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-4 bg-gray-200 rounded w-24"></div>
+              <div className="w-10 h-10 bg-gray-200 rounded-lg"></div>
+            </div>
+            <div className="h-8 bg-gray-200 rounded w-16"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Default values if stats not loaded
+  const statsData = [
+    { 
+      value: stats?.total_farmers || '0', 
+      label: 'Farmers Treated', 
+      icon: '👨‍🌾', 
+      color: 'bg-blue-500' 
+    },
+    { 
+      value: stats?.total_animals || '0', 
+      label: 'Animals Treated', 
+      icon: '🐄', 
+      color: 'bg-cyan-500' 
+    },
+    { 
+      value: stats?.pending_treatments || '0', 
+      label: 'Pending Appointments', 
+      icon: '⏳', 
+      color: 'bg-yellow-500' 
+    },
+    { 
+      value: stats?.todays_appointments || '0', 
+      label: "Today's Accepted", 
+      icon: '✅', 
+      color: 'bg-green-500' 
+    }
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {stats.map((stat, index) => (
+      {statsData.map((stat, index) => (
         <div 
           key={index}
           className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow"

@@ -83,3 +83,16 @@ export const markAllMessagesRead = async (friendshipId) => {
     };
   }
 };
+
+// Get unread message count
+export const getUnreadMessageCount = async () => {
+  try {
+    const response = await messagesApi.get(`${MESSAGES_BASE_URL}/unread_count/`);
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.error || 'Failed to fetch unread count'
+    };
+  }
+};

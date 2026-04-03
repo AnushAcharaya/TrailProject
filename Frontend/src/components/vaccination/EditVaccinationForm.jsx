@@ -185,9 +185,15 @@ const EditVaccinationForm = ({ vaccinationId }) => {
                 name="nextDueDate"
                 value={formData.nextDueDate}
                 onChange={handleChange}
+                min={formData.dateGiven || undefined}
                 required
                 className="w-full p-2 border border-light rounded"
               />
+              {formData.dateGiven && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Must be on or after {new Date(formData.dateGiven).toLocaleDateString()}
+                </p>
+              )}
             </div>
           </div>
 

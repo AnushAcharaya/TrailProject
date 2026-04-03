@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getUserProfile } from '../../services/profileApi';
 import { getReceivedRequests } from '../../services/friendsApi';
+import { getUnreadMessageCount } from '../../services/messagesApi';
 
 function VetLayout({ children, pageTitle = "Dashboard" }) {
   const navigate = useNavigate();
@@ -10,10 +11,24 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [friendRequestCount, setFriendRequestCount] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   useEffect(() => {
     fetchProfile();
     loadFriendRequestCount();
+    loadUnreadMessageCount();
+    
+    // Listen for messages read event to refresh unread count
+    const handleMessagesRead = () => {
+      console.log('[VetLayout] Messages read event detected, refreshing unread count');
+      loadUnreadMessageCount();
+    };
+    
+    window.addEventListener('messagesRead', handleMessagesRead);
+    
+    return () => {
+      window.removeEventListener('messagesRead', handleMessagesRead);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -21,6 +36,13 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
     const result = await getReceivedRequests();
     if (result.success) {
       setFriendRequestCount(result.data.length);
+    }
+  };
+
+  const loadUnreadMessageCount = async () => {
+    const result = await getUnreadMessageCount();
+    if (result.success) {
+      setUnreadMessageCount(result.data.unread_count);
     }
   };
 
@@ -180,16 +202,57 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             <FaCalendarAlt className="text-white text-xl" />
             <span className="text-white font-medium">Appointments</span>
           </div>
+          
+          {/* Messages with Badge */}
+          <div 
+            onClick={() => navigate('/vet/messages')}
+            className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+              location.pathname === '/vet/messages' 
+                ? 'bg-emerald-700' 
+                : 'hover:bg-emerald-700'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <FaEnvelope className="text-white text-xl" />
+              <span className="text-white font-medium">Messages</span>
+            </div>
+            {unreadMessageCount > 0 && (
+              <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                {unreadMessageCount}
+              </span>
+            )}
+          </div>
+
+          {/* Friend Requests with Badge */}
+          <div 
+            onClick={() => navigate('/vet/friends/requests')}
+            className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+              location.pathname === '/vet/friends/requests' 
+                ? 'bg-emerald-700' 
+                : 'hover:bg-emerald-700'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <FaUserFriends className="text-white text-xl" />
+              <span className="text-white font-medium">Friend Requests</span>
+            </div>
+            {friendRequestCount > 0 && (
+              <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                {friendRequestCount}
+              </span>
+            )}
+          </div>
+
           <div 
             onClick={() => navigate('/vet/friends/list')}
             className={`flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
-              location.pathname.startsWith('/vet/friends') 
+              location.pathname === '/vet/friends/list' 
                 ? 'bg-emerald-700' 
                 : 'hover:bg-emerald-700'
             }`}
           >
             <FaUserFriends className="text-white text-xl" />
-            <span className="text-white font-medium">Friends</span>
+            <span className="text-white font-medium">Friends List</span>
           </div>
           <div 
             onClick={() => navigate('/profile')}
@@ -218,36 +281,9 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
         <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
           <div className="flex items-center space-x-6">
-            {/* Message Icon */}
-            <div 
-              className="relative cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => navigate('/vet/messages')}
-            >
-              <FaEnvelope className="text-gray-600 text-xl" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-xs text-white flex items-center justify-center">
-                5
-              </span>
-            </div>
-
-            {/* Friend Request Icon */}
-            <div 
-              className="relative cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => navigate('/vet/friends/requests')}
-            >
-              <FaUserFriends className="text-gray-600 text-xl" />
-              {friendRequestCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full text-xs text-white flex items-center justify-center">
-                  {friendRequestCount}
-                </span>
-              )}
-            </div>
-
             {/* Notification Bell */}
             <div className="relative cursor-pointer">
               <FaBell className="text-gray-600 text-xl" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-                3
-              </span>
             </div>
             
             {/* Profile with Name Below */}

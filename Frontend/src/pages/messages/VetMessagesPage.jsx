@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import { getFriends } from "../../services/friendsApi";
-import { getMessages, sendMessage } from "../../services/messagesApi";
+import { getMessages, sendMessage, markAllMessagesRead } from "../../services/messagesApi";
 import { FaSearch, FaPaperPlane, FaSmile, FaCalendarAlt } from "react-icons/fa";
 
 const VetMessagesPage = () => {
@@ -67,6 +67,14 @@ const VetMessagesPage = () => {
         ? result.data 
         : result.data.results || [];
       setMessages(messagesList);
+      
+      // Mark all messages in this conversation as read
+      const markResult = await markAllMessagesRead(friendshipId);
+      
+      // If messages were marked as read, dispatch event to update unread count
+      if (markResult.success && markResult.data.marked_read > 0) {
+        window.dispatchEvent(new Event('messagesRead'));
+      }
     } else {
       console.error('Failed to load messages:', result.error);
       setMessages([]);

@@ -53,13 +53,25 @@ function AnimalSection({ animals }) {
                   {/* Action Buttons */}
                   <div className="flex flex-col gap-2">
                     <button 
-                      onClick={() => navigate('/vaccination', { state: { animalId: animal.id } })}
+                      onClick={() => {
+                        // Store animal tag for the vaccination form
+                        localStorage.setItem('selectedAnimalTag', animal.tag_id);
+                        localStorage.setItem('selectedAnimalId', animal.id);
+                        // Navigate directly to add vaccination form
+                        navigate('/vaccination/add', { state: { from: 'vet', animalId: animal.id, animalTag: animal.tag_id } });
+                      }}
                       className="w-full px-3 py-2 bg-emerald-50 text-emerald-700 text-sm font-medium rounded hover:bg-emerald-100 transition-colors"
                     >
                       Vaccinations
                     </button>
                     <button 
-                      onClick={() => navigate('/medical/history', { state: { animalId: animal.id } })}
+                      onClick={() => {
+                        // Store animal tag for the medical history form
+                        localStorage.setItem('selectedAnimalTag', animal.tag_id);
+                        localStorage.setItem('selectedAnimalId', animal.id);
+                        // Navigate directly to add treatment form
+                        navigate('/medical/add', { state: { from: 'vet', animalId: animal.id, animalTag: animal.tag_id } });
+                      }}
                       className="w-full px-3 py-2 bg-gray-50 text-gray-700 text-sm font-medium rounded hover:bg-gray-100 transition-colors"
                     >
                       Medical History

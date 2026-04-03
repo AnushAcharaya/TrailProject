@@ -1,6 +1,6 @@
 // src/pages/vaccination/VaccinationPage.jsx
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaSyringe, FaCalendar, FaClock, FaCheck, FaChevronRight } from "react-icons/fa";
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import FarmerLayout from "../../components/farmerDashboard/FarmerLayout";
@@ -17,9 +17,19 @@ const VaccinationPage = () => {
   const [counts, setCounts] = useState({ upcoming: 0, completed: 0, overdue: 0 });
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Determine if user is a farmer or vet based on the user role
+  // Determine if user is a farmer or vet based on location state or user role
   const getUserRole = () => {
+    // First check if we came from vet dashboard
+    if (location.state?.from === 'vet') {
+      return 'vet';
+    }
+    if (location.state?.from === 'farmer') {
+      return 'farmer';
+    }
+    
+    // Otherwise check localStorage
     try {
       const profile = JSON.parse(localStorage.getItem('profile') || '{}');
       return profile.role || localStorage.getItem('userRole') || 'farmer';
@@ -147,7 +157,7 @@ const VaccinationPage = () => {
               <p className="text-sm text-muted">Manage and track livestock vaccinations</p>
             </div>
           </div>
-          <Link to="/vaccination/add" className="add-btn">
+          <Link to="/vaccination/add" state={{ from: isFarmer ? 'farmer' : 'vet' }} className="add-btn">
             <FaSyringe className="mr-1" size={18} />
             Add Vaccination
           </Link>

@@ -9,6 +9,11 @@ from .views import (
     GetAllFarmersView,
     GetFarmerProfileView
 )
+from .vet_dashboard_views import (
+    VetDashboardStatsView,
+    VetDashboardActivitiesView,
+    VetDashboardAlertsView
+)
 
 app_name = 'userprofile'
 
@@ -36,4 +41,9 @@ urlpatterns = [
     
     # Get specific farmer profile (GET) - for vets to view farmer details
     path('farmers/<str:username>/', GetFarmerProfileView.as_view(), name='get-farmer-profile'),
+    
+    # Vet Dashboard endpoints
+    path('vet/dashboard/stats/', VetDashboardStatsView.as_view(), name='vet-dashboard-stats'),
+    path('vet/dashboard/activities/', VetDashboardActivitiesView.as_view(), name='vet-dashboard-activities'),
+    path('vet/dashboard/alerts/', VetDashboardAlertsView.as_view(), name='vet-dashboard-alerts'),
 ]

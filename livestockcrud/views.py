@@ -30,6 +30,29 @@ class LivestockListCreateView(generics.ListCreateAPIView):
     
     def get_queryset(self):
         user = self.request.user
+        
+        # Check if 'owner' parameter is provided (for vets viewing farmer's animals)
+        owner_username = self.request.query_params.get('owner', None)
+        
+        if owner_username:
+            # Only vets can view other users' livestock
+            if user.role == 'vet':
+                from authentication.models import CustomUser
+                try:
+                    owner = CustomUser.objects.get(username=owner_username)
+                    return Livestock.objects.filter(
+                        user=owner
+                    ).select_related('species', 'breed', 'user')
+                except CustomUser.DoesNotExist:
+                    # Return empty queryset if owner not found
+                    return Livestock.objects.none()
+            else:
+                # Farmers can only view their own livestock
+                return Livestock.objects.filter(
+                    user=user
+                ).select_related('species', 'breed', 'user')
+        
+        # Default: return user's own livestock
         return Livestock.objects.filter(
             user=user
         ).select_related('species', 'breed', 'user')

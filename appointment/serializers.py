@@ -32,9 +32,10 @@ class AppointmentSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'farmer', 'farmer_details', 'veterinarian', 'veterinarian_id',
             'veterinarian_details', 'animal_type', 'reason', 'preferred_date',
-            'preferred_time', 'status', 'vet_notes', 'created_at', 'updated_at'
+            'preferred_time', 'status', 'vet_notes', 'created_at', 'updated_at',
+            'payment', 'payment_status', 'appointment_fee'
         ]
-        read_only_fields = ['farmer', 'veterinarian', 'created_at', 'updated_at']
+        read_only_fields = ['farmer', 'veterinarian', 'created_at', 'updated_at', 'payment', 'payment_status']
     
     def create(self, validated_data):
         # Set farmer from request user

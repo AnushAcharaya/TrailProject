@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import StepIndicator from './StepIndicator';
 import SelectLivestockStep from './SelectLivestockStep';
 import SelectPlanStep from './SelectPlanStep';
+import UploadPaymentProofStep from './UploadPaymentProofStep';
 import ReviewSubmitStep from './ReviewSubmitStep';
 import Toast from '../../../common/Toast';
 import { createEnrollment } from '../../../../services/insuranceApi';
@@ -13,8 +14,25 @@ const Enroll = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLivestock, setSelectedLivestock] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [paymentProof, setPaymentProof] = useState(null);
   const [toast, setToast] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Check if returning from eSewa payment
+  useEffect(() => {
+    const pendingEnrollment = sessionStorage.getItem('pending_insurance_enrollment');
+    if (pendingEnrollment) {
+      const data = JSON.parse(pendingEnrollment);
+      if (data.payment_initiated) {
+        // User returned from eSewa, move to step 3 (upload proof)
+        setCurrentStep(3);
+        setToast({
+          message: 'Payment completed! Please upload your payment screenshot.',
+          type: 'success'
+        });
+      }
+    }
+  }, []);
 
   // Check if a plan was pre-selected from the plan cards page
   useEffect(() => {
@@ -24,7 +42,7 @@ const Enroll = () => {
   }, [location.state]);
 
   const handleNext = () => {
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -36,9 +54,9 @@ const Enroll = () => {
   };
 
   const handleSubmit = async () => {
-    if (!selectedLivestock || !selectedPlan) {
+    if (!selectedLivestock || !selectedPlan || !paymentProof) {
       setToast({
-        message: 'Please select both livestock and plan',
+        message: 'Please complete all steps including payment proof upload',
         type: 'error'
       });
       return;
@@ -52,32 +70,39 @@ const Enroll = () => {
       const endDate = new Date();
       endDate.setFullYear(endDate.getFullYear() + 1);
 
-      // Prepare enrollment data
-      const enrollmentData = {
-        livestock: selectedLivestock.id,
-        plan: selectedPlan.id,
-        start_date: startDate.toISOString().split('T')[0],
-        end_date: endDate.toISOString().split('T')[0],
-        premium_paid: selectedPlan.premium_amount || selectedPlan.price,
-        payment_date: startDate.toISOString().split('T')[0],
-        notes: `Enrolled ${selectedLivestock.tag || selectedLivestock.tag_number || selectedLivestock.id} in ${selectedPlan.name}`
-      };
+      // Prepare form data with payment screenshot
+      const formData = new FormData();
+      formData.append('livestock', selectedLivestock.id);
+      formData.append('plan', selectedPlan.id);
+      formData.append('start_date', startDate.toISOString().split('T')[0]);
+      formData.append('end_date', endDate.toISOString().split('T')[0]);
+      formData.append('premium_paid', selectedPlan.premium_amount || selectedPlan.price);
+      formData.append('payment_date', new Date().toISOString().split('T')[0]);
+      formData.append('notes', `Enrolled ${selectedLivestock.tag || selectedLivestock.tag_number || selectedLivestock.id} in ${selectedPlan.name}`);
+      
+      // Add payment screenshot
+      if (paymentProof.file) {
+        formData.append('payment_screenshot', paymentProof.file);
+      }
 
-      console.log('Submitting enrollment:', enrollmentData);
+      console.log('Submitting enrollment with payment proof');
 
       // Create enrollment via API
-      await createEnrollment(enrollmentData);
+      const enrollment = await createEnrollment(formData);
+      console.log('Enrollment created:', enrollment);
 
-      // Show success toast
+      // Clear session storage
+      sessionStorage.removeItem('pending_insurance_enrollment');
+
       setToast({
-        message: 'Enrollment submitted successfully!',
+        message: 'Enrollment submitted successfully! Awaiting admin verification.',
         type: 'success'
       });
 
-      // Navigate to insurance dashboard after a short delay
+      // Redirect to dashboard after 2 seconds
       setTimeout(() => {
-        navigate('/farmerinsurancedashboard');
-      }, 1500);
+        navigate('/farmer/insurance/dashboard');
+      }, 2000);
 
     } catch (error) {
       console.error('Error submitting enrollment:', error);
@@ -106,7 +131,6 @@ const Enroll = () => {
         message: errorMessage,
         type: 'error'
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -136,6 +160,7 @@ const Enroll = () => {
         {currentStep === 2 && (
           <SelectPlanStep
             plan={selectedPlan}
+            livestock={selectedLivestock}
             onPlanSelect={setSelectedPlan}
             onNext={handleNext}
             onBack={handleBack}
@@ -144,9 +169,19 @@ const Enroll = () => {
         )}
 
         {currentStep === 3 && (
+          <UploadPaymentProofStep
+            paymentProof={paymentProof}
+            onProofUpload={setPaymentProof}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
+        )}
+
+        {currentStep === 4 && (
           <ReviewSubmitStep
             livestock={selectedLivestock}
             plan={selectedPlan}
+            paymentProof={paymentProof}
             onSubmit={handleSubmit}
             onBack={handleBack}
             isSubmitting={isSubmitting}

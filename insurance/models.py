@@ -80,6 +80,7 @@ class Enrollment(models.Model):
     
     premium_paid = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     payment_date = models.DateField(null=True, blank=True)
+    payment_screenshot = models.ImageField(upload_to='insurance/enrollments/payment_proofs/', null=True, blank=True)
     
     notes = models.TextField(blank=True, null=True)
     

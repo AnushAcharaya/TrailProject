@@ -4,6 +4,8 @@ import { FiCalendar, FiUser, FiFileText, FiClock } from "react-icons/fi";
 import { MdPets } from "react-icons/md";
 import { getAllVets } from "../../services/profileApi";
 import { createAppointment, formatAppointmentData } from "../../services/appointmentApi";
+import { initiatePayment, redirectToEsewa } from "../../services/paymentApi";
+import PaymentMethodModal from "./PaymentMethodModal";
 import "../../styles/appointments.css";
 
 const AppointmentRequestForm = () => {
@@ -16,6 +18,8 @@ const AppointmentRequestForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [createdAppointment, setCreatedAppointment] = useState(null);
   
   const [formData, setFormData] = useState({
     veterinarian: "",
@@ -124,12 +128,22 @@ const AppointmentRequestForm = () => {
       const response = await createAppointment(appointmentData);
       
       console.log("Appointment created successfully:", response);
-      setSuccess(true);
       
-      // Show success message and redirect after 2 seconds
-      setTimeout(() => {
-        navigate('/appointments', { state: { appointmentCreated: true } });
-      }, 2000);
+      // Store appointment data for payment
+      setCreatedAppointment(response);
+      
+      // Check if payment is required
+      if (response.appointment_fee && response.appointment_fee > 0) {
+        // Show payment method selection modal
+        setShowPaymentModal(true);
+        setIsSubmitting(false);
+      } else {
+        // No payment required, show success and redirect
+        setSuccess(true);
+        setTimeout(() => {
+          navigate('/appointments', { state: { appointmentCreated: true } });
+        }, 2000);
+      }
       
     } catch (err) {
       console.error("Error creating appointment:", err);
@@ -138,27 +152,68 @@ const AppointmentRequestForm = () => {
     }
   };
 
+  const handlePaymentMethodSelect = async (paymentMethod) => {
+    if (paymentMethod === 'cash') {
+      // Cash payment - just show success and redirect
+      setShowPaymentModal(false);
+      setSuccess(true);
+      setTimeout(() => {
+        navigate('/appointments', { 
+          state: { 
+            appointmentCreated: true,
+            message: 'Appointment created! Please pay in cash at the clinic.'
+          } 
+        });
+      }, 2000);
+    } else if (paymentMethod === 'esewa') {
+      // eSewa payment - initiate payment
+      try {
+        const paymentData = {
+          amount: createdAppointment.appointment_fee,
+          product_code: 'APPOINTMENT_FEE',
+          product_description: `Appointment #${createdAppointment.id} with ${selectedVet?.full_name || 'Veterinarian'}`,
+          tax_amount: 0
+        };
+
+        const result = await initiatePayment(paymentData);
+
+        if (result.success) {
+          // Redirect to eSewa
+          redirectToEsewa(result.payment_data, result.esewa_url);
+        } else {
+          throw new Error('Failed to initiate payment');
+        }
+      } catch (err) {
+        console.error('Payment initiation error:', err);
+        setError('Failed to initiate payment. Please try again.');
+        setShowPaymentModal(false);
+        setIsSubmitting(false);
+      }
+    }
+  };
+
   const handleCancel = () => {
     navigate('/appointments');
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-      {/* Success Message */}
-      {success && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800 font-medium">
-            ✓ Appointment request submitted successfully! Redirecting...
-          </p>
-        </div>
-      )}
+    <>
+      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+        {/* Success Message */}
+        {success && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-800 font-medium">
+              ✓ Appointment request submitted successfully! Redirecting...
+            </p>
+          </div>
+        )}
 
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800">{error}</p>
-        </div>
-      )}
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800">{error}</p>
+          </div>
+        )}
 
       {/* Select Veterinarian */}
       <div className="bg-white rounded-xl p-6 mb-6 shadow-sm">
@@ -358,6 +413,15 @@ const AppointmentRequestForm = () => {
         </button>
       </div>
     </form>
+
+    {/* Payment Method Modal */}
+    <PaymentMethodModal
+      isOpen={showPaymentModal}
+      onClose={() => setShowPaymentModal(false)}
+      appointmentData={createdAppointment}
+      onPaymentMethodSelect={handlePaymentMethodSelect}
+    />
+    </>
   );
 };
 

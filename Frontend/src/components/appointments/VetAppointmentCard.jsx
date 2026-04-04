@@ -14,8 +14,29 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [showNotesModal, setShowNotesModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [notes, setNotes] = useState("");
   const [actionType, setActionType] = useState(null); // 'decline' or 'complete'
+
+  const getPaymentStatusBadge = (paymentStatus) => {
+    const statusMap = {
+      'paid': { label: '✓ Paid', class: 'badge badge-green' },
+      'pending': { label: '⏳ Pending', class: 'badge badge-yellow' },
+      'failed': { label: '✗ Failed', class: 'badge badge-red' },
+      'not_required': { label: 'Not Required', class: 'badge badge-gray' },
+    };
+    return statusMap[paymentStatus] || { label: 'Unknown', class: 'badge badge-gray' };
+  };
+
+  const getPaymentMethodLabel = (appointment) => {
+    if (appointment.payment_status === 'paid' && appointment.payment) {
+      return 'eSewa';
+    }
+    if (appointment.payment_status === 'pending') {
+      return 'Cash';
+    }
+    return 'N/A';
+  };
 
   const handleApprove = async () => {
     setIsProcessing(true);
@@ -81,13 +102,13 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
     <>
       <div className="app-card">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <FiUser className="text-blue-600" size={20} />
+          <div className="flex items-center gap-4 mb-5">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <FiUser className="text-blue-600" size={22} />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800">{farmerName}</h3>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <h3 className="font-semibold text-gray-800 text-lg">{farmerName}</h3>
+              <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
                 <MdPets size={16} />
                 <span>{animalType}</span>
                 <span>·</span>
@@ -97,36 +118,36 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
             </div>
           </div>
 
-          <div className="flex items-start gap-2 app-note mb-2">
-            <FiFileText className="text-gray-500 mt-0.5" size={16} />
-            <p className="text-sm text-gray-700">
+          <div className="flex items-start gap-3 mb-4">
+            <FiFileText className="text-gray-500 mt-0.5 flex-shrink-0" size={18} />
+            <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed">
               {appointment.reason}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <FiClock size={14} />
+          <div className="flex items-center gap-3 text-sm text-gray-600 mb-4">
+            <FiClock size={16} />
             <span>Preferred: {preferredDate} at {preferredTime}</span>
           </div>
 
           {appointment.vet_notes && (
-            <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-700">
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-sm text-gray-700 leading-relaxed">
                 <span className="font-medium">Notes:</span> {appointment.vet_notes}
               </p>
             </div>
           )}
 
           {error && (
-            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
         </div>
 
-        <div className="text-right">
+        <div className="flex flex-col gap-6">
           <span
-            className={`badge ${
+            className={`badge self-end ${
               appointment.status === "Approved"
                 ? "badge-green"
                 : appointment.status === "Pending"
@@ -141,18 +162,31 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
             {appointment.status}
           </span>
 
-          <div className="mt-4 flex flex-col gap-2">
+          {/* Payment Badges and Action Buttons in Same Row */}
+          <div className="flex flex-wrap items-center gap-6">
+            {/* Payment Information Badges */}
+            <span className="badge badge-gray px-4 py-2 text-xs font-semibold rounded-md shadow-sm whitespace-nowrap">
+              {getPaymentMethodLabel(appointment)}
+            </span>
+            <span className={`${getPaymentStatusBadge(appointment.payment_status).class} px-4 py-2 text-xs font-semibold rounded-md shadow-sm whitespace-nowrap`}>
+              {getPaymentStatusBadge(appointment.payment_status).label}
+            </span>
+
+            {/* Spacer between badges and buttons */}
+            <div className="w-8"></div>
+
+            {/* Action Buttons */}
             {appointment.status === "Pending" && (
               <>
                 <button 
-                  className="btn-primary"
+                  className="px-5 py-2.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 hover:shadow-md transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                   onClick={handleApprove}
                   disabled={isProcessing}
                 >
                   {isProcessing ? "Processing..." : "Approve"}
                 </button>
                 <button 
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 hover:shadow-md transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                   onClick={handleDecline}
                   disabled={isProcessing}
                 >
@@ -163,13 +197,20 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
 
             {appointment.status === "Approved" && (
               <button 
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 hover:shadow-md transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 onClick={handleComplete}
                 disabled={isProcessing}
               >
-                Complete Appointment
+                Complete
               </button>
             )}
+            
+            <button 
+              className="px-5 py-2.5 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 hover:shadow-md transition-all font-medium whitespace-nowrap"
+              onClick={() => setShowDetailsModal(true)}
+            >
+              View Details
+            </button>
           </div>
         </div>
       </div>
@@ -221,6 +262,114 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
               >
                 {isProcessing ? "Processing..." : actionType === 'decline' ? 'Decline' : 'Complete'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Details Modal */}
+      {showDetailsModal && (
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)'
+          }}
+        >
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Appointment Details</h2>
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Farmer</label>
+                  <p className="text-gray-900">{farmerName}</p>
+                  <p className="text-sm text-gray-600">{appointment.farmer_details?.email}</p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Animal Type</label>
+                  <p className="text-gray-900 capitalize">{animalType}</p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Date & Time</label>
+                  <p className="text-gray-900">
+                    {preferredDate} at {preferredTime}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Status</label>
+                  <p>
+                    <span className={`badge ${
+                      appointment.status === "Approved"
+                        ? "badge-green"
+                        : appointment.status === "Pending"
+                        ? "badge-yellow"
+                        : appointment.status === "Completed"
+                        ? "badge-blue"
+                        : appointment.status === "Declined"
+                        ? "badge-red"
+                        : "badge-gray"
+                    }`}>
+                      {appointment.status}
+                    </span>
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Payment Method</label>
+                  <p className="text-gray-900 font-medium">
+                    {getPaymentMethodLabel(appointment)}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Payment Status</label>
+                  <p>
+                    <span className={getPaymentStatusBadge(appointment.payment_status).class}>
+                      {getPaymentStatusBadge(appointment.payment_status).label}
+                    </span>
+                  </p>
+                </div>
+
+                {appointment.appointment_fee && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Appointment Fee</label>
+                    <p className="text-gray-900 font-semibold">Rs. {appointment.appointment_fee}</p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Reason for Visit</label>
+                  <p className="text-gray-900">{appointment.reason}</p>
+                </div>
+
+                {appointment.vet_notes && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Vet Notes</label>
+                    <p className="text-gray-900">{appointment.vet_notes}</p>
+                  </div>
+                )}
+
+                <div className="pt-4 border-t flex justify-center">
+                  <button
+                    onClick={() => setShowDetailsModal(false)}
+                    className="px-6 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

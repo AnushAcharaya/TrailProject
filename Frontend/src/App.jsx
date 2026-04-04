@@ -21,6 +21,8 @@ import FarmerDashboardPage from "./pages/FarmerDashboard/FarmerDashboardPage";
 import FarmerAppointments from "./pages/appointments/FarmerAppointments";
 import VetAppointments from "./pages/appointments/VetAppointments";
 import RequestAppointmentPage from "./pages/appointments/RequestAppointmentPage";
+import PaymentSuccess from "./pages/payment/PaymentSuccess";
+import PaymentFailure from "./pages/payment/PaymentFailure";
 import FriendRequestsPage from "./pages/friends/FriendRequests";
 import FriendsListPage from "./pages/friends/FriendsList";
 import VetFriendRequestsPage from "./pages/friends/VetFriendRequests";
@@ -71,6 +73,8 @@ function App() {
         <Route path="/vetappointment" element={<VetAppointments />} />
         <Route path="/vet/appointments" element={<VetAppointments />} />
         <Route path="/appointments/request" element={<RequestAppointmentPage />} />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/failure" element={<PaymentFailure />} />
         <Route path="/farmer/friends/requests" element={<FriendRequestsPage />} />
         <Route path="/farmer/friends/list" element={<FriendsListPage />} />
         <Route path="/messages" element={<MessagesPage />} />

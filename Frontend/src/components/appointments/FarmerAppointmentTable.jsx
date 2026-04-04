@@ -61,6 +61,28 @@ const FarmerAppointmentTable = () => {
     return classes[status] || 'badge badge-gray';
   };
 
+  const getPaymentStatusBadge = (paymentStatus) => {
+    const statusMap = {
+      'paid': { label: '✓ Paid', class: 'badge badge-green' },
+      'pending': { label: '⏳ Pending', class: 'badge badge-yellow' },
+      'failed': { label: '✗ Failed', class: 'badge badge-red' },
+      'not_required': { label: 'Not Required', class: 'badge badge-gray' },
+    };
+    return statusMap[paymentStatus] || { label: 'Unknown', class: 'badge badge-gray' };
+  };
+
+  const getPaymentMethodLabel = (appointment) => {
+    // If paid, check if there's a payment record
+    if (appointment.payment_status === 'paid' && appointment.payment) {
+      return 'eSewa';
+    }
+    // If pending and has fee, assume cash or esewa pending
+    if (appointment.payment_status === 'pending') {
+      return 'Cash';
+    }
+    return 'N/A';
+  };
+
   if (isLoading) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-8 text-center">
@@ -101,6 +123,8 @@ const FarmerAppointmentTable = () => {
               <th>Animal</th>
               <th>Date & Time</th>
               <th>Status</th>
+              <th>Payment Method</th>
+              <th>Payment Status</th>
               <th className="text-right">Actions</th>
             </tr>
           </thead>
@@ -125,6 +149,16 @@ const FarmerAppointmentTable = () => {
                 <td>
                   <span className={getStatusBadgeClass(appointment.status)}>
                     {appointment.status}
+                  </span>
+                </td>
+                <td>
+                  <span className="text-gray-700 font-medium">
+                    {getPaymentMethodLabel(appointment)}
+                  </span>
+                </td>
+                <td>
+                  <span className={getPaymentStatusBadge(appointment.payment_status).class}>
+                    {getPaymentStatusBadge(appointment.payment_status).label}
                   </span>
                 </td>
                 <td className="text-right">
@@ -154,7 +188,13 @@ const FarmerAppointmentTable = () => {
 
       {/* Details Modal */}
       {showDetailsModal && selectedAppointment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)'
+          }}
+        >
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
@@ -196,6 +236,29 @@ const FarmerAppointmentTable = () => {
                 </div>
 
                 <div>
+                  <label className="text-sm font-medium text-gray-500">Payment Method</label>
+                  <p className="text-gray-900 font-medium">
+                    {getPaymentMethodLabel(selectedAppointment)}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Payment Status</label>
+                  <p>
+                    <span className={getPaymentStatusBadge(selectedAppointment.payment_status).class}>
+                      {getPaymentStatusBadge(selectedAppointment.payment_status).label}
+                    </span>
+                  </p>
+                </div>
+
+                {selectedAppointment.appointment_fee && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Appointment Fee</label>
+                    <p className="text-gray-900 font-semibold">Rs. {selectedAppointment.appointment_fee}</p>
+                  </div>
+                )}
+
+                <div>
                   <label className="text-sm font-medium text-gray-500">Reason for Visit</label>
                   <p className="text-gray-900">{selectedAppointment.reason}</p>
                 </div>
@@ -207,10 +270,10 @@ const FarmerAppointmentTable = () => {
                   </div>
                 )}
 
-                <div className="pt-4 border-t">
+                <div className="pt-4 border-t flex justify-center">
                   <button
                     onClick={() => setShowDetailsModal(false)}
-                    className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    className="px-6 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
                   >
                     Close
                   </button>

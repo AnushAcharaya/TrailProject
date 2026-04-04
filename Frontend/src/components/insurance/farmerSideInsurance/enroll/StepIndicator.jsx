@@ -3,8 +3,9 @@ import { FaCheck } from 'react-icons/fa';
 const StepIndicator = ({ currentStep }) => {
   const steps = [
     { number: 1, label: 'Select Livestock' },
-    { number: 2, label: 'Select Plan' },
-    { number: 3, label: 'Review & Submit' }
+    { number: 2, label: 'Select Plan & Pay' },
+    { number: 3, label: 'Upload Proof' },
+    { number: 4, label: 'Review & Submit' }
   ];
 
   const progressWidth = ((currentStep - 1) / (steps.length - 1)) * 100;

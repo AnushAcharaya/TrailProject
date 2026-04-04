@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/v1/profile-transfer/', include('profileTransfer.urls')),  # Profile Transfer
     path('api/v1/friends/', include('friends.urls')),  # Friends & Friend Requests
     path('api/v1/', include('messaging.urls')),  # Messages
+    path('api/v1/payment/', include('payment.urls')),  # eSewa Payment
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='redoc-ui'),

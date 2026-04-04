@@ -36,6 +36,14 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     ordering_fields = ['preferred_date', 'created_at', 'status']
     ordering = ['-created_at']
     
+    def perform_create(self, serializer):
+        """Set default appointment fee when creating appointment"""
+        # Set default appointment fee if not provided
+        if 'appointment_fee' not in serializer.validated_data or serializer.validated_data.get('appointment_fee') is None:
+            serializer.save(appointment_fee=500.00, payment_status='pending')
+        else:
+            serializer.save()
+    
     def get_queryset(self):
         user = self.request.user
         

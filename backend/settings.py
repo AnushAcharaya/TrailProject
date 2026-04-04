@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'profileTransfer',
     'friends',
     'messaging',
+    'payment',  # eSewa payment integration
 ]
 
 MIDDLEWARE = [
@@ -282,3 +283,11 @@ SOCIAL_AUTH_PIPELINE = (
 
 # Nepal NPR formatting
 USE_L10N = True
+
+# eSewa Payment Gateway Configuration
+ESEWA_MERCHANT_ID = os.getenv('ESEWA_MERCHANT_ID', '')
+ESEWA_SECRET_KEY = os.getenv('ESEWA_SECRET_KEY', '')
+ESEWA_SUCCESS_URL = os.getenv('ESEWA_SUCCESS_URL', 'http://localhost:3000/payment/success')
+ESEWA_FAILURE_URL = os.getenv('ESEWA_FAILURE_URL', 'http://localhost:3000/payment/failure')
+ESEWA_PAYMENT_URL = os.getenv('ESEWA_PAYMENT_URL', 'https://uat.esewa.com.np/epay/main')  # Test URL
+# For production: https://esewa.com.np/epay/main

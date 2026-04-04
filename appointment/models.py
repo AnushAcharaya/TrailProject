@@ -16,6 +16,13 @@ class Appointment(models.Model):
         ('Declined', 'Declined'),
     ]
     
+    PAYMENT_STATUS_CHOICES = [
+        ('not_required', 'Not Required'),
+        ('pending', 'Payment Pending'),
+        ('paid', 'Paid'),
+        ('failed', 'Payment Failed'),
+    ]
+    
     ANIMAL_TYPE_CHOICES = [
         ('cattle', 'Cattle'),
         ('sheep', 'Sheep'),
@@ -45,6 +52,29 @@ class Appointment(models.Model):
     preferred_time = models.TimeField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     
+    # Payment integration
+    payment = models.ForeignKey(
+        'payment.Payment',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='appointments',
+        help_text="Payment record for this appointment"
+    )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='not_required',
+        help_text="Payment status for this appointment"
+    )
+    appointment_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Fee for this appointment (if applicable)"
+    )
+    
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -71,3 +101,17 @@ class Appointment(models.Model):
     
     def __str__(self):
         return f"{self.farmer.get_full_name()} - {self.veterinarian.get_full_name()} ({self.preferred_date})"
+    
+    def requires_payment(self):
+        """Check if appointment requires payment"""
+        return self.appointment_fee and self.appointment_fee > 0
+    
+    def is_paid(self):
+        """Check if appointment is paid"""
+        return self.payment_status == 'paid' and self.payment and self.payment.status == 'completed'
+    
+    def mark_as_paid(self, payment):
+        """Mark appointment as paid"""
+        self.payment = payment
+        self.payment_status = 'paid'
+        self.save()

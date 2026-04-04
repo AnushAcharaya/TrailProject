@@ -1,6 +1,6 @@
-import { FaCheck } from 'react-icons/fa';
+import { FaCheck, FaImage } from 'react-icons/fa';
 
-const ReviewSubmitStep = ({ livestock, plan, onSubmit, onBack, isSubmitting }) => {
+const ReviewSubmitStep = ({ livestock, plan, paymentProof, onSubmit, onBack, isSubmitting }) => {
   return (
     <div className="form-card">
       <h2 className="form-title">Review & Submit</h2>
@@ -35,6 +35,23 @@ const ReviewSubmitStep = ({ livestock, plan, onSubmit, onBack, isSubmitting }) =
         <div className="review-row">
           <span className="review-label">{plan?.description || ''}</span>
         </div>
+      </div>
+
+      <div className="review-section">
+        <div className="review-section-title">Payment Proof</div>
+        {paymentProof?.preview ? (
+          <div className="payment-proof-preview">
+            <FaImage className="text-emerald-600 mb-2" />
+            <img
+              src={paymentProof.preview}
+              alt="Payment proof"
+              className="payment-proof-image"
+            />
+            <p className="text-sm text-gray-600 mt-2">Screenshot uploaded successfully</p>
+          </div>
+        ) : (
+          <p className="text-gray-500">No payment proof uploaded</p>
+        )}
       </div>
 
       <div className="premium-box">

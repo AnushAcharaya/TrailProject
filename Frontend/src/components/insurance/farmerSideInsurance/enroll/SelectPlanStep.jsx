@@ -1,7 +1,13 @@
+import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import PlanDetails from './PlanDetails';
+import { initiatePayment, redirectToEsewa } from '../../../../services/paymentApi';
+import Toast from '../../../common/Toast';
 
-const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected }) => {
+const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected, livestock }) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [toast, setToast] = useState(null);
+
   const planOptions = [
     {
       id: 1,
@@ -36,6 +42,64 @@ const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected }) => 
       fullDescription: 'Maximum protection with extended coverage period and all risk types.'
     }
   ];
+
+  const handleProceedToPayment = async () => {
+    if (!plan) {
+      setToast({
+        message: 'Please select a plan first',
+        type: 'error'
+      });
+      return;
+    }
+
+    if (!livestock) {
+      setToast({
+        message: 'Livestock information is missing',
+        type: 'error'
+      });
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+
+      // Initiate eSewa payment
+      const premiumAmount = plan.premium_amount || plan.price;
+      const paymentData = {
+        amount: premiumAmount,
+        product_code: 'INSURANCE_PREMIUM',
+        product_description: `Insurance Premium - ${plan.name} for ${livestock.name || livestock.tag}`,
+        tax_amount: 0
+      };
+
+      console.log('Initiating payment:', paymentData);
+      const paymentResponse = await initiatePayment(paymentData);
+      
+      if (paymentResponse.success) {
+        // Store enrollment data in sessionStorage for after payment
+        sessionStorage.setItem('pending_insurance_enrollment', JSON.stringify({
+          livestock_id: livestock.id,
+          plan_id: plan.id,
+          plan_name: plan.name,
+          premium_amount: premiumAmount,
+          payment_initiated: true
+        }));
+        
+        // Redirect to eSewa
+        redirectToEsewa(paymentResponse.payment_data, paymentResponse.esewa_url);
+      } else {
+        throw new Error('Failed to initiate payment');
+      }
+
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+      setToast({
+        message: 'Failed to initiate payment. Please try again.',
+        type: 'error'
+      });
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="form-card">
@@ -87,17 +151,25 @@ const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected }) => 
       )}
 
       <div className="btn-container">
-        <button className="btn-back" onClick={onBack}>
+        <button className="btn-back" onClick={onBack} disabled={isProcessing}>
           ← Back
         </button>
         <button
           className="btn-next"
-          onClick={onNext}
-          disabled={!plan}
+          onClick={handleProceedToPayment}
+          disabled={!plan || isProcessing}
         >
-          Next →
+          {isProcessing ? 'Processing...' : 'Proceed to Payment →'}
         </button>
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

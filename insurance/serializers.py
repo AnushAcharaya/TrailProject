@@ -61,16 +61,26 @@ class EnrollmentSerializer(serializers.ModelSerializer):
     farmer_details = UserBasicSerializer(source='farmer', read_only=True)
     livestock_details = LivestockBasicSerializer(source='livestock', read_only=True)
     plan_details = InsurancePlanSerializer(source='plan', read_only=True)
+    payment_screenshot = serializers.SerializerMethodField()
     
     class Meta:
         model = Enrollment
         fields = [
             'id', 'farmer', 'farmer_details', 'livestock', 'livestock_details',
             'plan', 'plan_details', 'status', 'enrollment_date', 'start_date',
-            'end_date', 'premium_paid', 'payment_date', 'notes',
+            'end_date', 'premium_paid', 'payment_date', 'payment_screenshot', 'notes',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['farmer', 'enrollment_date', 'created_at', 'updated_at']
+    
+    def get_payment_screenshot(self, obj):
+        """Return absolute URL for payment screenshot"""
+        if obj.payment_screenshot:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.payment_screenshot.url)
+            return obj.payment_screenshot.url
+        return None
     
     def validate(self, data):
         """Validate enrollment data"""
@@ -109,6 +119,26 @@ class EnrollmentSerializer(serializers.ModelSerializer):
             })
         
         return data
+    
+    def create(self, validated_data):
+        """Handle file uploads during creation"""
+        # Extract file fields from initial_data if present
+        request = self.context.get('request')
+        if request and request.FILES:
+            if 'payment_screenshot' in request.FILES:
+                validated_data['payment_screenshot'] = request.FILES['payment_screenshot']
+        
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        """Handle file uploads during update"""
+        # Extract file fields from initial_data if present
+        request = self.context.get('request')
+        if request and request.FILES:
+            if 'payment_screenshot' in request.FILES:
+                validated_data['payment_screenshot'] = request.FILES['payment_screenshot']
+        
+        return super().update(instance, validated_data)
 
 
 class ClaimSerializer(serializers.ModelSerializer):

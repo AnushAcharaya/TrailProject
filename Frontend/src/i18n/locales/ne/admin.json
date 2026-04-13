@@ -1,0 +1,86 @@
+{
+  "topNav": {
+    "title": "पशुपालन हब प्रशासक",
+    "subtitle": "किसान र पशु चिकित्सक व्यवस्थापन"
+  },
+  "sideNav": {
+    "allUsers": "सबै प्रयोगकर्ताहरू",
+    "accountVerifications": "खाता प्रमाणीकरण",
+    "insurance": "बीमा",
+    "profileTransfer": "प्रोफाइल स्थानान्तरण",
+    "analytics": "विश्लेषण",
+    "settings": "सेटिङहरू",
+    "helpSupport": "मद्दत र समर्थन",
+    "logout": "लगआउट",
+    "copyright": "© {{year}} पशुपालन हब"
+  },
+  "logoutModal": {
+    "title": "लगआउट पुष्टि गर्नुहोस्",
+    "message": "के तपाईं लगआउट गर्न निश्चित हुनुहुन्छ?",
+    "cancel": "रद्द गर्नुहोस्",
+    "confirm": "हो, लगआउट गर्नुहोस्"
+  },
+  "dashboard": {
+    "cards": {
+      "totalRegistrations": "कुल दर्ताहरू",
+      "pendingReviews": "समीक्षा बाँकी",
+      "approvedAccounts": "स्वीकृत खाताहरू",
+      "activeThisWeek": "यो हप्ता सक्रिय"
+    },
+    "recentRegistrations": {
+      "title": "हालैका दर्ताहरू",
+      "subtitle": "पछिल्लो ५ दर्ता अनुरोधहरू",
+      "viewAll": "सबै हेर्नुहोस्",
+      "noRegistrations": "हालैको कुनै दर्ता फेला परेन।",
+      "loading": "प्रयोगकर्ताहरू लोड गर्दै..."
+    },
+    "charts": {
+      "monthlyVerifications": "मासिक प्रमाणीकरणहरू",
+      "weeklyActivity": "साप्ताहिक गतिविधि",
+      "farmers": "किसानहरू",
+      "veterinarians": "पशु चिकित्सकहरू"
+    }
+  },
+  "accountVerifications": {
+    "title": "खाता प्रमाणीकरण",
+    "noUsers": "कुनै प्रयोगकर्ता फेला परेन।",
+    "loading": "प्रयोगकर्ताहरू लोड गर्दै..."
+  },
+  "filterBar": {
+    "searchPlaceholder": "नाम, इमेल, वा फोनबाट खोज्नुहोस्...",
+    "roles": {
+      "all": "सबै भूमिकाहरू",
+      "farmer": "किसान",
+      "veterinarian": "पशु चिकित्सक"
+    },
+    "statuses": {
+      "all": "सबै स्थिति",
+      "pending": "बाँकी",
+      "approved": "स्वीकृत",
+      "declined": "अस्वीकृत"
+    }
+  },
+  "accountCard": {
+    "viewMore": "थप हेर्नुहोस्",
+    "viewLess": "कम हेर्नुहोस्",
+    "farmName": "फार्मको नाम",
+    "specialization": "विशेषज्ञता",
+    "uploadedDocuments": "अपलोड गरिएका कागजातहरू",
+    "submitted": "पेश गरिएको",
+    "approve": "स्वीकृत गर्नुहोस्",
+    "decline": "अस्वीकार गर्नुहोस्",
+    "roles": {
+      "farmer": "किसान",
+      "veterinarian": "पशु चिकित्सक",
+      "vet": "पशु चिकित्सक"
+    },
+    "statuses": {
+      "pending": "बाँकी",
+      "approved": "स्वीकृत",
+      "declined": "अस्वीकृत"
+    }
+  },
+  "common": {
+    "loading": "लोड गर्दै..."
+  }
+}

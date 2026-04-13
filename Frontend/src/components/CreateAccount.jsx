@@ -2,9 +2,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserPlus, Upload, LogIn, Mail, CheckCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { registerUser, verifyEmailOTP, resendEmailOTP } from "../services/api";
 
 const CreateAccount = () => {
+  const { t } = useTranslation('auth');
   const [step, setStep] = useState(1); // 1: Registration, 2: Success Message, 3: OTP Verification
   const [registeredUser, setRegisteredUser] = useState(null);
   const [emailVerified, setEmailVerified] = useState(false);
@@ -116,14 +118,14 @@ const CreateAccount = () => {
             <>
               <UserPlus className="text-primary-dark w-10 h-10 sm:w-8 sm:h-8" />
               <h1 className="text-2xl sm:text-3xl font-bold text-primary-dark text-center">
-                Create Account
+                {t('register.title')}
               </h1>
             </>
           ) : (
             <>
               <CheckCircle className="text-green-600 w-10 h-10 sm:w-8 sm:h-8" />
               <h1 className="text-2xl sm:text-3xl font-bold text-primary-dark text-center">
-                Verify Your Account
+                {t('register.verifyYourAccount')}
               </h1>
             </>
           )}
@@ -134,12 +136,12 @@ const CreateAccount = () => {
           <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Helper to create horizontal label + input */}
           {[
-            { label: "Username", name: "username", type: "text", placeholder: "Username" },
-            { label: "Full Name", name: "fullName", type: "text", placeholder: "Full Name" },
-            { label: "Address", name: "address", type: "text", placeholder: "Address" },
-            { label: "Phone", name: "phone", type: "text", placeholder: "Phone" },
-            { label: "Email", name: "email", type: "email", placeholder: "Email" },
-            { label: "Password", name: "password", type: "password", placeholder: "Password" },
+            { label: t('register.username'), name: "username", type: "text", placeholder: t('register.username') },
+            { label: t('register.fullName'), name: "fullName", type: "text", placeholder: t('register.fullName') },
+            { label: t('register.address'), name: "address", type: "text", placeholder: t('register.address') },
+            { label: t('register.phone'), name: "phone", type: "text", placeholder: t('register.phone') },
+            { label: t('register.email'), name: "email", type: "email", placeholder: t('register.email') },
+            { label: t('register.password'), name: "password", type: "password", placeholder: t('register.password') },
           ].map((field) => (
             <div key={field.name} className="flex items-center justify-between gap-4 w-full">
               <label className="w-1/4 text-right font-medium">{field.label}:</label>
@@ -157,7 +159,7 @@ const CreateAccount = () => {
 
           {/* Role Selector */}
           <div className="flex items-center justify-between gap-4 w-full">
-            <label className="w-1/4 text-right font-medium">Role:</label>
+            <label className="w-1/4 text-right font-medium">{t('register.role')}:</label>
             <select
               name="role"
               value={formData.role}
@@ -165,10 +167,10 @@ const CreateAccount = () => {
               required
               className="w-1/2 input-field py-1 px-2 border rounded bg-white"
             >
-              <option value="">Select your role</option>
-              <option value="farmer">Farmer</option>
-              <option value="vet">Veterinarian</option>
-              <option value="admin">Admin</option>
+              <option value="">{t('register.selectRole')}</option>
+              <option value="farmer">{t('roles.farmer')}</option>
+              <option value="vet">{t('roles.vet')}</option>
+              <option value="admin">{t('roles.admin')}</option>
             </select>
           </div>
 
@@ -185,24 +187,24 @@ const CreateAccount = () => {
                 className="space-y-4 bg-green-50 p-4 rounded-xl"
               >
                 <div className="flex items-center justify-between gap-4 w-full">
-                  <label className="w-1/4 text-right font-medium">Farm Name:</label>
+                  <label className="w-1/4 text-right font-medium">{t('register.farmName')}:</label>
                   <input
                     type="text"
                     name="farmName"
                     value={formData.farmName}
                     onChange={handleChange}
                     required
-                    placeholder="Farm Name"
+                    placeholder={t('register.farmName')}
                     className="w-1/2 input-field py-1 px-2 border rounded"
                   />
                 </div>
 
                 <div className="flex items-center justify-between gap-4 w-full">
-                  <label className="w-1/4 text-right font-medium">NID Photo:</label>
+                  <label className="w-1/4 text-right font-medium">{t('register.nidPhoto')}:</label>
                   <div className="w-1/2">
                     <label className="upload-box flex items-center gap-2 p-2 border rounded-lg cursor-pointer">
                       <Upload className="text-green-700" />
-                      <span>{formData.nidPhoto ? formData.nidPhoto.name : 'Choose File'}</span>
+                      <span>{formData.nidPhoto ? formData.nidPhoto.name : t('register.chooseFile')}</span>
                       <input
                         type="file"
                         name="nidPhoto"
@@ -228,24 +230,24 @@ const CreateAccount = () => {
                 className="space-y-4 bg-green-50 p-4 rounded-xl"
               >
                 <div className="flex items-center justify-between gap-4 w-full">
-                  <label className="w-1/4 text-right font-medium">Specialization:</label>
+                  <label className="w-1/4 text-right font-medium">{t('register.specialization')}:</label>
                   <input
                     type="text"
                     name="specialization"
                     value={formData.specialization}
                     onChange={handleChange}
                     required
-                    placeholder="Specialization"
+                    placeholder={t('register.specialization')}
                     className="w-1/2 input-field py-1 px-2 border rounded"
                   />
                 </div>
 
                 <div className="flex items-center justify-between gap-4 w-full">
-                  <label className="w-1/4 text-right font-medium">Certificate:</label>
+                  <label className="w-1/4 text-right font-medium">{t('register.certificatePhoto')}:</label>
                   <div className="w-1/2">
                     <label className="upload-box flex items-center gap-2 p-2 border rounded-lg cursor-pointer">
                       <Upload className="text-green-700" />
-                      <span>{formData.certificatePhoto ? formData.certificatePhoto.name : 'Choose File'}</span>
+                      <span>{formData.certificatePhoto ? formData.certificatePhoto.name : t('register.chooseFile')}</span>
                       <input
                         type="file"
                         name="certificatePhoto"
@@ -271,7 +273,7 @@ const CreateAccount = () => {
                 className="bg-green-50 p-4 rounded-xl text-center"
               >
                 <p className="text-sm sm:text-base text-gray-700 italic">
-                  Admin accounts have system-level access. Proceed carefully.
+                  {t('register.adminNote')}
                 </p>
               </motion.div>
             )}
@@ -286,7 +288,7 @@ const CreateAccount = () => {
             className="btn-google mx-auto block py-2 px-4 mt-4 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600 transition"
           >
             <LogIn className="inline w-4 h-4 mr-2" />
-            Login with Google
+            {t('register.loginWithGoogle')}
           </motion.button>
 
           {/* Error Message */}
@@ -303,7 +305,7 @@ const CreateAccount = () => {
             type="submit"
             className="btn-primary mx-auto block py-2 px-6 mt-4 text-sm sm:text-base"
           >
-            Create Account
+            {t('register.createAccount')}
           </motion.button>
         </form>
         )}
@@ -317,12 +319,12 @@ const CreateAccount = () => {
           >
             <CheckCircle className="w-20 h-20 text-green-600 mx-auto" />
             <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg">
-              <p className="font-bold text-xl">Registration Completed!</p>
-              <p className="text-base mt-2">Please verify your email.</p>
+              <p className="font-bold text-xl">{t('register.registrationComplete')}</p>
+              <p className="text-base mt-2">{t('register.verifyEmail')}</p>
             </div>
             <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
-              <span>Redirecting to verification page...</span>
+              <span>{t('register.redirectingToVerification')}</span>
             </div>
           </motion.div>
         )}
@@ -340,7 +342,7 @@ const CreateAccount = () => {
                 <div className="flex items-center gap-2">
                   <Mail className={`w-6 h-6 ${emailVerified ? 'text-green-600' : 'text-blue-600'}`} />
                   <h3 className={`text-lg font-semibold ${emailVerified ? 'text-green-900' : 'text-blue-900'}`}>
-                    Email Verification
+                    {t('register.emailVerification')}
                   </h3>
                 </div>
                 {emailVerified && <CheckCircle className="w-6 h-6 text-green-600" />}
@@ -353,7 +355,7 @@ const CreateAccount = () => {
                     name="emailOtp"
                     value={otpData.emailOtp}
                     onChange={handleOtpChange}
-                    placeholder="Enter 6-digit email OTP"
+                    placeholder={t('register.enterEmailOTP')}
                     maxLength="6"
                     className="w-full input-field py-2 px-4 border rounded-lg text-center text-2xl tracking-widest"
                   />
@@ -370,7 +372,7 @@ const CreateAccount = () => {
                       disabled={otpData.emailOtp.length !== 6}
                       className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Verify Email
+                      {t('register.verifyEmailButton')}
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.03 }}
@@ -378,12 +380,12 @@ const CreateAccount = () => {
                       onClick={handleResendOtp}
                       className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
                     >
-                      Resend
+                      {t('register.resend')}
                     </motion.button>
                   </div>
                 </>
               ) : (
-                <p className="text-green-700 font-semibold text-center">✓ Email Verified Successfully!</p>
+                <p className="text-green-700 font-semibold text-center">✓ {t('register.emailVerifiedSuccess')}</p>
               )}
             </motion.div>
 
@@ -395,14 +397,14 @@ const CreateAccount = () => {
                 className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg text-center space-y-4"
               >
                 <CheckCircle className="w-16 h-16 text-green-600 mx-auto" />
-                <p className="font-bold text-xl">Account Verified Successfully!</p>
+                <p className="font-bold text-xl">{t('register.accountVerifiedSuccess')}</p>
                 <Link to="/login">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="bg-green-600 text-white py-3 px-8 rounded-lg hover:bg-green-700 transition font-semibold"
                   >
-                    Go to Login Page
+                    {t('register.goToLogin')}
                   </motion.button>
                 </Link>
               </motion.div>

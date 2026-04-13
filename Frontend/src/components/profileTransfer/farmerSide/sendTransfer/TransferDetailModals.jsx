@@ -1,9 +1,12 @@
 // components/profile-transfer/farmer-side/send-transfer/components/TransferDetailsModal.jsx
+import { useTranslation } from 'react-i18next';
 import { FaTimes } from 'react-icons/fa';
 import ProgressStepper from './ProgressStepper';
 import AnimalDetail from './AnimalDetail';
 
 export default function TransferDetailsModal({ transfer, onClose }) {
+  const { t } = useTranslation('profileTransfer');
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -11,7 +14,7 @@ export default function TransferDetailsModal({ transfer, onClose }) {
         <div className="p-6 pb-4 border-b border-emerald-100 sticky top-0 bg-white/95 backdrop-blur-md z-10">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              Transfer Details {transfer.details.animal.tag}
+              {t('sentTransfers.viewDetails')} {transfer.details.animal.tag}
             </h2>
             <button
               onClick={onClose}
@@ -32,23 +35,23 @@ export default function TransferDetailsModal({ transfer, onClose }) {
           
           {/* Transfer Info */}
           <div className="bg-emerald-50/50 rounded-2xl p-6 border border-emerald-200/50">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Transfer Information</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">{t('reviewTransfer.animal')}</h3>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-600">Recipient:</span>
+                <span className="text-gray-600">{t('transferItem.to')}:</span>
                 <span className="font-semibold text-gray-900">{transfer.details.recipient}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Status:</span>
+                <span className="text-gray-600">{t('transferItem.status')}:</span>
                 <span className="font-semibold text-yellow-600">{transfer.status}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Time:</span>
+                <span className="text-gray-600">{t('transferItem.date')}:</span>
                 <span className="font-semibold text-gray-900">{transfer.time}</span>
               </div>
               {transfer.details.reason && (
                 <div className="pt-3 border-t border-emerald-200">
-                  <span className="text-gray-600 block mb-2">Reason:</span>
+                  <span className="text-gray-600 block mb-2">{t('transferItem.reason')}:</span>
                   <p className="text-gray-900">{transfer.details.reason}</p>
                 </div>
               )}

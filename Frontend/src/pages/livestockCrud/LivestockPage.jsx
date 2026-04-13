@@ -1,15 +1,19 @@
 // src/pages/LivestockPage.jsx
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { FaSearch, FaTimes } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import FarmerLayout from "../../components/farmerDashboard/FarmerLayout";
 import LivestockList from "../../components/livestockCrud/LivestockList";
 import { getAllLivestock, deleteLivestock } from "../../services/livestockCrudApi";
 import "../../styles/livestock.css";
 
 const LivestockPage = () => {
+  const { t } = useTranslation('livestock');
   const [livestockData, setLivestockData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const location = useLocation();
 
   // Fetch livestock data from API
@@ -54,12 +58,57 @@ const LivestockPage = () => {
     }
   };
 
+  // Filter livestock based on search term
+  const filteredLivestock = livestockData.filter((livestock) => {
+    if (!searchTerm) return true;
+    
+    const search = searchTerm.toLowerCase();
+    const tagId = livestock.tag_id?.toLowerCase() || "";
+    const speciesName = livestock.species_name?.toLowerCase() || "";
+    const breedName = livestock.breed_name?.toLowerCase() || "";
+    const gender = livestock.gender?.toLowerCase() || "";
+    const healthStatus = livestock.health_status?.toLowerCase() || "";
+    
+    return (
+      tagId.includes(search) ||
+      speciesName.includes(search) ||
+      breedName.includes(search) ||
+      gender.includes(search) ||
+      healthStatus.includes(search)
+    );
+  });
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+  };
+
   return (
-    <FarmerLayout pageTitle="My Livestock">
+    <FarmerLayout pageTitle={t('pageTitle')}>
       <div className="livestock-container">
-        {/* Header with title and button */}
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search by tag ID, species, breed, gender, or health status..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+            {searchTerm && (
+              <button
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <FaTimes size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Header with button */}
         <div className="livestock-header">
-          <h1 className="page-title">My Livestock</h1>
           <Link to="/livestock/add" className="add-button">
             + Add New Livestock
           </Link>
@@ -81,8 +130,10 @@ const LivestockPage = () => {
 
         {/* Show list or empty message */}
         {!loading && !error && (
-          livestockData.length > 0 ? (
-            <LivestockList livestockData={livestockData} onDelete={handleDelete} />
+          filteredLivestock.length > 0 ? (
+            <LivestockList livestockData={filteredLivestock} onDelete={handleDelete} />
+          ) : searchTerm ? (
+            <p className="empty-message">No livestock found matching "{searchTerm}".</p>
           ) : (
             <p className="empty-message">No livestock records yet.</p>
           )

@@ -1,11 +1,14 @@
 import { FaCheck } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 const StepIndicator = ({ currentStep }) => {
+  const { t } = useTranslation('insurance');
+  
   const steps = [
-    { number: 1, label: 'Select Livestock' },
-    { number: 2, label: 'Select Plan & Pay' },
-    { number: 3, label: 'Upload Proof' },
-    { number: 4, label: 'Review & Submit' }
+    { number: 1, label: t('enroll.steps.selectLivestock') },
+    { number: 2, label: t('enroll.steps.selectPlan') },
+    { number: 3, label: t('enroll.steps.uploadProof') },
+    { number: 4, label: t('enroll.steps.reviewSubmit') }
   ];
 
   const progressWidth = ((currentStep - 1) / (steps.length - 1)) * 100;

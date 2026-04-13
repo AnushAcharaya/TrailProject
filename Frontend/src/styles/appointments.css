@@ -62,6 +62,21 @@
 .app-table {
   width: 100%;
   font-size: 0.875rem;
+  table-layout: fixed;
+  min-width: 900px;
+}
+
+/* Action buttons grid layout */
+.action-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  justify-items: end;
+}
+
+.action-button-slot {
+  min-width: 60px;
+  text-align: right;
 }
 
 .app-table thead {
@@ -72,18 +87,73 @@
 .app-table th {
   padding: 1rem;
   text-align: left;
+  white-space: nowrap;
 }
 
 .app-table td {
   padding: 1rem;
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+/* Table wrapper for horizontal scroll */
+.bg-white.rounded-xl.shadow-sm.overflow-hidden {
+  overflow-x: auto;
+}
+
+/* Fixed column widths for consistent layout */
+.app-table th:nth-child(1),
+.app-table td:nth-child(1) {
+  width: 18%;
+  min-width: 150px;
+}
+
+.app-table th:nth-child(2),
+.app-table td:nth-child(2) {
+  width: 10%;
+  min-width: 80px;
+}
+
+.app-table th:nth-child(3),
+.app-table td:nth-child(3) {
+  width: 15%;
+  min-width: 120px;
+}
+
+.app-table th:nth-child(4),
+.app-table td:nth-child(4) {
+  width: 12%;
+  min-width: 100px;
+}
+
+.app-table th:nth-child(5),
+.app-table td:nth-child(5) {
+  width: 10%;
+  min-width: 80px;
+}
+
+.app-table th:nth-child(6),
+.app-table td:nth-child(6) {
+  width: 15%;
+  min-width: 120px;
+}
+
+.app-table th:nth-child(7),
+.app-table td:nth-child(7) {
+  width: 20%;
+  min-width: 150px;
 }
 
 /* Status badges */
 .badge {
+  display: inline-block;
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
   border-radius: 0.25rem;
   font-weight: 500;
+  white-space: nowrap;
+  text-align: center;
+  min-width: 80px;
 }
 
 .badge-green {
@@ -121,15 +191,21 @@
 
 /* Buttons */
 .btn-primary {
-  background-color: #059669;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: #ffffff;
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background-color: #047857;
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+  border-color: #86efac;
 }
 
 .btn-outline-red {
@@ -302,4 +378,342 @@
 
 .animate-slide-in {
   animation: slide-in 0.3s ease-out;
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 1024px) {
+  /* Hide table on mobile, show card layout instead */
+  .app-table {
+    display: none;
+  }
+  
+  /* Mobile appointment cards */
+  .mobile-appointment-card {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+  }
+  
+  .mobile-appointment-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .mobile-card-vet {
+    flex: 1;
+  }
+  
+  .mobile-card-vet-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+  
+  .mobile-card-vet-email {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+  
+  .mobile-card-body {
+    display: grid;
+    gap: 0.75rem;
+  }
+  
+  .mobile-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .mobile-card-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+  }
+  
+  .mobile-card-value {
+    font-size: 0.875rem;
+    color: #1f2937;
+    text-align: right;
+  }
+  
+  .mobile-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .mobile-card-actions button {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .mobile-btn-view {
+    background-color: #059669;
+    color: #ffffff;
+  }
+  
+  .mobile-btn-view:hover {
+    background-color: #047857;
+  }
+  
+  .mobile-btn-cancel {
+    background-color: #fee2e2;
+    color: #dc2626;
+  }
+  
+  .mobile-btn-cancel:hover {
+    background-color: #fecaca;
+  }
+  
+  .mobile-btn-cancel:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Desktop - Show table, hide mobile cards */
+@media (min-width: 1025px) {
+  .mobile-appointment-card {
+    display: none;
+  }
+}
+
+/* Tablet and Mobile - General Responsive Adjustments */
+@media (max-width: 1024px) {
+  /* Page layout */
+  .app-page {
+    padding: 1rem;
+  }
+  
+  /* Title and header adjustments */
+  .app-title {
+    font-size: 1.25rem;
+  }
+  
+  .section-header {
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.8125rem;
+  }
+  
+  /* Stat cards - 2 columns on tablet */
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8125rem;
+  }
+  
+  /* Vet profile cards - 2 columns on tablet */
+  .vet-profiles-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .vet-profile-card {
+    padding: 1.25rem;
+  }
+  
+  .vet-profile-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .vet-profile-name {
+    font-size: 1.125rem;
+  }
+  
+  .vet-profile-detail {
+    font-size: 0.8125rem;
+  }
+  
+  .vet-profile-bio {
+    font-size: 0.8125rem;
+  }
+  
+  /* Buttons */
+  .btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .btn-appoint-vet {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Badge adjustments */
+  .badge {
+    min-width: 70px;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
+  
+  /* Form adjustments */
+  .app-card {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 640px) {
+  /* Page layout */
+  .app-page {
+    padding: 0.75rem;
+  }
+  
+  /* Title and headers */
+  .app-title {
+    font-size: 1.125rem;
+  }
+  
+  .section-header {
+    font-size: 1.125rem;
+    margin-top: 1.25rem;
+  }
+  
+  /* Stat cards - 1 column on mobile */
+  .stat-card {
+    padding: 0.875rem;
+  }
+  
+  .stat-value {
+    font-size: 1.125rem;
+  }
+  
+  .stat-label {
+    font-size: 0.75rem;
+  }
+  
+  /* Vet profile cards - 1 column on mobile */
+  .vet-profiles-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .vet-profile-card {
+    padding: 1rem;
+  }
+  
+  .vet-profile-image {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .vet-profile-name {
+    font-size: 1rem;
+  }
+  
+  .vet-profile-detail {
+    font-size: 0.75rem;
+  }
+  
+  .vet-profile-bio {
+    font-size: 0.75rem;
+    padding: 0.625rem;
+  }
+  
+  /* Buttons */
+  .btn-primary {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+    width: 100%;
+  }
+  
+  .btn-appoint-vet {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  /* Mobile card actions - stack vertically */
+  .mobile-card-actions {
+    flex-direction: column;
+  }
+  
+  .mobile-card-actions button {
+    width: 100%;
+  }
+  
+  /* Form adjustments */
+  .app-card {
+    padding: 1.25rem;
+    gap: 1.25rem;
+    flex-direction: column;
+  }
+  
+  /* Search bar */
+  .app-search {
+    font-size: 0.875rem;
+  }
+  
+  /* Badge adjustments */
+  .badge {
+    min-width: 60px;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+}
+
+/* Extra small mobile (< 375px) */
+@media (max-width: 374px) {
+  .app-page {
+    padding: 0.5rem;
+  }
+  
+  .app-title {
+    font-size: 1rem;
+  }
+  
+  .section-header {
+    font-size: 1rem;
+  }
+  
+  .stat-card {
+    padding: 0.75rem;
+  }
+  
+  .stat-value {
+    font-size: 1rem;
+  }
+  
+  .vet-profile-image {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .vet-profile-name {
+    font-size: 0.9375rem;
+  }
+  
+  .btn-primary,
+  .btn-appoint-vet {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
 }

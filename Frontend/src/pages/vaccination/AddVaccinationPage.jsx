@@ -1,12 +1,14 @@
 // src/pages/vaccination/AddVaccinationPage.jsx
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaChevronRight } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import FarmerLayout from "../../components/farmerDashboard/FarmerLayout";
 import AddVaccinationForm from "../../components/vaccination/AddVaccinationForm";
 import "../../styles/vaccination.css";
 
 const AddVaccinationPage = () => {
+  const { t } = useTranslation('vaccination');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -24,17 +26,17 @@ const AddVaccinationPage = () => {
         onClick={() => navigate('/farmerpage')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Dashboard
+        {t('breadcrumbs.dashboard')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
       <button 
         onClick={() => navigate('/vaccination')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Vaccinations
+        {t('breadcrumbs.vaccinations')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
-      <span className="text-gray-600">Add Vaccination</span>
+      <span className="text-gray-600">{t('addForm.title')}</span>
     </div>
   ) : (
     <div className="flex items-center gap-2 text-sm mb-6">
@@ -42,32 +44,32 @@ const AddVaccinationPage = () => {
         onClick={() => navigate('/vet/farmer-profiles')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Farmer Profiles
+        {t('breadcrumbs.farmerProfiles')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
       <button 
         onClick={() => navigate('/vet/farmer-details')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Animals
+        {t('breadcrumbs.animals')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
-      <span className="text-gray-600">Add Vaccination</span>
+      <span className="text-gray-600">{t('addForm.title')}</span>
     </div>
   );
 
   return (
-    <Layout pageTitle="Add Vaccination">
+    <Layout pageTitle={t('addForm.title')}>
       <div className="vaccination-bg min-h-screen px-8 py-6">
         {/* Breadcrumbs */}
         {breadcrumbs}
 
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-gray-800">
-            Add Vaccination Record
+            {t('addForm.title')}
           </h1>
           <p className="text-sm text-gray-500">
-            Record vaccination details for livestock
+            {t('addForm.subtitle')}
           </p>
         </div>
 

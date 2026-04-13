@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import TopNav from "../../components/farmerDashboard/TopNav";
 import SideNav from "../../components/farmerDashboard/SideNav";
 import SearchBar from "../../components/farmerDashboard/SearchBar";
@@ -10,6 +11,7 @@ import "../../styles/farmerdashboard.css";
 
 const FarmerDashboardPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { t } = useTranslation('dashboard');
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -31,7 +33,7 @@ const FarmerDashboardPage = () => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col ml-64">
         {/* Mobile Menu Button */}
         <div className="lg:hidden bg-white px-4 py-3 flex items-center justify-between border-b">
           <button
@@ -40,13 +42,13 @@ const FarmerDashboardPage = () => {
           >
             {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
-          <h1 className="font-semibold text-slate-800">FarmCare</h1>
+          <h1 className="font-semibold text-slate-800">{t('appName')}</h1>
           <div className="w-10" /> {/* Spacer for centering */}
         </div>
 
-        <TopNav pageTitle="Dashboard" />
+        <TopNav pageTitle={t('title')} />
 
-        <div className="flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <div className="flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6 mt-20">
           <SearchBar />
           <SummaryCards />
           <ChartsSection />

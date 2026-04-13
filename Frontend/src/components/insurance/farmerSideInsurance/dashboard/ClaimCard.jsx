@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import StatusBadge from './StatusBadge';
 import { FaFileInvoice, FaCalendarAlt } from 'react-icons/fa';
 
 const ClaimCard = ({ claimNumber, status, date, title, description, type, onViewDetails }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('insurance');
 
   const handleViewDetails = () => {
     // Extract the actual ID from claimNumber (e.g., "enrollment-3" or "claim-5")
@@ -30,25 +32,25 @@ const ClaimCard = ({ claimNumber, status, date, title, description, type, onView
       
       // Map claim statuses to badge display
       if (normalizedStatus === 'submitted' || normalizedStatus === 'under-review' || normalizedStatus === 'pending-verification') {
-        return { text: 'In Review', className: 'enrollment-badge-review' };
+        return { text: t('trackClaim.status.underReview'), className: 'enrollment-badge-review' };
       }
       if (normalizedStatus === 'verified') {
-        return { text: 'Verified', className: 'enrollment-badge-verified' };
+        return { text: t('verify.title'), className: 'enrollment-badge-verified' };
       }
       if (normalizedStatus === 'approved' || normalizedStatus === 'paid') {
-        return { text: 'Approved', className: 'enrollment-badge-enrolled' };
+        return { text: t('trackClaim.status.approved'), className: 'enrollment-badge-enrolled' };
       }
       if (normalizedStatus === 'rejected') {
-        return { text: 'Rejected', className: 'enrollment-badge-rejected' };
+        return { text: t('trackClaim.status.rejected'), className: 'enrollment-badge-rejected' };
       }
     } else if (type === 'enrollment') {
       // "pending" status means not yet approved by admin - show "In Review"
       if (status === 'pending') {
-        return { text: 'In Review', className: 'enrollment-badge-review' };
+        return { text: t('trackClaim.status.underReview'), className: 'enrollment-badge-review' };
       }
       // "active" status means approved by admin - show "Enrolled"
       if (status === 'active') {
-        return { text: 'Enrolled', className: 'enrollment-badge-enrolled' };
+        return { text: t('dashboard.stats.enrollments'), className: 'enrollment-badge-enrolled' };
       }
     }
     return null;
@@ -88,7 +90,7 @@ const ClaimCard = ({ claimNumber, status, date, title, description, type, onView
           onClick={handleViewDetails}
           className="text-emerald-600 hover:text-emerald-800 font-medium text-sm flex items-center gap-1 transition-colors"
         >
-          View Details <span>→</span>
+          {t('trackClaim.buttons.viewDetails')} <span>→</span>
         </button>
       </div>
     </div>

@@ -1,17 +1,20 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   FaHome, FaShieldAlt, FaUserPlus, FaFileAlt, FaUser 
 } from 'react-icons/fa';
+import LanguageSwitcher from '../../common/LanguageSwitcher';
 
 const FarmerInsuranceNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation('insurance');
 
   const navItems = [
-    { path: '/farmerinsurancedashboard', icon: FaHome, label: 'Dashboard' },
-    { path: '/farmerinsuranceplan', icon: FaShieldAlt, label: 'Insurance' },
-    { path: '/farmerinsuranceenroll', icon: FaUserPlus, label: 'Enroll' },
-    { path: '/farmerinsurancesubmitclaim', icon: FaFileAlt, label: 'Claims' }
+    { path: '/farmerinsurancedashboard', icon: FaHome, label: t('nav.dashboard') },
+    { path: '/farmerinsuranceplan', icon: FaShieldAlt, label: t('nav.insurance') },
+    { path: '/farmerinsuranceenroll', icon: FaUserPlus, label: t('nav.enroll') },
+    { path: '/farmerinsurancesubmitclaim', icon: FaFileAlt, label: t('nav.claims') }
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -22,7 +25,7 @@ const FarmerInsuranceNav = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <FaShieldAlt className="w-6 h-6" />
-            <span className="text-xl font-bold">Farmer Portal</span>
+            <span className="text-xl font-bold">{t('nav.farmerPortal')}</span>
           </div>
           <nav className="flex items-center gap-1">
             {navItems.map((item) => (
@@ -40,9 +43,10 @@ const FarmerInsuranceNav = () => {
               </button>
             ))}
             <div className="w-px h-6 bg-emerald-200 mx-2" />
+            <LanguageSwitcher context="farmer" />
             <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-emerald-500/20 transition-all">
               <FaUser className="w-5 h-5 text-emerald-100" />
-              <span className="text-sm">Farmer</span>
+              <span className="text-sm">{t('nav.farmerPortal').split(' ')[0]}</span>
             </button>
           </nav>
         </div>

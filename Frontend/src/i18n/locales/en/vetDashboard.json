@@ -1,0 +1,85 @@
+{
+  "appName": "VetCare",
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "farmerProfiles": "Farmer Profiles",
+    "appointments": "Appointments",
+    "messages": "Messages",
+    "friendRequests": "Friend Requests",
+    "friendsList": "Friends List",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to VetCare Dashboard",
+    "welcomeMessage": "Manage your veterinary practice efficiently. Track treatments, monitor appointments, and stay connected with farmers in your network.",
+    "stats": {
+      "farmersTreated": "Farmers Treated",
+      "animalsTreated": "Animals Treated",
+      "pendingAppointments": "Pending Appointments",
+      "todaysAccepted": "Today's Accepted"
+    },
+    "actions": {
+      "searchFarmer": "Search Farmer",
+      "addTreatment": "Add Treatment",
+      "addVaccination": "Add Vaccination",
+      "viewMedicalHistory": "View Medical History"
+    },
+    "recentActivities": "Recent Activities",
+    "pendingTasks": "Pending Tasks & Alerts",
+    "allTasksComplete": "All tasks complete!",
+    "noPendingAlerts": "No pending alerts at this time",
+    "noRecentActivities": "No recent activities",
+    "loading": "Loading farmer profiles...",
+    "retry": "Retry",
+    "errorMessage": "Failed to load dashboard data. Please try again.",
+    "timeAgo": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}} minutes ago",
+      "hoursAgo": "{{count}} hours ago",
+      "daysAgo": "{{count}} days ago"
+    },
+    "alerts": {
+      "overdue": "Overdue by {{count}} days",
+      "dueIn": "Due in {{count}} days"
+    }
+  },
+  "farmerProfiles": {
+    "title": "Farmer Profiles",
+    "welcome": "Welcome to Farmer Profiles",
+    "welcomeMessage": "Manage and connect with farmers in your network. Search, view profiles, and stay updated with their livestock information.",
+    "registeredFarmers": "{{count}} Registered farmers",
+    "loading": "Loading farmer profiles...",
+    "noFarmersFound": "No farmers found matching \"{{query}}\"",
+    "noRegisteredFarmers": "No registered farmers found",
+    "searchPlaceholder": "Search by name, phone or farmer ID...",
+    "animals": "{{count}} animals",
+    "viewAnimals": "View Animals",
+    "message": "Message",
+    "pending": "Pending",
+    "addFriend": "Add Friend",
+    "sending": "Sending...",
+    "friendRequestSent": "Friend request sent successfully!",
+    "messagingComingSoon": "Messaging feature coming soon!"
+  },
+  "friendRequests": {
+    "title": "Friend Requests",
+    "loading": "Loading friend requests...",
+    "noPendingRequests": "No pending friend requests",
+    "accept": "Accept",
+    "reject": "Reject",
+    "requestAccepted": "Friend request accepted!",
+    "requestRejected": "Friend request rejected"
+  },
+  "friendsList": {
+    "title": "My Friends",
+    "loading": "Loading friends...",
+    "noFriends": "No friends yet",
+    "noFriendsDescription": "Send friend requests to farmers to connect with them",
+    "message": "Message",
+    "unfriend": "Unfriend",
+    "unfriendConfirm": "Unfriend {{name}}?",
+    "friendRemoved": "Friend removed successfully"
+  }
+}

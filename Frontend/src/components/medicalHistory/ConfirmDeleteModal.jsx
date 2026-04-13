@@ -1,7 +1,10 @@
 // src/components/medicalHistory/ConfirmDeleteModal.jsx
+import { useTranslation } from 'react-i18next';
 import "./../../styles/medicalHistory.css";
 
 const ConfirmDeleteModal = ({ treatment, onConfirm, onCancel }) => {
+  const { t } = useTranslation('medical');
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
@@ -26,35 +29,40 @@ const ConfirmDeleteModal = ({ treatment, onConfirm, onCancel }) => {
 
         {/* Title */}
         <h3 className="text-xl font-semibold text-center text-gray-900 mb-2">
-          Delete Treatment Record
+          {t('deleteModal.title')}
         </h3>
 
         {/* Message */}
         <p className="text-center text-gray-600 mb-4">
-          Are you sure you want to delete this treatment record? This action cannot be undone.
+          {t('deleteModal.message')}
         </p>
 
         {/* Treatment Info */}
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-sm font-medium text-gray-700">Treatment:</span>
+              <span className="text-sm font-medium text-gray-700">{t('deleteModal.treatmentName', { name: '' })}</span>
               <span className="text-sm text-gray-900">{treatment.treatment_name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm font-medium text-gray-700">Livestock:</span>
+              <span className="text-sm font-medium text-gray-700">{t('deleteModal.livestock', { tag: '' })}</span>
               <span className="text-sm text-gray-900">{treatment.livestock?.tag_id || "N/A"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm font-medium text-gray-700">Date:</span>
+              <span className="text-sm font-medium text-gray-700">{t('viewModal.treatmentDate')}:</span>
               <span className="text-sm text-gray-900">{treatment.treatment_date}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm font-medium text-gray-700">Status:</span>
+              <span className="text-sm font-medium text-gray-700">{t('viewModal.status')}:</span>
               <span className="text-sm text-gray-900">{treatment.status}</span>
             </div>
           </div>
         </div>
+
+        {/* Warning */}
+        <p className="text-center text-sm text-red-600 mb-4">
+          {t('deleteModal.warning')}
+        </p>
 
         {/* Action Buttons */}
         <div className="flex gap-3">
@@ -62,13 +70,13 @@ const ConfirmDeleteModal = ({ treatment, onConfirm, onCancel }) => {
             onClick={onCancel}
             className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition font-medium"
           >
-            Cancel
+            {t('deleteModal.cancel')}
           </button>
           <button
             onClick={onConfirm}
             className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition font-medium"
           >
-            Delete
+            {t('deleteModal.confirm')}
           </button>
         </div>
       </div>

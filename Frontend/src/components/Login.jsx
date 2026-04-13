@@ -2,9 +2,11 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { LogIn } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { sendLoginOTP, verifyLoginOTP } from "../services/api";
 
 const Login = () => {
+    const { t } = useTranslation('auth');
     const navigate = useNavigate();
     const [step, setStep] = useState(1); // 1: Login Form, 2: OTP Verification
     const [formData, setFormData] = useState({
@@ -39,32 +41,32 @@ const Login = () => {
 
         // Role validation
         if (!formData.role) {
-            newErrors.role = "Please select your role";
+            newErrors.role = t('errors.roleRequired');
             setErrors(newErrors);
             return false;
         }
 
         // Email validation for all roles
         if (!formData.email) {
-            newErrors.email = "Email is required";
+            newErrors.email = t('errors.emailRequired');
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "Email address is invalid";
+            newErrors.email = t('errors.emailInvalid');
         }
 
         // Phone validation for farmer/vet
         if (formData.role !== "admin") {
             if (!formData.phone) {
-                newErrors.phone = "Phone number is required";
+                newErrors.phone = t('errors.phoneRequired');
             } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
-                newErrors.phone = "Phone number is invalid";
+                newErrors.phone = t('errors.phoneInvalid');
             }
         }
 
         // Password validation
         if (!formData.password) {
-            newErrors.password = "Password is required";
+            newErrors.password = t('errors.passwordRequired');
         } else if (formData.password.length < 6) {
-            newErrors.password = "Password must be at least 6 characters";
+            newErrors.password = t('errors.passwordMinLength');
         }
 
         setErrors(newErrors);
@@ -182,7 +184,7 @@ const Login = () => {
                 <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-6 justify-center">
                     <LogIn className="text-primary-dark w-10 h-10 sm:w-8 sm:h-8" />
                     <h1 className="text-2xl sm:text-3xl font-bold text-primary-dark text-center">
-                        {step === 1 ? "Login" : "Verify OTP"}
+                        {step === 1 ? t('login.title') : t('login.verifyOTP')}
                     </h1>
                 </div>
 
@@ -191,7 +193,7 @@ const Login = () => {
                 <form className="space-y-5" onSubmit={handleSubmit}>
                     {/* Role Selector - First */}
                     <div className="form-row">
-                        <label className="label">Role</label>
+                        <label className="label">{t('login.role')}</label>
                         <div className="w-full">
                             <select
                                 name="role"
@@ -199,10 +201,10 @@ const Login = () => {
                                 onChange={handleChange}
                                 className={`input-field bg-white ${errors.role ? "border-red-400 focus:outline-red-400" : ""}`}
                             >
-                                <option value="">Select your role</option>
-                                <option value="farmer">Farmer</option>
-                                <option value="vet">Veterinarian</option>
-                                <option value="admin">Admin</option>
+                                <option value="">{t('login.selectRole')}</option>
+                                <option value="farmer">{t('roles.farmer')}</option>
+                                <option value="vet">{t('roles.vet')}</option>
+                                <option value="admin">{t('roles.admin')}</option>
                             </select>
                             {errors.role && (
                                 <p className="text-red-500 text-xs mt-1">{errors.role}</p>
@@ -213,7 +215,7 @@ const Login = () => {
                     {/* Email - Always visible after role selection */}
                     {formData.role && (
                         <div className="form-row">
-                            <label className="label">Email</label>
+                            <label className="label">{t('login.email')}</label>
                             <div className="w-full">
                                 <input
                                     type="email"
@@ -221,7 +223,7 @@ const Login = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     className={`input-field ${errors.email ? "border-red-400 focus:outline-red-400" : ""}`}
-                                    placeholder="Enter your email"
+                                    placeholder={t('login.enterEmail')}
                                 />
                                 {errors.email && (
                                     <p className="text-red-500 text-xs mt-1">{errors.email}</p>
@@ -233,7 +235,7 @@ const Login = () => {
                     {/* Phone - Only for Farmer/Vet */}
                     {formData.role && formData.role !== "admin" && (
                         <div className="form-row">
-                            <label className="label">Phone</label>
+                            <label className="label">{t('login.phone')}</label>
                             <div className="w-full">
                                 <input
                                     type="tel"
@@ -241,7 +243,7 @@ const Login = () => {
                                     value={formData.phone}
                                     onChange={handleChange}
                                     className={`input-field ${errors.phone ? "border-red-400 focus:outline-red-400" : ""}`}
-                                    placeholder="Enter your phone number"
+                                    placeholder={t('login.enterPhone')}
                                 />
                                 {errors.phone && (
                                     <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
@@ -253,7 +255,7 @@ const Login = () => {
                     {/* Password */}
                     {formData.role && (
                         <div className="form-row">
-                            <label className="label">Password</label>
+                            <label className="label">{t('login.password')}</label>
                             <div className="w-full">
                                 <input
                                     type="password"
@@ -261,7 +263,7 @@ const Login = () => {
                                     value={formData.password}
                                     onChange={handleChange}
                                     className={`input-field ${errors.password ? "border-red-400 focus:outline-red-400" : ""}`}
-                                    placeholder="Enter your password"
+                                    placeholder={t('login.enterPassword')}
                                 />
                                 {errors.password && (
                                     <p className="text-red-500 text-xs mt-1">{errors.password}</p>
@@ -276,7 +278,7 @@ const Login = () => {
                             to="/forgot-password"
                             className="text-sm text-green-600 hover:text-green-700 hover:underline focus:outline-none focus:ring-2 focus:ring-green-500 rounded transition-colors"
                         >
-                            Forgot Password?
+                            {t('login.forgotPassword')}
                         </Link>
                     </div>
 
@@ -289,7 +291,7 @@ const Login = () => {
                         className={`btn-primary w-full py-3 mt-2 text-base sm:text-lg ${isSubmitting ? "opacity-75 cursor-not-allowed" : ""
                             }`}
                     >
-                        {isSubmitting ? "Sending OTP..." : "Send OTP"}
+                        {isSubmitting ? t('login.sendingOTP') : t('login.sendOTP')}
                     </motion.button>
                 </form>
                 )}
@@ -301,9 +303,9 @@ const Login = () => {
                         <div className={`p-6 rounded-xl space-y-4 ${emailVerified ? 'bg-green-100 border-2 border-green-500' : 'bg-blue-50'}`}>
                             <div className="flex items-center justify-between">
                                 <h3 className={`text-lg font-semibold ${emailVerified ? 'text-green-900' : 'text-blue-900'}`}>
-                                    Email Verification
+                                    {t('login.emailVerification')}
                                 </h3>
-                                {emailVerified && <span className="text-green-600">✓ Verified</span>}
+                                {emailVerified && <span className="text-green-600">✓ {t('login.verified')}</span>}
                             </div>
                             
                             {!emailVerified ? (
@@ -313,7 +315,7 @@ const Login = () => {
                                         name="emailOtp"
                                         value={otpData.emailOtp}
                                         onChange={handleOtpChange}
-                                        placeholder="Enter 6-digit email OTP"
+                                        placeholder={t('login.enterEmailOTP')}
                                         maxLength="6"
                                         className="w-full input-field py-2 px-4 border rounded-lg text-center text-2xl tracking-widest"
                                     />
@@ -325,7 +327,7 @@ const Login = () => {
                                             disabled={otpData.emailOtp.length !== 6}
                                             className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            Verify Email
+                                            {t('login.verifyEmail')}
                                         </motion.button>
                                         <motion.button
                                             whileHover={{ scale: 1.03 }}
@@ -333,20 +335,20 @@ const Login = () => {
                                             onClick={handleResendOtp}
                                             className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
                                         >
-                                            Resend
+                                            {t('login.resend')}
                                         </motion.button>
                                     </div>
                                 </>
                             ) : (
-                                <p className="text-green-700 font-semibold text-center">✓ Email Verified Successfully!</p>
+                                <p className="text-green-700 font-semibold text-center">✓ {t('login.emailVerifiedSuccess')}</p>
                             )}
                         </div>
 
                         {/* Success Message */}
                         {emailVerified && (
                             <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg text-center">
-                                <p className="font-bold text-xl">Login Successful!</p>
-                                <p className="text-sm mt-2">Redirecting...</p>
+                                <p className="font-bold text-xl">{t('login.loginSuccess')}</p>
+                                <p className="text-sm mt-2">{t('login.redirecting')}</p>
                             </div>
                         )}
 
@@ -356,7 +358,7 @@ const Login = () => {
                                 onClick={() => setStep(1)}
                                 className="text-sm text-gray-600 hover:text-gray-700 hover:underline"
                             >
-                                ← Back to Login
+                                {t('login.backToLogin')}
                             </button>
                         </div>
                     </div>

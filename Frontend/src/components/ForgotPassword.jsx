@@ -2,9 +2,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Key, Lock, ArrowLeft, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { forgotPassword, verifyResetToken, resetPassword } from "../services/api";
 
 const ForgotPassword = () => {
+  const { t } = useTranslation('auth');
   const [step, setStep] = useState(1); // 1: Email, 2: Token, 3: New Password
   const [formData, setFormData] = useState({
     email: "",
@@ -29,9 +31,9 @@ const ForgotPassword = () => {
     const newErrors = {};
     
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = t('errors.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = t('validation.emailFormat');
     }
     
     setErrors(newErrors);
@@ -42,11 +44,11 @@ const ForgotPassword = () => {
     const newErrors = {};
     
     if (!formData.token.trim()) {
-      newErrors.token = "Token is required";
+      newErrors.token = t('errors.tokenRequired');
     } else if (formData.token.length !== 6) {
-      newErrors.token = "Token must be exactly 6 digits";
+      newErrors.token = t('errors.tokenLength');
     } else if (!/^\d{6}$/.test(formData.token)) {
-      newErrors.token = "Token must contain only numbers";
+      newErrors.token = t('errors.tokenNumeric');
     }
     
     setErrors(newErrors);
@@ -57,15 +59,15 @@ const ForgotPassword = () => {
     const newErrors = {};
     
     if (!formData.newPassword) {
-      newErrors.newPassword = "New password is required";
+      newErrors.newPassword = t('errors.passwordRequired');
     } else if (formData.newPassword.length < 6) {
-      newErrors.newPassword = "Password must be at least 6 characters";
+      newErrors.newPassword = t('errors.passwordMinLength');
     }
     
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
+      newErrors.confirmPassword = t('errors.passwordRequired');
     } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = t('errors.passwordsDoNotMatch');
     }
     
     setErrors(newErrors);
@@ -168,22 +170,22 @@ const ForgotPassword = () => {
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-blue-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Forgot Password?</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('forgotPassword.title')}</h2>
               <p className="text-gray-600">
-                Enter your email address and we'll send you a reset token
+                {t('forgotPassword.subtitle')}
               </p>
             </div>
 
             <form onSubmit={handleEmailSubmit} className="space-y-4">
               <div>
-                <label className="label">Email Address</label>
+                <label className="label">{t('forgotPassword.emailAddress')}</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   className={`input-field ${errors.email ? 'border-red-300 bg-red-50' : ''}`}
-                  placeholder="Enter your email address"
+                  placeholder={t('forgotPassword.enterEmail')}
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -198,10 +200,10 @@ const ForgotPassword = () => {
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Sending Token...
+                    {t('forgotPassword.sendingToken')}
                   </div>
                 ) : (
-                  "Send Reset Token"
+                  t('forgotPassword.sendResetToken')
                 )}
               </button>
             </form>
@@ -222,15 +224,15 @@ const ForgotPassword = () => {
               <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Key className="w-8 h-8 text-amber-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Enter Reset Token</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('forgotPassword.enterResetToken')}</h2>
               <p className="text-gray-600">
-                We've sent a reset token to <strong>{formData.email}</strong>
+                {t('forgotPassword.tokenSentTo')} <strong>{formData.email}</strong>
               </p>
             </div>
 
             <form onSubmit={handleTokenSubmit} className="space-y-4">
               <div>
-                <label className="label">Reset Token</label>
+                <label className="label">{t('forgotPassword.resetToken')}</label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -239,7 +241,7 @@ const ForgotPassword = () => {
                   value={formData.token}
                   onChange={handleChange}
                   className={`input-field text-center tracking-widest ${errors.token ? 'border-red-300 bg-red-50' : ''}`}
-                  placeholder="Enter 6-digit token"
+                  placeholder={t('forgotPassword.enterToken')}
                   maxLength="6"
                 />
                 {errors.token && (
@@ -254,7 +256,7 @@ const ForgotPassword = () => {
                   className="flex items-center gap-2 px-4 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  Back
+                  {t('forgotPassword.back')}
                 </button>
                 <button
                   type="submit"
@@ -264,10 +266,10 @@ const ForgotPassword = () => {
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Verifying...
+                      {t('forgotPassword.verifying')}
                     </div>
                   ) : (
-                    "Verify Token"
+                    t('forgotPassword.verifyToken')
                   )}
                 </button>
               </div>
@@ -289,22 +291,22 @@ const ForgotPassword = () => {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Lock className="w-8 h-8 text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Reset Password</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('forgotPassword.resetPassword')}</h2>
               <p className="text-gray-600">
-                Enter your new password below
+                {t('forgotPassword.enterNewPassword')}
               </p>
             </div>
 
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
-                <label className="label">New Password</label>
+                <label className="label">{t('forgotPassword.newPassword')}</label>
                 <input
                   type="password"
                   name="newPassword"
                   value={formData.newPassword}
                   onChange={handleChange}
                   className={`input-field ${errors.newPassword ? 'border-red-300 bg-red-50' : ''}`}
-                  placeholder="Enter new password"
+                  placeholder={t('forgotPassword.enterNewPasswordPlaceholder')}
                 />
                 {errors.newPassword && (
                   <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
@@ -312,14 +314,14 @@ const ForgotPassword = () => {
               </div>
 
               <div>
-                <label className="label">Confirm Password</label>
+                <label className="label">{t('forgotPassword.confirmPassword')}</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className={`input-field ${errors.confirmPassword ? 'border-red-300 bg-red-50' : ''}`}
-                  placeholder="Confirm new password"
+                  placeholder={t('forgotPassword.confirmPasswordPlaceholder')}
                 />
                 {errors.confirmPassword && (
                   <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
@@ -333,7 +335,7 @@ const ForgotPassword = () => {
                   className="flex items-center gap-2 px-4 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  Back
+                  {t('forgotPassword.back')}
                 </button>
                 <button
                   type="submit"
@@ -343,10 +345,10 @@ const ForgotPassword = () => {
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Resetting...
+                      {t('forgotPassword.resetting')}
                     </div>
                   ) : (
-                    "Reset Password"
+                    t('forgotPassword.resetPasswordButton')
                   )}
                 </button>
               </div>
@@ -368,15 +370,15 @@ const ForgotPassword = () => {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Password Reset Successful!</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('forgotPassword.passwordResetSuccess')}</h2>
             <p className="text-gray-600 mb-6">
-              Your password has been successfully reset. You can now login with your new password.
+              {t('forgotPassword.passwordResetMessage')}
             </p>
             <Link
               to="/login"
               className="btn-primary inline-block px-8 py-3 text-center"
             >
-              Go to Login
+              {t('forgotPassword.goToLogin')}
             </Link>
           </motion.div>
         );
@@ -404,7 +406,7 @@ const ForgotPassword = () => {
               to="/login"
               className="text-sm text-gray-600 hover:text-gray-800 transition"
             >
-              Remember your password? Back to Login
+              {t('forgotPassword.rememberPassword')}
             </Link>
           </div>
         )}

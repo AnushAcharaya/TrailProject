@@ -1,8 +1,10 @@
 // components/profile-transfer/admin-side/dashboard/components/TransferTable.jsx
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import StatusTag from './StatusTag';
 
 export default function TransferTable({ data, onUpdate }) {
+  const { t } = useTranslation('profileTransfer');
   const navigate = useNavigate();
 
   const handleReview = (transfer) => {
@@ -13,7 +15,7 @@ export default function TransferTable({ data, onUpdate }) {
   return (
     <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-bold text-gray-800">Recent Transfers</h2>
+        <h2 className="text-xl font-bold text-gray-800">{t('adminDashboard.title')}</h2>
       </div>
       
       <div className="overflow-x-auto">
@@ -21,22 +23,22 @@ export default function TransferTable({ data, onUpdate }) {
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Animal Tag
+                {t('transferTable.headers.animalTag')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                From
+                {t('transferTable.headers.from')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                To
+                {t('transferTable.headers.to')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Status
+                {t('transferTable.headers.status')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Date
+                {t('transferTable.headers.date')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Action
+                {t('transferTable.headers.action')}
               </th>
             </tr>
           </thead>
@@ -63,7 +65,7 @@ export default function TransferTable({ data, onUpdate }) {
                     onClick={() => handleReview(row)}
                     className="text-emerald-600 hover:text-emerald-700 text-sm font-medium transition-colors"
                   >
-                    {row.action} →
+                    {t('transferTable.review')} →
                   </button>
                 </td>
               </tr>

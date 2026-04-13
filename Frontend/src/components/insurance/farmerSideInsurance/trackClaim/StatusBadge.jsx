@@ -1,16 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import { FaCircle } from 'react-icons/fa';
 
 const StatusBadge = ({ status }) => {
+  const { t } = useTranslation('insurance');
+  
   const getStatusConfig = () => {
     switch (status) {
       case 'review':
-        return { className: 'status-review', label: 'Review' };
+        return { className: 'status-review', label: t('trackClaim.status.underReview') };
       case 'submitted':
-        return { className: 'status-submitted', label: 'Submitted' };
+        return { className: 'status-submitted', label: t('trackClaim.status.submitted') };
       case 'approved':
-        return { className: 'status-approved', label: 'Approved' };
+        return { className: 'status-approved', label: t('trackClaim.status.approved') };
       default:
-        return { className: 'bg-gray-300', label: 'Pending' };
+        return { className: 'bg-gray-300', label: t('trackClaim.status.submitted') };
     }
   };
 

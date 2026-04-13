@@ -1,7 +1,10 @@
 // src/components/ConfirmDeleteModal.jsx
+import { useTranslation } from "react-i18next";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 const ConfirmDeleteModal = ({ livestock, onConfirm, onCancel }) => {
+  const { t } = useTranslation('livestock');
+  
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -11,36 +14,36 @@ const ConfirmDeleteModal = ({ livestock, onConfirm, onCancel }) => {
         </div>
 
         {/* Title */}
-        <h3 className="modal-title">Delete Livestock</h3>
+        <h3 className="modal-title">{t('deleteModal.title')}</h3>
 
         {/* Confirmation Message */}
         <p className="modal-message">
-          Are you sure you want to delete this livestock? This action cannot be undone.
+          {t('deleteModal.message')}
         </p>
 
         {/* Livestock Info */}
         <div className="livestock-info">
           <div className="info-row">
-            <span className="label">Tag ID:</span>
-            <span className="value">{livestock.tag_id || "N/A"}</span>
+            <span className="label">{t('deleteModal.labels.tagId')}</span>
+            <span className="value">{livestock.tag_id || t('card.values.na')}</span>
           </div>
           <div className="info-row">
-            <span className="label">Species:</span>
-            <span className="value">{livestock.species_name || "N/A"}</span>
+            <span className="label">{t('deleteModal.labels.species')}</span>
+            <span className="value">{livestock.species_name || t('card.values.na')}</span>
           </div>
           <div className="info-row">
-            <span className="label">Breed:</span>
-            <span className="value">{livestock.breed_name || "N/A"}</span>
+            <span className="label">{t('deleteModal.labels.breed')}</span>
+            <span className="value">{livestock.breed_name || t('card.values.na')}</span>
           </div>
         </div>
 
         {/* Buttons */}
         <div className="modal-buttons">
           <button onClick={onCancel} className="cancel-btn">
-            Cancel
+            {t('deleteModal.buttons.cancel')}
           </button>
           <button onClick={onConfirm} className="delete-btn">
-            Delete
+            {t('deleteModal.buttons.delete')}
           </button>
         </div>
       </div>

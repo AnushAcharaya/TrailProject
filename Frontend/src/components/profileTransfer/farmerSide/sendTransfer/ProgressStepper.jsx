@@ -1,7 +1,10 @@
 // components/profile-transfer/farmer-side/send-transfer/components/ProgressStepper.jsx
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function ProgressStepper({ status = 'Pending' }) {
+  const { t } = useTranslation('profileTransfer');
+
   // Determine which steps are completed based on status
   const getStepStatus = (stepNumber) => {
     switch (status) {
@@ -21,10 +24,10 @@ export default function ProgressStepper({ status = 'Pending' }) {
   };
 
   const steps = [
-    { label: 'Request Created', number: 1 },
-    { label: 'Receiver Approval', number: 2 },
-    { label: 'Admin Approval', number: 3 },
-    { label: 'Transfer Completed', number: 4 }
+    { label: t('progressStepper.step1'), number: 1 },
+    { label: t('progressStepper.step2'), number: 2 },
+    { label: t('progressStepper.step3'), number: 3 },
+    { label: t('progressStepper.step4'), number: 4 }
   ];
 
   return (

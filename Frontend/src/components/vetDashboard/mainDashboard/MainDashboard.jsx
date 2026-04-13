@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import VetLayout from '../VetLayout';
 import StatsGrid from './StatsGrid';
 import ActivityCard from './ActivityCard';
@@ -8,6 +9,7 @@ import { getDashboardStats, getRecentActivities, getPendingAlerts } from '../../
 
 function MainDashboard() {
   const navigate = useNavigate();
+  const { t } = useTranslation('vetDashboard');
   const [stats, setStats] = useState(null);
   const [activities, setActivities] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -50,20 +52,28 @@ function MainDashboard() {
 
       // If all failed, show error
       if (!statsResult.success && !activitiesResult.success && !alertsResult.success) {
-        setError('Failed to load dashboard data. Please try again.');
+        setError(t('dashboard.errorMessage'));
       }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError('An unexpected error occurred. Please try again.');
+      setError(t('dashboard.errorMessage'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <VetLayout pageTitle="Dashboard">
+    <VetLayout pageTitle={t('dashboard.title')}>
         {/* Dashboard Content */}
         <div className="p-8">
+          {/* Welcome Section */}
+          <div className="mb-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white shadow-lg">
+            <h1 className="text-3xl font-bold mb-3">{t('dashboard.welcome')}</h1>
+            <p className="text-emerald-50 text-lg leading-relaxed">
+              {t('dashboard.welcomeMessage')}
+            </p>
+          </div>
+
           {/* Error Message */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -73,7 +83,7 @@ function MainDashboard() {
                   onClick={fetchDashboardData}
                   className="text-red-700 hover:text-red-900 font-medium"
                 >
-                  Retry
+                  {t('dashboard.retry')}
                 </button>
               </div>
             </div>
@@ -93,7 +103,7 @@ function MainDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <span className="font-semibold text-gray-700">Search Farmer</span>
+              <span className="font-semibold text-gray-700">{t('dashboard.actions.searchFarmer')}</span>
             </button>
             
             <button 
@@ -105,7 +115,7 @@ function MainDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <span className="font-semibold text-gray-700">Add Treatment</span>
+              <span className="font-semibold text-gray-700">{t('dashboard.actions.addTreatment')}</span>
             </button>
             
             <button 
@@ -117,7 +127,7 @@ function MainDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                 </svg>
               </div>
-              <span className="font-semibold text-gray-700">Add Vaccination</span>
+              <span className="font-semibold text-gray-700">{t('dashboard.actions.addVaccination')}</span>
             </button>
             
             <button 
@@ -129,7 +139,7 @@ function MainDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <span className="font-semibold text-gray-700">View Medical History</span>
+              <span className="font-semibold text-gray-700">{t('dashboard.actions.viewMedicalHistory')}</span>
             </button>
           </div>
 

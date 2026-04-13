@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { FiUser, FiCalendar, FiFileText, FiClock } from "react-icons/fi";
 import { MdPets } from "react-icons/md";
 import { 
@@ -11,6 +12,7 @@ import {
 import "../../styles/appointments.css";
 
 const VetAppointmentCard = ({ appointment, onUpdate }) => {
+  const { t } = useTranslation('appointments');
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [showNotesModal, setShowNotesModal] = useState(false);
@@ -20,22 +22,22 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
 
   const getPaymentStatusBadge = (paymentStatus) => {
     const statusMap = {
-      'paid': { label: '✓ Paid', class: 'badge badge-green' },
-      'pending': { label: '⏳ Pending', class: 'badge badge-yellow' },
-      'failed': { label: '✗ Failed', class: 'badge badge-red' },
-      'not_required': { label: 'Not Required', class: 'badge badge-gray' },
+      'paid': { label: t('vet.paymentStatus.paid'), class: 'badge badge-green' },
+      'pending': { label: t('vet.paymentStatus.pending'), class: 'badge badge-yellow' },
+      'failed': { label: t('vet.paymentStatus.failed'), class: 'badge badge-red' },
+      'not_required': { label: t('vet.paymentStatus.notRequired'), class: 'badge badge-gray' },
     };
-    return statusMap[paymentStatus] || { label: 'Unknown', class: 'badge badge-gray' };
+    return statusMap[paymentStatus] || { label: t('vet.paymentStatus.unknown'), class: 'badge badge-gray' };
   };
 
   const getPaymentMethodLabel = (appointment) => {
     if (appointment.payment_status === 'paid' && appointment.payment) {
-      return 'eSewa';
+      return t('vet.paymentMethod.esewa');
     }
     if (appointment.payment_status === 'pending') {
-      return 'Cash';
+      return t('vet.paymentMethod.cash');
     }
-    return 'N/A';
+    return t('vet.paymentMethod.na');
   };
 
   const handleApprove = async () => {
@@ -47,7 +49,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
       onUpdate();
     } catch (err) {
       console.error("Error approving appointment:", err);
-      setError("Failed to approve appointment. Please try again.");
+      setError(t('vet.errors.approveFailed'));
     } finally {
       setIsProcessing(false);
     }
@@ -79,7 +81,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
       onUpdate();
     } catch (err) {
       console.error(`Error ${actionType}ing appointment:`, err);
-      setError(`Failed to ${actionType} appointment. Please try again.`);
+      setError(t('vet.errors.actionFailed', { action: actionType }));
     } finally {
       setIsProcessing(false);
     }
@@ -92,8 +94,8 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
     setError(null);
   };
 
-  const farmerName = appointment.farmer_details?.full_name || appointment.farmer_details?.username || "Unknown Farmer";
-  const animalType = appointment.animal_type?.charAt(0).toUpperCase() + appointment.animal_type?.slice(1) || "Unknown";
+  const farmerName = appointment.farmer_details?.full_name || appointment.farmer_details?.username || t('vet.unknownFarmer');
+  const animalType = appointment.animal_type?.charAt(0).toUpperCase() + appointment.animal_type?.slice(1) || t('vet.unknownAnimal');
   const createdDate = formatAppointmentDate(appointment.created_at);
   const preferredDate = formatAppointmentDate(appointment.preferred_date);
   const preferredTime = formatAppointmentTime(appointment.preferred_time);
@@ -113,7 +115,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
                 <span>{animalType}</span>
                 <span>·</span>
                 <FiCalendar size={14} />
-                <span>Requested {createdDate}</span>
+                <span>{t('vet.requested')} {createdDate}</span>
               </div>
             </div>
           </div>
@@ -127,13 +129,13 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
 
           <div className="flex items-center gap-3 text-sm text-gray-600 mb-4">
             <FiClock size={16} />
-            <span>Preferred: {preferredDate} at {preferredTime}</span>
+            <span>{t('vet.preferred')}: {preferredDate} {t('vet.at')} {preferredTime}</span>
           </div>
 
           {appointment.vet_notes && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <p className="text-sm text-gray-700 leading-relaxed">
-                <span className="font-medium">Notes:</span> {appointment.vet_notes}
+                <span className="font-medium">{t('vet.notes')}:</span> {appointment.vet_notes}
               </p>
             </div>
           )}
@@ -183,14 +185,14 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
                   onClick={handleApprove}
                   disabled={isProcessing}
                 >
-                  {isProcessing ? "Processing..." : "Approve"}
+                  {isProcessing ? t('vet.processing') : t('vet.actions.approve')}
                 </button>
                 <button 
                   className="px-5 py-2.5 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 hover:shadow-md transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                   onClick={handleDecline}
                   disabled={isProcessing}
                 >
-                  Decline
+                  {t('vet.actions.decline')}
                 </button>
               </>
             )}
@@ -201,7 +203,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
                 onClick={handleComplete}
                 disabled={isProcessing}
               >
-                Complete
+                {t('vet.actions.complete')}
               </button>
             )}
             
@@ -209,7 +211,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
               className="px-5 py-2.5 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 hover:shadow-md transition-all font-medium whitespace-nowrap"
               onClick={() => setShowDetailsModal(true)}
             >
-              View Details
+              {t('vet.actions.viewDetails')}
             </button>
           </div>
         </div>
@@ -220,19 +222,19 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">
-              {actionType === 'decline' ? 'Decline Appointment' : 'Complete Appointment'}
+              {actionType === 'decline' ? t('vet.modal.declineTitle') : t('vet.modal.completeTitle')}
             </h3>
             
             <p className="text-sm text-gray-600 mb-4">
               {actionType === 'decline' 
-                ? 'Please provide a reason for declining this appointment (optional):'
-                : 'Add any notes about the completed appointment (optional):'}
+                ? t('vet.modal.declinePrompt')
+                : t('vet.modal.completePrompt')}
             </p>
 
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Enter notes here..."
+              placeholder={t('vet.modal.notesPlaceholder')}
               rows="4"
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none text-gray-700 mb-4"
             />
@@ -249,7 +251,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
                 disabled={isProcessing}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Cancel
+                {t('vet.modal.cancel')}
               </button>
               <button
                 onClick={handleSubmitNotes}
@@ -260,7 +262,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
                     : 'bg-blue-500 hover:bg-blue-600'
                 }`}
               >
-                {isProcessing ? "Processing..." : actionType === 'decline' ? 'Decline' : 'Complete'}
+                {isProcessing ? t('vet.processing') : actionType === 'decline' ? t('vet.actions.decline') : t('vet.actions.complete')}
               </button>
             </div>
           </div>
@@ -279,7 +281,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Appointment Details</h2>
+                <h2 className="text-2xl font-bold text-gray-800">{t('vet.detailsModal.title')}</h2>
                 <button
                   onClick={() => setShowDetailsModal(false)}
                   className="text-gray-400 hover:text-gray-600"
@@ -290,25 +292,25 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Farmer</label>
+                  <label className="text-sm font-medium text-gray-500">{t('vet.detailsModal.farmer')}</label>
                   <p className="text-gray-900">{farmerName}</p>
                   <p className="text-sm text-gray-600">{appointment.farmer_details?.email}</p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Animal Type</label>
+                  <label className="text-sm font-medium text-gray-500">{t('vet.detailsModal.animalType')}</label>
                   <p className="text-gray-900 capitalize">{animalType}</p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Date & Time</label>
+                  <label className="text-sm font-medium text-gray-500">{t('vet.detailsModal.dateTime')}</label>
                   <p className="text-gray-900">
-                    {preferredDate} at {preferredTime}
+                    {preferredDate} {t('vet.at')} {preferredTime}
                   </p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Status</label>
+                  <label className="text-sm font-medium text-gray-500">{t('vet.detailsModal.status')}</label>
                   <p>
                     <span className={`badge ${
                       appointment.status === "Approved"
@@ -327,14 +329,14 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Payment Method</label>
+                  <label className="text-sm font-medium text-gray-500">{t('vet.detailsModal.paymentMethod')}</label>
                   <p className="text-gray-900 font-medium">
                     {getPaymentMethodLabel(appointment)}
                   </p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Payment Status</label>
+                  <label className="text-sm font-medium text-gray-500">{t('vet.detailsModal.paymentStatus')}</label>
                   <p>
                     <span className={getPaymentStatusBadge(appointment.payment_status).class}>
                       {getPaymentStatusBadge(appointment.payment_status).label}
@@ -344,19 +346,19 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
 
                 {appointment.appointment_fee && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Appointment Fee</label>
+                    <label className="text-sm font-medium text-gray-500">{t('vet.detailsModal.appointmentFee')}</label>
                     <p className="text-gray-900 font-semibold">Rs. {appointment.appointment_fee}</p>
                   </div>
                 )}
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Reason for Visit</label>
+                  <label className="text-sm font-medium text-gray-500">{t('vet.detailsModal.reason')}</label>
                   <p className="text-gray-900">{appointment.reason}</p>
                 </div>
 
                 {appointment.vet_notes && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Vet Notes</label>
+                    <label className="text-sm font-medium text-gray-500">{t('vet.detailsModal.vetNotes')}</label>
                     <p className="text-gray-900">{appointment.vet_notes}</p>
                   </div>
                 )}
@@ -366,7 +368,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
                     onClick={() => setShowDetailsModal(false)}
                     className="px-6 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
                   >
-                    Close
+                    {t('vet.detailsModal.close')}
                   </button>
                 </div>
               </div>

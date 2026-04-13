@@ -2,11 +2,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaSyringe } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { getAllLivestock } from "../../services/livestockCrudApi";
 import { createVaccination } from "../../services/vaccinationApi";
 import "./../../styles/vaccination.css";
 
 const AddVaccinationForm = () => {
+  const { t } = useTranslation('vaccination');
   const navigate = useNavigate();
   const location = useLocation();
   const preSelectedLivestock = location.state?.preSelectedLivestock;
@@ -107,7 +109,7 @@ const AddVaccinationForm = () => {
     const result = await createVaccination(formData);
     
     if (result.success) {
-      setNotification({ type: 'success', message: 'Vaccination record created successfully!' });
+      setNotification({ type: 'success', message: t('addForm.messages.createSuccess') });
       setTimeout(() => {
         // Check if coming from vet dashboard
         const isFromVet = location.state?.from === 'vet';
@@ -122,7 +124,7 @@ const AddVaccinationForm = () => {
     } else {
       const errorMessage = typeof result.error === 'object' 
         ? Object.entries(result.error).map(([key, value]) => `${key}: ${value}`).join(', ')
-        : result.error?.message || 'Failed to create vaccination record.';
+        : result.error?.message || t('addForm.messages.createError');
       setNotification({ type: 'error', message: errorMessage });
       setSubmitting(false);
     }
@@ -135,8 +137,8 @@ const AddVaccinationForm = () => {
           <FaSyringe className="text-green-700" size={24} />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-body">Add Vaccination Record</h2>
-          <p className="text-sm text-muted">Record a new vaccination for your livestock</p>
+          <h2 className="text-xl font-semibold text-body">{t('addForm.title')}</h2>
+          <p className="text-sm text-muted">{t('addForm.subtitle')}</p>
         </div>
       </div>
 
@@ -154,9 +156,9 @@ const AddVaccinationForm = () => {
         <div className="space-y-4">
           {/* Livestock Search with Autocomplete */}
           <div className="relative">
-            <label className="block text-sm font-medium text-body mb-1">Livestock *</label>
+            <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.livestock')} *</label>
             {loading ? (
-              <p className="text-sm text-gray-500">Loading livestock...</p>
+              <p className="text-sm text-gray-500">{t('addForm.fields.loadingLivestock')}</p>
             ) : (
               <>
                 <input
@@ -165,7 +167,7 @@ const AddVaccinationForm = () => {
                   onChange={(e) => handleLivestockSearch(e.target.value)}
                   onFocus={() => setShowDropdown(true)}
                   onBlur={() => setTimeout(() => setShowDropdown(false), 300)}
-                  placeholder="Search by tag ID, breed, or species..."
+                  placeholder={t('addForm.fields.livestockPlaceholder')}
                   required
                   className="w-full p-2 border border-light rounded focus:outline-none focus:ring-2 focus:ring-primary"
                 />
@@ -183,11 +185,11 @@ const AddVaccinationForm = () => {
                         className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                       >
                         <div className="font-medium text-gray-900">
-                          Tag: {animal.tag_id}
+                          {t('addForm.livestockInfo.tag')}: {animal.tag_id}
                         </div>
                         <div className="text-sm text-gray-600">
-                          <span>Breed: {animal.breed_name || 'N/A'} | Species: {animal.species_name}</span>
-                          {animal.age && <span> | Age: {animal.age} years</span>}
+                          <span>{t('addForm.livestockInfo.breed')}: {animal.breed_name || 'N/A'} | {t('addForm.livestockInfo.species')}: {animal.species_name}</span>
+                          {animal.age && <span> | {t('addForm.livestockInfo.age')}: {animal.age} {t('addForm.livestockInfo.years')}</span>}
                         </div>
                       </div>
                     ))}
@@ -197,7 +199,7 @@ const AddVaccinationForm = () => {
                 {/* No Results Message */}
                 {showDropdown && searchTerm && filteredLivestock.length === 0 && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
-                    <p className="text-gray-500 text-sm">No livestock found matching "{searchTerm}"</p>
+                    <p className="text-gray-500 text-sm">{t('addForm.fields.noLivestock', { search: searchTerm })}</p>
                   </div>
                 )}
               </>
@@ -205,20 +207,20 @@ const AddVaccinationForm = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-body mb-1">Vaccine Name *</label>
+            <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.vaccineName')} *</label>
             <input
               type="text"
               name="vaccineName"
               value={formData.vaccineName}
               onChange={handleChange}
-              placeholder="e.g., Foot and Mouth Disease Vaccine"
+              placeholder={t('addForm.fields.vaccineNamePlaceholder')}
               required
               className="w-full p-2 border border-light rounded"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-body mb-1">Vaccine Type *</label>
+            <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.vaccineType')} *</label>
             <select
               name="vaccineType"
               value={formData.vaccineType}
@@ -226,16 +228,16 @@ const AddVaccinationForm = () => {
               required
               className="w-full p-2 border border-light rounded"
             >
-              <option value="">Select vaccine type</option>
-              <option value="Viral Vaccine">Viral Vaccine</option>
-              <option value="Bacterial Vaccine">Bacterial Vaccine</option>
-              <option value="Clostridial Vaccine">Clostridial Vaccine</option>
+              <option value="">{t('addForm.fields.vaccineTypeSelect')}</option>
+              <option value="Viral Vaccine">{t('addForm.fields.vaccineTypes.viral')}</option>
+              <option value="Bacterial Vaccine">{t('addForm.fields.vaccineTypes.bacterial')}</option>
+              <option value="Clostridial Vaccine">{t('addForm.fields.vaccineTypes.clostridial')}</option>
             </select>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-body mb-1">Date Given *</label>
+              <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.dateGiven')} *</label>
               <input
                 type="date"
                 name="dateGiven"
@@ -246,7 +248,7 @@ const AddVaccinationForm = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-body mb-1">Next Due Date *</label>
+              <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.nextDueDate')} *</label>
               <input
                 type="date"
                 name="nextDueDate"
@@ -258,19 +260,19 @@ const AddVaccinationForm = () => {
               />
               {formData.dateGiven && (
                 <p className="text-xs text-gray-500 mt-1">
-                  Must be on or after {new Date(formData.dateGiven).toLocaleDateString()}
+                  {t('addForm.fields.nextDueDateHint', { date: new Date(formData.dateGiven).toLocaleDateString() })}
                 </p>
               )}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-body mb-1">Notes (Optional)</label>
+            <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.notes')}</label>
             <textarea
               name="notes"
               value={formData.notes}
               onChange={handleChange}
-              placeholder="Add any additional notes about this vaccination..."
+              placeholder={t('addForm.fields.notesPlaceholder')}
               rows="3"
               className="w-full p-2 border border-light rounded"
             />
@@ -283,14 +285,14 @@ const AddVaccinationForm = () => {
               onClick={() => navigate('/vaccination')}
               disabled={submitting}
             >
-              Cancel
+              {t('addForm.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="bg-primary text-white px-4 py-2 rounded hover:bg-green-800 disabled:bg-gray-400"
               disabled={submitting}
             >
-              {submitting ? 'Saving...' : 'Save Vaccination'}
+              {submitting ? t('addForm.buttons.saving') : t('addForm.buttons.save')}
             </button>
           </div>
         </div>

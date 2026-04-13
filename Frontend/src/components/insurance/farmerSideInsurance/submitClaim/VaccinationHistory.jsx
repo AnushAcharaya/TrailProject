@@ -1,7 +1,9 @@
 import { FaSyringe, FaFileUpload, FaFileAlt, FaTimes } from 'react-icons/fa';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const VaccinationHistory = ({ vaccinationHistory, onChange }) => {
+  const { t } = useTranslation('insurance');
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -12,7 +14,7 @@ const VaccinationHistory = ({ vaccinationHistory, onChange }) => {
       if (validTypes.includes(file.type)) {
         onChange('vaccinationHistory', file);
       } else {
-        alert('Please upload a valid document file (.txt, .pdf, .doc, .docx)');
+        alert(t('submitClaim.form.invalidFileType'));
       }
     }
   };
@@ -47,7 +49,7 @@ const VaccinationHistory = ({ vaccinationHistory, onChange }) => {
     <div className="form-section">
       <h3 className="section-title">
         <FaSyringe className="w-6 h-6 text-emerald-600" />
-        Vaccination History
+        {t('submitClaim.sections.vaccinationHistory')}
       </h3>
       
       <div className="file-upload-container">
@@ -59,8 +61,8 @@ const VaccinationHistory = ({ vaccinationHistory, onChange }) => {
             onClick={() => fileInputRef.current?.click()}
           >
             <FaFileUpload className="upload-icon" />
-            <p className="upload-text">Drop vaccination history file here or click to upload</p>
-            <p className="upload-subtext">TXT, PDF, DOC, DOCX (Downloaded from Reports)</p>
+            <p className="upload-text">{t('submitClaim.form.dropVaccinationFile')}</p>
+            <p className="upload-subtext">{t('submitClaim.form.fileFormats')}</p>
             <input
               ref={fileInputRef}
               type="file"

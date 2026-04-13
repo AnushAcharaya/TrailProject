@@ -1,5 +1,6 @@
 // ProfileTab.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { updateProfile } from "../../services/profileApi";
 
 const BRAND = {
@@ -15,6 +16,7 @@ const BRAND = {
 };
 
 const ProfileTab = ({ user, onUpdate }) => {
+  const { t } = useTranslation('profile');
   const [form, setForm] = useState({
     location: "",
     bio: "",
@@ -75,7 +77,7 @@ const ProfileTab = ({ user, onUpdate }) => {
     if (result.success) {
       console.log('[ProfileTab] Profile updated successfully:', result.data);
       onUpdate(result.data);
-      setStatus("Profile updated successfully!");
+      setStatus(t('profileTab.messages.success'));
       setProfileImage(null); // Clear selected file
       
       // Dispatch event to notify other components (like FarmerLayout/VetLayout)
@@ -94,7 +96,7 @@ const ProfileTab = ({ user, onUpdate }) => {
                        result.error?.gender?.[0] || 
                        result.error?.profile_image?.[0] ||
                        result.error?.message || 
-                       "Failed to update profile.";
+                       t('profileTab.messages.error');
       setError(errorMsg);
     }
     
@@ -134,10 +136,10 @@ const ProfileTab = ({ user, onUpdate }) => {
         className="text-lg font-semibold mb-1"
         style={{ color: BRAND.textDark }}
       >
-        Profile information
+        {t('profileTab.title')}
       </h3>
       <p className="text-xs mb-4" style={{ color: BRAND.textLight }}>
-        Update your profile information. Fields from registration are read-only.
+        {t('profileTab.subtitle')}
       </p>
 
       {/* Profile Photo Upload */}
@@ -146,7 +148,7 @@ const ProfileTab = ({ user, onUpdate }) => {
           className="block text-xs font-medium mb-2"
           style={{ color: BRAND.textMedium }}
         >
-          Profile Photo
+          {t('profileTab.photo.label')}
         </label>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -188,10 +190,10 @@ const ProfileTab = ({ user, onUpdate }) => {
                 e.currentTarget.style.backgroundColor = BRAND.primary;
               }}
             >
-              Upload Photo
+              {t('profileTab.photo.upload')}
             </label>
             <p className="text-[10px] mt-1" style={{ color: BRAND.textLight }}>
-              JPG, PNG or GIF (max 2MB)
+              {t('profileTab.photo.format')}
             </p>
           </div>
         </div>
@@ -200,42 +202,42 @@ const ProfileTab = ({ user, onUpdate }) => {
       {/* Read-only fields from registration */}
       <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: "#F5F5F5", border: `1px solid ${BRAND.border}` }}>
         <p className="text-xs font-medium mb-2" style={{ color: BRAND.textMedium }}>
-          Registration Information (Read-only)
+          {t('profileTab.registration.title')}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
           <div>
-            <span style={{ color: BRAND.textLight }}>Full Name:</span>
+            <span style={{ color: BRAND.textLight }}>{t('profileTab.registration.fullName')}</span>
             <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.full_name || "N/A"}</span>
           </div>
           <div>
-            <span style={{ color: BRAND.textLight }}>Username:</span>
+            <span style={{ color: BRAND.textLight }}>{t('profileTab.registration.username')}</span>
             <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.username || "N/A"}</span>
           </div>
           <div>
-            <span style={{ color: BRAND.textLight }}>Email:</span>
+            <span style={{ color: BRAND.textLight }}>{t('profileTab.registration.email')}</span>
             <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.email || "N/A"}</span>
           </div>
           <div>
-            <span style={{ color: BRAND.textLight }}>Phone:</span>
+            <span style={{ color: BRAND.textLight }}>{t('profileTab.registration.phone')}</span>
             <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.phone || "N/A"}</span>
           </div>
           <div>
-            <span style={{ color: BRAND.textLight }}>Role:</span>
+            <span style={{ color: BRAND.textLight }}>{t('profileTab.registration.role')}</span>
             <span className="ml-2 font-medium capitalize" style={{ color: BRAND.textDark }}>{user?.role || "N/A"}</span>
           </div>
           <div>
-            <span style={{ color: BRAND.textLight }}>Address:</span>
+            <span style={{ color: BRAND.textLight }}>{t('profileTab.registration.address')}</span>
             <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user?.address || "N/A"}</span>
           </div>
           {user?.role === 'farmer' && user?.farm_name && (
             <div>
-              <span style={{ color: BRAND.textLight }}>Farm Name:</span>
+              <span style={{ color: BRAND.textLight }}>{t('profileTab.registration.farmName')}</span>
               <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user.farm_name}</span>
             </div>
           )}
           {user?.role === 'vet' && user?.specialization && (
             <div>
-              <span style={{ color: BRAND.textLight }}>Specialization:</span>
+              <span style={{ color: BRAND.textLight }}>{t('profileTab.registration.specialization')}</span>
               <span className="ml-2 font-medium" style={{ color: BRAND.textDark }}>{user.specialization}</span>
             </div>
           )}
@@ -250,7 +252,7 @@ const ProfileTab = ({ user, onUpdate }) => {
             className="block text-xs font-medium mb-1"
             style={{ color: BRAND.textMedium }}
           >
-            Location
+            {t('profileTab.fields.location')}
           </label>
           <input
             type="text"
@@ -261,7 +263,7 @@ const ProfileTab = ({ user, onUpdate }) => {
               border: `1px solid ${BRAND.border}`,
               backgroundColor: "#FFFFFF",
             }}
-            placeholder="Kathmandu, Nepal"
+            placeholder={t('profileTab.fields.locationPlaceholder')}
             onFocus={attachInteractiveStyles}
             onBlur={resetInteractiveStyles}
             onMouseEnter={hoverOn}
@@ -276,7 +278,7 @@ const ProfileTab = ({ user, onUpdate }) => {
           className="block text-xs font-medium mb-2"
           style={{ color: BRAND.textMedium }}
         >
-          Gender
+          {t('profileTab.fields.gender')}
         </label>
         <div className="flex gap-6">
           <label className="flex items-center gap-2 cursor-pointer">
@@ -290,7 +292,7 @@ const ProfileTab = ({ user, onUpdate }) => {
               style={{ accentColor: BRAND.primary }}
             />
             <span className="text-sm" style={{ color: BRAND.textMedium }}>
-              Male
+              {t('profileTab.fields.male')}
             </span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
@@ -304,7 +306,7 @@ const ProfileTab = ({ user, onUpdate }) => {
               style={{ accentColor: BRAND.primary }}
             />
             <span className="text-sm" style={{ color: BRAND.textMedium }}>
-              Female
+              {t('profileTab.fields.female')}
             </span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
@@ -318,7 +320,7 @@ const ProfileTab = ({ user, onUpdate }) => {
               style={{ accentColor: BRAND.primary }}
             />
             <span className="text-sm" style={{ color: BRAND.textMedium }}>
-              Other
+              {t('profileTab.fields.other')}
             </span>
           </label>
         </div>
@@ -329,7 +331,7 @@ const ProfileTab = ({ user, onUpdate }) => {
           className="block text-xs font-medium mb-1"
           style={{ color: BRAND.textMedium }}
         >
-          Bio
+          {t('profileTab.fields.bio')}
         </label>
         <textarea
           value={form.bio}
@@ -339,7 +341,7 @@ const ProfileTab = ({ user, onUpdate }) => {
             border: `1px solid ${BRAND.border}`,
             backgroundColor: "#FFFFFF",
           }}
-          placeholder="Write a short bio about yourself..."
+          placeholder={t('profileTab.fields.bioPlaceholder')}
           onFocus={attachInteractiveStyles}
           onBlur={resetInteractiveStyles}
           onMouseEnter={hoverOn}
@@ -381,7 +383,7 @@ const ProfileTab = ({ user, onUpdate }) => {
             e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
           }}
         >
-          {loading ? "Saving..." : "Save changes"}
+          {loading ? t('profileTab.buttons.saving') : t('profileTab.buttons.save')}
         </button>
       </div>
     </div>

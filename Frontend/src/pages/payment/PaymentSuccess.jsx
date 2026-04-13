@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { verifyPayment } from '../../services/paymentApi';
 import { FiCheckCircle, FiLoader } from 'react-icons/fi';
 
 const PaymentSuccess = () => {
+  const { t } = useTranslation('payment');
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [verifying, setVerifying] = useState(true);
@@ -19,7 +21,7 @@ const PaymentSuccess = () => {
         const transactionUuid = searchParams.get('oid');
 
         if (!refId || !transactionUuid) {
-          setError('Invalid payment callback parameters');
+          setError(t('verification.invalidParameters'));
           setVerifying(false);
           return;
         }
@@ -100,8 +102,8 @@ const PaymentSuccess = () => {
           <div className="flex justify-center mb-6">
             <FiLoader className="animate-spin text-green-600" size={64} />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Verifying Payment</h1>
-          <p className="text-gray-600">Please wait while we verify your payment...</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('success.verifying.title')}</h1>
+          <p className="text-gray-600">{t('success.verifying.message')}</p>
         </div>
       </div>
     );
@@ -118,7 +120,7 @@ const PaymentSuccess = () => {
               </svg>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Verification Failed</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('verification.failed.title')}</h1>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => {
@@ -133,7 +135,7 @@ const PaymentSuccess = () => {
             }}
             className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
           >
-            Go Back
+            {t('verification.failed.button')}
           </button>
         </div>
       </div>
@@ -146,27 +148,27 @@ const PaymentSuccess = () => {
         <div className="flex justify-center mb-6">
           <FiCheckCircle className="text-green-600" size={64} />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('success.title')}</h1>
         <p className="text-gray-600 mb-6">
           {isInsurancePayment 
-            ? 'Your payment has been processed successfully. Please continue with the enrollment process.'
-            : 'Your appointment has been confirmed and payment has been processed successfully.'}
+            ? t('success.insuranceMessage')
+            : t('success.appointmentMessage')}
         </p>
         
         {verificationResult && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 text-left">
             <div className="text-sm space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-600">Payment ID:</span>
+                <span className="text-gray-600">{t('success.details.paymentId')}:</span>
                 <span className="font-medium text-gray-900">{verificationResult.payment_id}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Status:</span>
+                <span className="text-gray-600">{t('success.details.status')}:</span>
                 <span className="font-medium text-green-600">{verificationResult.status}</span>
               </div>
               {verificationResult.esewa_ref_id && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Reference ID:</span>
+                  <span className="text-gray-600">{t('success.details.referenceId')}:</span>
                   <span className="font-medium text-gray-900">{verificationResult.esewa_ref_id}</span>
                 </div>
               )}
@@ -176,15 +178,15 @@ const PaymentSuccess = () => {
 
         <p className="text-sm text-gray-500 mb-6">
           {isInsurancePayment 
-            ? 'Redirecting back to enrollment in 2 seconds...'
-            : 'Redirecting to appointments page in 3 seconds...'}
+            ? t('success.redirecting.insurance')
+            : t('success.redirecting.appointment')}
         </p>
 
         <button
           onClick={() => navigate(isInsurancePayment ? '/farmer/insurance/enroll' : '/appointments')}
           className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
         >
-          {isInsurancePayment ? 'Continue Enrollment' : 'Go to Appointments Now'}
+          {isInsurancePayment ? t('success.buttons.continueEnrollment') : t('success.buttons.goToAppointments')}
         </button>
       </div>
     </div>

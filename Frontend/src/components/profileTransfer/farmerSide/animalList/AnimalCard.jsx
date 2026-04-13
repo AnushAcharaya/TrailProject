@@ -1,7 +1,9 @@
 // components/profile-transfer/farmer-side/animal-list/components/AnimalCard.jsx
+import { useTranslation } from 'react-i18next';
 import { FaExchangeAlt } from 'react-icons/fa';
 
 export default function AnimalCard({ animal, onTransferClick }) {
+  const { t } = useTranslation('profileTransfer');
   // Status badge styling
   const getStatusStyle = (status) => {
     const styles = {
@@ -40,15 +42,15 @@ export default function AnimalCard({ animal, onTransferClick }) {
         {/* Details */}
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Species:</span>
+            <span className="text-gray-600">{t('animalCard.breed')}:</span>
             <span className="font-semibold text-gray-800">{animal.breed}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Age:</span>
+            <span className="text-gray-600">{t('animalCard.age')}:</span>
             <span className="font-semibold text-gray-800">{animal.age}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Owner:</span>
+            <span className="text-gray-600">{t('animalCard.owner')}:</span>
             <span className="font-semibold text-gray-800">{animal.owner}</span>
           </div>
         </div>
@@ -59,7 +61,7 @@ export default function AnimalCard({ animal, onTransferClick }) {
           className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
         >
           <FaExchangeAlt className="text-sm" />
-          <span>Transfer</span>
+          <span>{t('animalCard.transfer')}</span>
         </button>
       </div>
     </div>

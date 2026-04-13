@@ -195,6 +195,24 @@ export const fetchAllUsers = async () => {
   }
 };
 
+export const fetchAdminDashboardStats = async () => {
+  try {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    const response = await api.get('/admin/dashboard/stats/', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data || { message: 'Failed to fetch dashboard stats.' }
+    };
+  }
+};
+
 export const approveUser = async (userId) => {
   try {
     // Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)

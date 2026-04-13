@@ -1,15 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import FarmerLayout from '../../../components/farmerDashboard/FarmerLayout';
 import Enroll from '../../../components/insurance/farmerSideInsurance/enroll/Enroll';
 import '../../../styles/farmerSideInsurance/enroll.css';
 
 const EnrollPage = () => {
+  const { t } = useTranslation('insurance');
+
   return (
-    <FarmerLayout pageTitle="Enroll Livestock">
+    <FarmerLayout pageTitle={t('nav.enroll')}>
       <div className="enroll-page">
-        <div className="page-header">
-          <h1 className="page-title">Enroll Livestock</h1>
-          <p className="page-subtitle">Follow the steps to insure your livestock.</p>
-        </div>
         <Enroll />
       </div>
     </FarmerLayout>

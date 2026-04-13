@@ -1,0 +1,235 @@
+{
+  "page": {
+    "title": "Treatment History",
+    "subtitle": "View and manage livestock medical records",
+    "addTitle": "Add Treatment Record",
+    "addSubtitle": "Record medical treatments for your livestock",
+    "editTitle": "Edit Treatment Record",
+    "editSubtitle": "Update medical treatment information",
+    "deadlinesTitle": "Treatment Deadlines",
+    "deadlinesSubtitle": "Track upcoming and overdue follow-up appointments",
+    "alertsTitle": "Treatment Alerts",
+    "alertsSubtitle": "Notifications for upcoming or missed follow-up appointments",
+    "loading": "Loading treatments...",
+    "loadingData": "Loading treatment data...",
+    "loadingDeadlines": "Loading deadlines...",
+    "savingTreatment": "Saving treatment...",
+    "notFound": "Treatment not found"
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "farmerProfiles": "Farmer Profiles",
+    "animals": "Animals",
+    "medicalHistory": "Medical History",
+    "addTreatment": "Add Treatment",
+    "editTreatment": "Edit Treatment"
+  },
+  "tabs": {
+    "tracking": "Medicine Tracking",
+    "past": "Past Treatments",
+    "inProgress": "In Progress"
+  },
+  "buttons": {
+    "addTreatment": "+ Add Treatment",
+    "cancel": "Cancel",
+    "save": "Save Treatment",
+    "update": "Update Treatment",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "markTaken": "Mark Taken",
+    "confirmContinue": "Confirm & Continue",
+    "setTimesForNextDay": "Set Times for Day {day} →"
+  },
+  "filter": {
+    "allLivestock": "All Livestock"
+  },
+  "card": {
+    "livestock": "Livestock",
+    "diagnosis": "Diagnosis",
+    "medicines": "Medicines",
+    "vet": "Vet",
+    "start": "Start",
+    "next": "Next",
+    "status": {
+      "inProgress": "In Progress",
+      "completed": "Completed"
+    }
+  },
+  "form": {
+    "livestock": "Livestock",
+    "livestockPlaceholder": "Search by tag number, name, or breed...",
+    "noLivestock": "No livestock found matching \"{search}\"",
+    "treatmentName": "Treatment Name",
+    "treatmentNamePlaceholder": "e.g., Deworming, Infection Treatment",
+    "diagnosis": "Diagnosis / Description",
+    "diagnosisPlaceholder": "Describe condition or treatment plan",
+    "medicines": "Medicines",
+    "addAnother": "+ Add Another",
+    "medicineName": "What medicine?",
+    "medicineNamePlaceholder": "e.g., Ivermectin",
+    "dosage": "How much each time?",
+    "dosagePlaceholder": "e.g., 5 mL",
+    "frequency": "How many times per day?",
+    "frequencyOptions": {
+      "once": "Once",
+      "twice": "Twice",
+      "three": "Three times"
+    },
+    "scheduleType": "How to schedule doses?",
+    "scheduleInterval": "Every X hours",
+    "scheduleExact": "Set exact times",
+    "startTime": "Start time",
+    "intervalHours": "Every how many hours?",
+    "exactTime": "Time {number}",
+    "duration": "For how many days?",
+    "durationDays": "days",
+    "remove": "Remove",
+    "schedulePreview": {
+      "interval": "Doses every {hours} hours starting {time}",
+      "exact": "Doses at: {times}"
+    },
+    "vetName": "Veterinarian Name",
+    "vetNamePlaceholder": "e.g., Dr. Smith",
+    "treatmentDate": "Treatment Start Date",
+    "nextTreatmentDate": "Next Follow-up",
+    "status": "Treatment Status",
+    "document": "Upload Medical Document (Optional)",
+    "livestockInfo": {
+      "tag": "Tag",
+      "breed": "Breed",
+      "age": "Age",
+      "years": "years"
+    },
+    "validation": {
+      "required": "Please fill in at least one medicine with name and dosage."
+    }
+  },
+  "tracking": {
+    "scheduleTitle": "Medicine Schedule: {date}",
+    "future": "(Future)",
+    "dayOf": "Day {current} of {total}",
+    "noDoses": "No doses scheduled for this date.",
+    "taken": "✅ Taken",
+    "timeLeft": "{time}",
+    "dueNow": "Due now!",
+    "allCompleted": "✅ All doses completed for Day {day}!",
+    "treatmentCompleted": "🎉 Treatment completed successfully!",
+    "at": "At {time}",
+    "modal": {
+      "title": "Set Times for Day {day}",
+      "subtitle": "Set the exact times for each medicine dose. You must set exactly the required number of times.",
+      "dose": "Dose {number}",
+      "dosesRequired": "{name} - {count} dose(s) required"
+    }
+  },
+  "deadlines": {
+    "overdue": "❌ Overdue Follow-ups",
+    "dueSoon": "⚠️ Due Soon (Within 7 Days)",
+    "onTrack": "✅ On Track",
+    "daysOverdue": "{days} days overdue",
+    "dueToday": "Due today",
+    "dueIn": "Due in {days} days",
+    "empty": {
+      "icon": "⏰",
+      "title": "No treatment follow-ups scheduled",
+      "subtitle": "Add follow-up dates to treatments to track deadlines"
+    }
+  },
+  "alerts": {
+    "summary": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "oneDay": "1 Day",
+      "threeDays": "3 Days",
+      "sevenDays": "7 Days"
+    },
+    "sections": {
+      "overdue": {
+        "icon": "🚨",
+        "title": "Overdue Follow-ups",
+        "description": "These treatments have missed their follow-up dates. Please schedule appointments immediately."
+      },
+      "today": {
+        "icon": "📅",
+        "title": "Follow-ups Due Today",
+        "description": "These treatments require follow-up appointments today."
+      },
+      "tomorrow": {
+        "icon": "⏰",
+        "title": "Follow-ups Tomorrow",
+        "description": "Prepare for these follow-up appointments scheduled for tomorrow."
+      },
+      "threeDays": {
+        "icon": "📌",
+        "title": "Follow-ups in 3 Days",
+        "description": "Plan ahead for these upcoming follow-up appointments."
+      },
+      "sevenDays": {
+        "icon": "📋",
+        "title": "Follow-ups in 7 Days",
+        "description": "Early reminder for follow-ups scheduled next week."
+      }
+    },
+    "messages": {
+      "overdueBy": "Overdue by {days} days",
+      "dueToday": "Follow-up due today!",
+      "dueTomorrow": "Follow-up due tomorrow",
+      "dueInThree": "Follow-up in 3 days",
+      "dueInSeven": "Follow-up in 7 days"
+    },
+    "empty": {
+      "icon": "🔔",
+      "title": "No Alerts",
+      "subtitle": "All follow-up appointments are scheduled well in advance!"
+    }
+  },
+  "empty": {
+    "tracking": {
+      "icon": "💊",
+      "message": "No active treatments with medicine schedules."
+    },
+    "noRecords": {
+      "icon": "📋",
+      "message": "No treatment records found."
+    }
+  },
+  "deleteModal": {
+    "title": "Confirm Delete",
+    "message": "Are you sure you want to delete this treatment record?",
+    "treatmentName": "Treatment: {name}",
+    "livestock": "Livestock: {tag}",
+    "warning": "This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "viewModal": {
+    "title": "Treatment Details",
+    "close": "Close",
+    "livestock": "Livestock",
+    "treatmentName": "Treatment Name",
+    "diagnosis": "Diagnosis",
+    "medicines": "Medicines",
+    "vet": "Veterinarian",
+    "treatmentDate": "Treatment Date",
+    "nextFollowUp": "Next Follow-up",
+    "status": "Status",
+    "medicineDetails": {
+      "dosage": "Dosage",
+      "frequency": "Frequency",
+      "duration": "Duration",
+      "schedule": "Schedule",
+      "timesPerDay": "{count}x per day",
+      "forDays": "for {days} days"
+    }
+  },
+  "messages": {
+    "saveSuccess": "Treatment saved successfully!",
+    "updateSuccess": "Treatment updated successfully!",
+    "deleteSuccess": "Treatment deleted successfully!",
+    "saveFailed": "Failed to save treatment: {error}",
+    "updateFailed": "Failed to update treatment: {error}",
+    "deleteFailed": "Failed to delete treatment: {error}",
+    "loadFailed": "Failed to load treatment data"
+  }
+}

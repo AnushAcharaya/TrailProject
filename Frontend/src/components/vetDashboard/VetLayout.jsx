@@ -1,13 +1,17 @@
 import { FaHome, FaUser, FaCalendarAlt, FaCog, FaSignOutAlt, FaBell, FaEnvelope, FaUserFriends } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getUserProfile } from '../../services/profileApi';
 import { getReceivedRequests } from '../../services/friendsApi';
 import { getUnreadMessageCount } from '../../services/messagesApi';
+import LanguageSwitcher from '../common/LanguageSwitcher';
+import '../../styles/languageSwitcher.css';
 
 function VetLayout({ children, pageTitle = "Dashboard" }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation('vetDashboard');
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [friendRequestCount, setFriendRequestCount] = useState(0);
@@ -159,13 +163,13 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Dark Green Sidebar */}
-      <div className="w-64 bg-emerald-900 flex flex-col py-6 px-4">
+      {/* Dark Green Sidebar - Fixed and Non-scrollable */}
+      <div className="w-64 bg-emerald-900 flex flex-col py-6 px-4 fixed left-0 top-0 h-screen">
         <div className="flex items-center space-x-3 mb-8 px-2">
           <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
             <span className="text-emerald-900 font-bold text-lg">V</span>
           </div>
-          <span className="text-white font-bold text-xl">VetCare</span>
+          <span className="text-white font-bold text-xl">{t('appName')}</span>
         </div>
         
         <nav className="space-y-2 flex-1">
@@ -178,7 +182,7 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             }`}
           >
             <FaHome className="text-white text-xl" />
-            <span className="text-white font-medium">Dashboard</span>
+            <span className="text-white font-medium">{t('sidebar.dashboard')}</span>
           </div>
           <div 
             onClick={() => navigate('/vet/farmer-profiles')}
@@ -189,7 +193,7 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             }`}
           >
             <FaUser className="text-white text-xl" />
-            <span className="text-white font-medium">Farmer Profiles</span>
+            <span className="text-white font-medium">{t('sidebar.farmerProfiles')}</span>
           </div>
           <div 
             onClick={() => navigate('/vet/appointments')}
@@ -200,7 +204,7 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             }`}
           >
             <FaCalendarAlt className="text-white text-xl" />
-            <span className="text-white font-medium">Appointments</span>
+            <span className="text-white font-medium">{t('sidebar.appointments')}</span>
           </div>
           
           {/* Messages with Badge */}
@@ -214,7 +218,7 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
           >
             <div className="flex items-center space-x-3">
               <FaEnvelope className="text-white text-xl" />
-              <span className="text-white font-medium">Messages</span>
+              <span className="text-white font-medium">{t('sidebar.messages')}</span>
             </div>
             {unreadMessageCount > 0 && (
               <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
@@ -234,7 +238,7 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
           >
             <div className="flex items-center space-x-3">
               <FaUserFriends className="text-white text-xl" />
-              <span className="text-white font-medium">Friend Requests</span>
+              <span className="text-white font-medium">{t('sidebar.friendRequests')}</span>
             </div>
             {friendRequestCount > 0 && (
               <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
@@ -252,14 +256,14 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             }`}
           >
             <FaUserFriends className="text-white text-xl" />
-            <span className="text-white font-medium">Friends List</span>
+            <span className="text-white font-medium">{t('sidebar.friendsList')}</span>
           </div>
           <div 
             onClick={() => navigate('/profile')}
             className="flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors hover:bg-emerald-700"
           >
             <FaCog className="text-white text-xl" />
-            <span className="text-white font-medium">Settings</span>
+            <span className="text-white font-medium">{t('sidebar.settings')}</span>
           </div>
         </nav>
 
@@ -270,21 +274,23 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             className="flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors bg-red-600 hover:bg-red-700 w-full"
           >
             <FaSignOutAlt className="text-white text-xl" />
-            <span className="text-white font-medium">Logout</span>
+            <span className="text-white font-medium">{t('sidebar.logout')}</span>
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col ml-64">
         {/* Top Navigation */}
-        <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
+        <div className="px-8 py-4 flex items-center justify-end bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-500 shadow-2xl">
           <div className="flex items-center space-x-6">
             {/* Notification Bell */}
             <div className="relative cursor-pointer">
-              <FaBell className="text-gray-600 text-xl" />
+              <FaBell className="text-white text-xl" />
             </div>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher context="vet" />
             
             {/* Profile with Name Below */}
             <div 
@@ -292,8 +298,8 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
               className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
             >
               {loading ? (
-                <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mb-1 animate-pulse">
-                  <span className="text-gray-500 font-semibold">...</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center mb-1 animate-pulse bg-white/30">
+                  <span className="text-white font-semibold">...</span>
                 </div>
               ) : profileData?.profile_image_url || profileData?.profile_image ? (
                 <img 
@@ -304,14 +310,14 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
                     e.target.style.display = 'none';
                   }}
                   onLoad={() => console.log('[VetLayout] Image loaded successfully')}
-                  className="w-10 h-10 rounded-full object-cover mb-1 border-2 border-emerald-600"
+                  className="w-10 h-10 rounded-full object-cover mb-1 border-2 border-white"
                 />
               ) : (
-                <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center mb-1">
-                  <span className="text-white font-semibold">{getUserInitials()}</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center mb-1 bg-white">
+                  <span className="text-emerald-600 font-semibold">{getUserInitials()}</span>
                 </div>
               )}
-              <span className="text-xs text-gray-700 font-medium">
+              <span className="text-xs font-medium text-white">
                 {loading ? 'Loading...' : getDisplayName()}
               </span>
             </div>

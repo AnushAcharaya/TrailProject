@@ -1,0 +1,86 @@
+{
+  "topNav": {
+    "title": "LivestockHub Admin",
+    "subtitle": "Manage Farmer and Vet"
+  },
+  "sideNav": {
+    "allUsers": "All Users",
+    "accountVerifications": "Account Verifications",
+    "insurance": "Insurance",
+    "profileTransfer": "Profile Transfer",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "helpSupport": "Help & Support",
+    "logout": "Logout",
+    "copyright": "© {{year}} LivestockHub"
+  },
+  "logoutModal": {
+    "title": "Confirm Logout",
+    "message": "Are you sure you want to logout?",
+    "cancel": "Cancel",
+    "confirm": "Yes, Logout"
+  },
+  "dashboard": {
+    "cards": {
+      "totalRegistrations": "Total Registrations",
+      "pendingReviews": "Pending Reviews",
+      "approvedAccounts": "Approved Accounts",
+      "activeThisWeek": "Active This Week"
+    },
+    "recentRegistrations": {
+      "title": "Recent Registrations",
+      "subtitle": "Latest 5 registration requests",
+      "viewAll": "View All",
+      "noRegistrations": "No recent registrations found.",
+      "loading": "Loading users..."
+    },
+    "charts": {
+      "monthlyVerifications": "Monthly Verifications",
+      "weeklyActivity": "Weekly Activity",
+      "farmers": "Farmers",
+      "veterinarians": "Veterinarians"
+    }
+  },
+  "accountVerifications": {
+    "title": "Account Verifications",
+    "noUsers": "No users found.",
+    "loading": "Loading users..."
+  },
+  "filterBar": {
+    "searchPlaceholder": "Search by name, email, or phone...",
+    "roles": {
+      "all": "All Roles",
+      "farmer": "Farmer",
+      "veterinarian": "Veterinarian"
+    },
+    "statuses": {
+      "all": "All Status",
+      "pending": "Pending",
+      "approved": "Approved",
+      "declined": "Declined"
+    }
+  },
+  "accountCard": {
+    "viewMore": "View More",
+    "viewLess": "View Less",
+    "farmName": "Farm Name",
+    "specialization": "Specialization",
+    "uploadedDocuments": "Uploaded Documents",
+    "submitted": "Submitted",
+    "approve": "Approve",
+    "decline": "Decline",
+    "roles": {
+      "farmer": "Farmer",
+      "veterinarian": "Veterinarian",
+      "vet": "Vet"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "declined": "Declined"
+    }
+  },
+  "common": {
+    "loading": "Loading..."
+  }
+}

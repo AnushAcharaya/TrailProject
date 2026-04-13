@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import { getFriends } from "../../services/friendsApi";
 import { getMessages, sendMessage, markAllMessagesRead } from "../../services/messagesApi";
@@ -8,6 +9,7 @@ import { FaSearch, FaPaperPlane, FaSmile, FaCalendarAlt } from "react-icons/fa";
 const VetMessagesPage = () => {
   const navigate = useNavigate();
   const { friendId } = useParams();
+  const { t } = useTranslation('messages');
   const [friends, setFriends] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [messageText, setMessageText] = useState("");
@@ -92,14 +94,14 @@ const VetMessagesPage = () => {
       setMessageText("");
     } else {
       console.error('Failed to send message:', result.error);
-      alert('Failed to send message. Please try again.');
+      alert(t('errors.sendFailed'));
     }
   };
 
   const handleSendAppointmentCard = async () => {
     if (!friendId) return;
     
-    const appointmentText = "Book an Appointment";
+    const appointmentText = t('appointmentCard.title');
     const result = await sendMessage(friendId, appointmentText, 'appointment_card');
     
     if (result.success) {
@@ -107,7 +109,7 @@ const VetMessagesPage = () => {
       setMessages(prev => [...prev, result.data]);
     } else {
       console.error('Failed to send appointment card:', result.error);
-      alert('Failed to send appointment card. Please try again.');
+      alert(t('errors.appointmentFailed'));
     }
   };
 
@@ -118,7 +120,7 @@ const VetMessagesPage = () => {
   };
 
   const getLastMessage = () => {
-    if (messages.length === 0) return "No messages yet";
+    if (messages.length === 0) return t('noMessagesYet');
     const lastMsg = messages[messages.length - 1];
     return lastMsg.text;
   };
@@ -129,15 +131,15 @@ const VetMessagesPage = () => {
   };
 
   return (
-    <VetLayout pageTitle="Messages">
+    <VetLayout pageTitle={t('pageTitle')}>
       <div className="h-[calc(100vh-80px)] flex flex-col bg-gray-50">
         {/* Friends List - Horizontal Scroll */}
         <div className="bg-white border-b border-gray-200 px-4 py-3">
           <div className="flex items-center gap-3 overflow-x-auto pb-2">
             {isLoading ? (
-              <div className="text-gray-500">Loading friends...</div>
+              <div className="text-gray-500">{t('loading')}</div>
             ) : friends.length === 0 ? (
-              <div className="text-gray-500">No friends to message</div>
+              <div className="text-gray-500">{t('noFriends')}</div>
             ) : (
               friends.map((friendship) => {
                 const friend = friendship.friend;
@@ -189,7 +191,7 @@ const VetMessagesPage = () => {
                     />
                     <div>
                       <h3 className="font-semibold text-gray-800">{selectedFriend.full_name || selectedFriend.username}</h3>
-                      <p className="text-xs text-green-600">Active now</p>
+                      <p className="text-xs text-green-600">{t('activeNow')}</p>
                     </div>
                   </div>
                   <button
@@ -221,8 +223,8 @@ const VetMessagesPage = () => {
                                   <FaCalendarAlt className="text-emerald-600 text-xl" />
                                 </div>
                                 <div>
-                                  <h4 className="font-semibold text-gray-800">Book an Appointment</h4>
-                                  <p className="text-xs text-gray-500">Schedule a visit with the vet</p>
+                                  <h4 className="font-semibold text-gray-800">{t('appointmentCard.title')}</h4>
+                                  <p className="text-xs text-gray-500">{t('appointmentCard.subtitle')}</p>
                                 </div>
                               </div>
                               {!isMyMessage && (
@@ -230,7 +232,7 @@ const VetMessagesPage = () => {
                                   onClick={() => navigate('/appointments')}
                                   className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition font-medium"
                                 >
-                                  Book Now
+                                  {t('appointmentCard.bookNow')}
                                 </button>
                               )}
                             </div>
@@ -275,7 +277,7 @@ const VetMessagesPage = () => {
                       className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition border border-emerald-200"
                     >
                       <FaCalendarAlt />
-                      <span className="text-sm font-medium">Send Appointment</span>
+                      <span className="text-sm font-medium">{t('sendAppointment')}</span>
                     </button>
                   </div>
                   <div className="flex items-center gap-3">
@@ -287,7 +289,7 @@ const VetMessagesPage = () => {
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                      placeholder="Type a message..."
+                      placeholder={t('typePlaceholder')}
                       className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:border-emerald-600"
                     />
                     <button
@@ -329,7 +331,7 @@ const VetMessagesPage = () => {
           <div className="flex-1 flex items-center justify-center text-gray-500">
             <div className="text-center">
               <FaSearch className="text-6xl mx-auto mb-4 text-gray-300" />
-              <p className="text-lg">Select a friend to start messaging</p>
+              <p className="text-lg">{t('selectFriend')}</p>
             </div>
           </div>
         )}

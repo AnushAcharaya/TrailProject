@@ -1,0 +1,19 @@
+{
+  "pageTitle": "Messages",
+  "loading": "Loading friends...",
+  "noFriends": "No friends to message",
+  "activeNow": "Active now",
+  "noMessagesYet": "No messages yet",
+  "sendAppointment": "Send Appointment",
+  "typePlaceholder": "Type a message...",
+  "selectFriend": "Select a friend to start messaging",
+  "appointmentCard": {
+    "title": "Book an Appointment",
+    "subtitle": "Schedule a visit with the vet",
+    "bookNow": "Book Now"
+  },
+  "errors": {
+    "sendFailed": "Failed to send message. Please try again.",
+    "appointmentFailed": "Failed to send appointment card. Please try again."
+  }
+}

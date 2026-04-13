@@ -1,9 +1,13 @@
 // components/profile-transfer/farmer-side/animal-list/components/ReasonTextarea.jsx
+import { useTranslation } from 'react-i18next';
+
 export default function ReasonTextarea({ reason, onReasonChange }) {
+  const { t } = useTranslation('profileTransfer');
+  
   return (
     <div className="relative">
       <textarea
-        placeholder="Reason for transfer..."
+        placeholder={t('transferModal.reasonPlaceholder')}
         rows={3}
         value={reason}
         onChange={(e) => onReasonChange(e.target.value)}

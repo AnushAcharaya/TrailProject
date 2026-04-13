@@ -1,9 +1,11 @@
 // components/profile-transfer/receiver-side/received-requests/ReceivedRequests.jsx
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import RequestCard from './RequestCard';
 import { getReceivedTransfers } from '../../../services/profileTransferApi';
 
 export default function ReceivedRequests() {
+  const { t } = useTranslation('profileTransfer');
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -63,7 +65,7 @@ export default function ReceivedRequests() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading received requests...</p>
+          <p className="text-gray-600">{t('receivedRequests.loading')}</p>
         </div>
       </div>
     );
@@ -79,7 +81,7 @@ export default function ReceivedRequests() {
             onClick={fetchReceivedTransfers}
             className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
           >
-            Retry
+            {t('receivedRequests.retry')}
           </button>
         </div>
       </div>
@@ -88,18 +90,12 @@ export default function ReceivedRequests() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <h1 className="text-2xl font-bold text-gray-900">Received Transfer Requests</h1>
-        <p className="text-sm text-gray-600 mt-1">Review and respond to incoming ownership transfer requests</p>
-      </div>
-
       {/* Main Content */}
       <div className="px-6 py-6">
         {requests.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No received transfer requests.</p>
-            <p className="text-gray-400 text-sm mt-2">Transfer requests sent to you will appear here.</p>
+            <p className="text-gray-500 text-lg">{t('receivedRequests.noRequests')}</p>
+            <p className="text-gray-400 text-sm mt-2">{t('receivedRequests.subtitle')}</p>
           </div>
         ) : (
           <div className="space-y-4">

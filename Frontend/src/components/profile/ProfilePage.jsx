@@ -1,7 +1,8 @@
 // ProfilePage.jsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaUser, FaLock, FaCog, FaSpinner, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import ProfileCard from "./ProfileCard";
 import ProfileTab from "./ProfileTab";
 import PasswordTab from "./PasswordTab";
@@ -9,8 +10,9 @@ import SettingsTab from "./SettingTab";
 import LogoutButton from "./LogoutButton";
 import { getUserProfile } from "../../services/profileApi";
 
-const ProfilePage = () => {
+const ProfilePage = ({ onClose }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('profile');
   const [activeTab, setActiveTab] = useState("profile");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,13 +50,21 @@ const ProfilePage = () => {
     }));
   };
 
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      navigate(-1);
+    }
+  };
+
   // Loading state
   if (loading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
         <div className="bg-white rounded-xl p-8 shadow-2xl flex flex-col items-center gap-4">
           <FaSpinner className="animate-spin text-4xl text-green-600" />
-          <p className="text-gray-600">Loading profile...</p>
+          <p className="text-gray-600">{t('page.loading')}</p>
         </div>
       </div>
     );
@@ -65,13 +75,13 @@ const ProfilePage = () => {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
         <div className="bg-white rounded-xl p-8 shadow-2xl max-w-md">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
+          <h2 className="text-xl font-semibold text-red-600 mb-2">{t('page.error')}</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
-            Retry
+            {t('page.retry')}
           </button>
         </div>
       </div>
@@ -102,7 +112,7 @@ const ProfilePage = () => {
         >
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate(-1)}
+              onClick={handleClose}
               className="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100"
               style={{ color: "#2E7D32" }}
               title="Go back"
@@ -111,10 +121,10 @@ const ProfilePage = () => {
             </button>
             <div>
               <h1 className="text-lg md:text-xl font-semibold" style={{ color: "#212121" }}>
-                Account Settings
+                {t('page.title')}
               </h1>
               <p className="text-[11px] md:text-xs" style={{ color: "#757575" }}>
-                Manage your profile and security.
+                {t('page.subtitle')}
               </p>
             </div>
           </div>
@@ -152,7 +162,7 @@ const ProfilePage = () => {
                           activeTab === "profile" ? "#E8F5E9" : "transparent",
                       }}
                     >
-                      <FaUser /> Profile
+                      <FaUser /> {t('tabs.profile')}
                     </button>
 
                     <button
@@ -169,7 +179,7 @@ const ProfilePage = () => {
                           activeTab === "password" ? "#E8F5E9" : "transparent",
                       }}
                     >
-                      <FaLock /> Security
+                      <FaLock /> {t('tabs.security')}
                     </button>
 
                     <button
@@ -186,7 +196,7 @@ const ProfilePage = () => {
                           activeTab === "settings" ? "#E8F5E9" : "transparent",
                       }}
                     >
-                      <FaCog /> Preferences
+                      <FaCog /> {t('tabs.preferences')}
                     </button>
                   </div>
                 </div>

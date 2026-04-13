@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaChevronRight } from "react-icons/fa";
+import { useTranslation } from 'react-i18next';
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import FarmerLayout from "../../components/farmerDashboard/FarmerLayout";
 import PageHeader from "../../components/medicalHistory/PageHeader";
@@ -10,6 +11,7 @@ import { createTreatment } from "../../services/medicalApi";
 import "../../styles/medicalHistory.css";
 
 const AddTreatmentRecord = () => {
+  const { t } = useTranslation('medical');
   const navigate = useNavigate();
   const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,17 +51,17 @@ const AddTreatmentRecord = () => {
         onClick={() => navigate('/farmerpage')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Dashboard
+        {t('breadcrumbs.dashboard')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
       <button 
         onClick={() => navigate('/medical/history', { state: { from: 'farmer' } })}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Medical History
+        {t('breadcrumbs.medicalHistory')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
-      <span className="text-gray-600">Add Treatment</span>
+      <span className="text-gray-600">{t('breadcrumbs.addTreatment')}</span>
     </div>
   ) : (
     <div className="flex items-center gap-2 text-sm mb-6">
@@ -67,24 +69,24 @@ const AddTreatmentRecord = () => {
         onClick={() => navigate('/vet/farmer-profiles')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Farmer Profiles
+        {t('breadcrumbs.farmerProfiles')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
       <button 
         onClick={() => navigate('/vet/farmer-details')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Animals
+        {t('breadcrumbs.animals')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
       <button 
         onClick={() => navigate('/medical/history', { state: { from: 'vet' } })}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Medical History
+        {t('breadcrumbs.medicalHistory')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
-      <span className="text-gray-600">Add Treatment</span>
+      <span className="text-gray-600">{t('breadcrumbs.addTreatment')}</span>
     </div>
   );
 
@@ -96,13 +98,13 @@ const AddTreatmentRecord = () => {
 
         <div className="max-w-3xl mx-auto">
           <PageHeader
-            title="Add Treatment Record"
-            subtitle="Record medical treatments for your livestock"
+            title={t('page.addTitle')}
+            subtitle={t('page.addSubtitle')}
           />
 
           {isSubmitting && (
             <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded">
-              Saving treatment...
+              {t('page.savingTreatment')}
             </div>
           )}
 

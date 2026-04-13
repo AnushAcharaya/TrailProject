@@ -1,0 +1,235 @@
+{
+  "page": {
+    "title": "उपचार इतिहास",
+    "subtitle": "पशुधन चिकित्सा रेकर्डहरू हेर्नुहोस् र व्यवस्थापन गर्नुहोस्",
+    "addTitle": "उपचार रेकर्ड थप्नुहोस्",
+    "addSubtitle": "आफ्नो पशुधनको लागि चिकित्सा उपचार रेकर्ड गर्नुहोस्",
+    "editTitle": "उपचार रेकर्ड सम्पादन गर्नुहोस्",
+    "editSubtitle": "चिकित्सा उपचार जानकारी अपडेट गर्नुहोस्",
+    "deadlinesTitle": "उपचार समयसीमा",
+    "deadlinesSubtitle": "आगामी र बाँकी फलोअप अपोइन्टमेन्टहरू ट्र्याक गर्नुहोस्",
+    "alertsTitle": "उपचार सतर्कता",
+    "alertsSubtitle": "आगामी वा छुटेका फलोअप अपोइन्टमेन्टहरूको लागि सूचनाहरू",
+    "loading": "उपचारहरू लोड हुँदैछ...",
+    "loadingData": "उपचार डेटा लोड हुँदैछ...",
+    "loadingDeadlines": "समयसीमाहरू लोड हुँदैछ...",
+    "savingTreatment": "उपचार सुरक्षित गर्दै...",
+    "notFound": "उपचार फेला परेन"
+  },
+  "breadcrumbs": {
+    "dashboard": "ड्यासबोर्ड",
+    "farmerProfiles": "किसान प्रोफाइलहरू",
+    "animals": "जनावरहरू",
+    "medicalHistory": "चिकित्सा इतिहास",
+    "addTreatment": "उपचार थप्नुहोस्",
+    "editTreatment": "उपचार सम्पादन गर्नुहोस्"
+  },
+  "tabs": {
+    "tracking": "औषधि ट्र्याकिङ",
+    "past": "विगतका उपचारहरू",
+    "inProgress": "प्रगतिमा"
+  },
+  "buttons": {
+    "addTreatment": "+ उपचार थप्नुहोस्",
+    "cancel": "रद्द गर्नुहोस्",
+    "save": "उपचार सुरक्षित गर्नुहोस्",
+    "update": "उपचार अपडेट गर्नुहोस्",
+    "view": "हेर्नुहोस्",
+    "edit": "सम्पादन गर्नुहोस्",
+    "delete": "मेटाउनुहोस्",
+    "markTaken": "लिइएको चिन्ह लगाउनुहोस्",
+    "confirmContinue": "पुष्टि गर्नुहोस् र जारी राख्नुहोस्",
+    "setTimesForNextDay": "दिन {day} को लागि समय सेट गर्नुहोस् →"
+  },
+  "filter": {
+    "allLivestock": "सबै पशुधन"
+  },
+  "card": {
+    "livestock": "पशुधन",
+    "diagnosis": "निदान",
+    "medicines": "औषधिहरू",
+    "vet": "पशु चिकित्सक",
+    "start": "सुरु",
+    "next": "अर्को",
+    "status": {
+      "inProgress": "प्रगतिमा",
+      "completed": "पूरा भएको"
+    }
+  },
+  "form": {
+    "livestock": "पशुधन",
+    "livestockPlaceholder": "ट्याग नम्बर, नाम, वा नस्लद्वारा खोज्नुहोस्...",
+    "noLivestock": "\"{search}\" सँग मेल खाने कुनै पशुधन फेला परेन",
+    "treatmentName": "उपचारको नाम",
+    "treatmentNamePlaceholder": "उदाहरण: कृमिनाशक, संक्रमण उपचार",
+    "diagnosis": "निदान / विवरण",
+    "diagnosisPlaceholder": "अवस्था वा उपचार योजना वर्णन गर्नुहोस्",
+    "medicines": "औषधिहरू",
+    "addAnother": "+ अर्को थप्नुहोस्",
+    "medicineName": "कुन औषधि?",
+    "medicineNamePlaceholder": "उदाहरण: आइभरमेक्टिन",
+    "dosage": "प्रत्येक पटक कति?",
+    "dosagePlaceholder": "उदाहरण: 5 mL",
+    "frequency": "दिनमा कति पटक?",
+    "frequencyOptions": {
+      "once": "एक पटक",
+      "twice": "दुई पटक",
+      "three": "तीन पटक"
+    },
+    "scheduleType": "खुराक कसरी तालिका बनाउने?",
+    "scheduleInterval": "प्रत्येक X घण्टा",
+    "scheduleExact": "सही समय सेट गर्नुहोस्",
+    "startTime": "सुरु समय",
+    "intervalHours": "प्रत्येक कति घण्टा?",
+    "exactTime": "समय {number}",
+    "duration": "कति दिनको लागि?",
+    "durationDays": "दिन",
+    "remove": "हटाउनुहोस्",
+    "schedulePreview": {
+      "interval": "{time} बाट सुरु गरी प्रत्येक {hours} घण्टामा खुराक",
+      "exact": "खुराक समय: {times}"
+    },
+    "vetName": "पशु चिकित्सकको नाम",
+    "vetNamePlaceholder": "उदाहरण: डा. स्मिथ",
+    "treatmentDate": "उपचार सुरु मिति",
+    "nextTreatmentDate": "अर्को फलोअप",
+    "status": "उपचार स्थिति",
+    "document": "चिकित्सा कागजात अपलोड गर्नुहोस् (वैकल्पिक)",
+    "livestockInfo": {
+      "tag": "ट्याग",
+      "breed": "नस्ल",
+      "age": "उमेर",
+      "years": "वर्ष"
+    },
+    "validation": {
+      "required": "कृपया नाम र खुराक सहित कम्तिमा एउटा औषधि भर्नुहोस्।"
+    }
+  },
+  "tracking": {
+    "scheduleTitle": "औषधि तालिका: {date}",
+    "future": "(भविष्य)",
+    "dayOf": "दिन {current} को {total}",
+    "noDoses": "यो मितिको लागि कुनै खुराक तालिका छैन।",
+    "taken": "✅ लिइएको",
+    "timeLeft": "{time}",
+    "dueNow": "अहिले बाँकी!",
+    "allCompleted": "✅ दिन {day} को लागि सबै खुराक पूरा भयो!",
+    "treatmentCompleted": "🎉 उपचार सफलतापूर्वक पूरा भयो!",
+    "at": "{time} मा",
+    "modal": {
+      "title": "दिन {day} को लागि समय सेट गर्नुहोस्",
+      "subtitle": "प्रत्येक औषधि खुराकको लागि सही समय सेट गर्नुहोस्। तपाईंले आवश्यक संख्यामा सही समय सेट गर्नुपर्छ।",
+      "dose": "खुराक {number}",
+      "dosesRequired": "{name} - {count} खुराक आवश्यक"
+    }
+  },
+  "deadlines": {
+    "overdue": "❌ बाँकी फलोअपहरू",
+    "dueSoon": "⚠️ चाँडै बाँकी (७ दिन भित्र)",
+    "onTrack": "✅ ट्र्याकमा",
+    "daysOverdue": "{days} दिन बाँकी",
+    "dueToday": "आज बाँकी",
+    "dueIn": "{days} दिनमा बाँकी",
+    "empty": {
+      "icon": "⏰",
+      "title": "कुनै उपचार फलोअप तालिका छैन",
+      "subtitle": "समयसीमा ट्र्याक गर्न उपचारहरूमा फलोअप मितिहरू थप्नुहोस्"
+    }
+  },
+  "alerts": {
+    "summary": {
+      "overdue": "बाँकी",
+      "today": "आज",
+      "oneDay": "१ दिन",
+      "threeDays": "३ दिन",
+      "sevenDays": "७ दिन"
+    },
+    "sections": {
+      "overdue": {
+        "icon": "🚨",
+        "title": "बाँकी फलोअपहरू",
+        "description": "यी उपचारहरूले आफ्नो फलोअप मितिहरू छुटेका छन्। कृपया तुरुन्त अपोइन्टमेन्ट तालिका बनाउनुहोस्।"
+      },
+      "today": {
+        "icon": "📅",
+        "title": "आज बाँकी फलोअपहरू",
+        "description": "यी उपचारहरूलाई आज फलोअप अपोइन्टमेन्ट चाहिन्छ।"
+      },
+      "tomorrow": {
+        "icon": "⏰",
+        "title": "भोलि फलोअपहरू",
+        "description": "भोलिको लागि तालिका बनाइएका यी फलोअप अपोइन्टमेन्टहरूको लागि तयारी गर्नुहोस्।"
+      },
+      "threeDays": {
+        "icon": "📌",
+        "title": "३ दिनमा फलोअपहरू",
+        "description": "यी आगामी फलोअप अपोइन्टमेन्टहरूको लागि अगाडि योजना बनाउनुहोस्।"
+      },
+      "sevenDays": {
+        "icon": "📋",
+        "title": "७ दिनमा फलोअपहरू",
+        "description": "अर्को हप्ता तालिका बनाइएका फलोअपहरूको लागि प्रारम्भिक सम्झना।"
+      }
+    },
+    "messages": {
+      "overdueBy": "{days} दिन बाँकी",
+      "dueToday": "आज फलोअप बाँकी!",
+      "dueTomorrow": "भोलि फलोअप बाँकी",
+      "dueInThree": "३ दिनमा फलोअप",
+      "dueInSeven": "७ दिनमा फलोअप"
+    },
+    "empty": {
+      "icon": "🔔",
+      "title": "कुनै सतर्कता छैन",
+      "subtitle": "सबै फलोअप अपोइन्टमेन्टहरू राम्रोसँग अगाडि तालिका बनाइएका छन्!"
+    }
+  },
+  "empty": {
+    "tracking": {
+      "icon": "💊",
+      "message": "औषधि तालिका भएका कुनै सक्रिय उपचारहरू छैनन्।"
+    },
+    "noRecords": {
+      "icon": "📋",
+      "message": "कुनै उपचार रेकर्डहरू फेला परेन।"
+    }
+  },
+  "deleteModal": {
+    "title": "मेटाउन पुष्टि गर्नुहोस्",
+    "message": "के तपाईं यो उपचार रेकर्ड मेटाउन निश्चित हुनुहुन्छ?",
+    "treatmentName": "उपचार: {name}",
+    "livestock": "पशुधन: {tag}",
+    "warning": "यो कार्य पूर्ववत गर्न सकिँदैन।",
+    "cancel": "रद्द गर्नुहोस्",
+    "confirm": "मेटाउनुहोस्"
+  },
+  "viewModal": {
+    "title": "उपचार विवरणहरू",
+    "close": "बन्द गर्नुहोस्",
+    "livestock": "पशुधन",
+    "treatmentName": "उपचारको नाम",
+    "diagnosis": "निदान",
+    "medicines": "औषधिहरू",
+    "vet": "पशु चिकित्सक",
+    "treatmentDate": "उपचार मिति",
+    "nextFollowUp": "अर्को फलोअप",
+    "status": "स्थिति",
+    "medicineDetails": {
+      "dosage": "खुराक",
+      "frequency": "आवृत्ति",
+      "duration": "अवधि",
+      "schedule": "तालिका",
+      "timesPerDay": "दिनमा {count}x",
+      "forDays": "{days} दिनको लागि"
+    }
+  },
+  "messages": {
+    "saveSuccess": "उपचार सफलतापूर्वक सुरक्षित भयो!",
+    "updateSuccess": "उपचार सफलतापूर्वक अपडेट भयो!",
+    "deleteSuccess": "उपचार सफलतापूर्वक मेटाइयो!",
+    "saveFailed": "उपचार सुरक्षित गर्न असफल: {error}",
+    "updateFailed": "उपचार अपडेट गर्न असफल: {error}",
+    "deleteFailed": "उपचार मेटाउन असफल: {error}",
+    "loadFailed": "उपचार डेटा लोड गर्न असफल"
+  }
+}

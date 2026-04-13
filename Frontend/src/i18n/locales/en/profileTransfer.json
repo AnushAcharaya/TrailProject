@@ -1,0 +1,223 @@
+{
+  "nav": {
+    "myAnimals": "My Animals",
+    "sentTransfers": "Sent Transfers",
+    "requests": "Requests"
+  },
+  "animalList": {
+    "title": "My Animals",
+    "subtitle": "Manage your livestock and initiate ownership transfers",
+    "searchPlaceholder": "Search by name or tag...",
+    "filter": "Filter",
+    "allSpecies": "All Species",
+    "loading": "Loading your animals...",
+    "error": "Failed to fetch livestock data",
+    "retry": "Retry",
+    "noAnimals": "No animals found. Add some livestock to get started!",
+    "noResults": "No animals found matching your search.",
+    "transferButton": "Transfer"
+  },
+  "animalCard": {
+    "tag": "Tag",
+    "breed": "Breed",
+    "age": "Age",
+    "owner": "Owner",
+    "status": "Status",
+    "transfer": "Transfer"
+  },
+  "transferModal": {
+    "title": "Transfer Animal",
+    "animalPreview": "Animal Preview",
+    "tag": "Tag",
+    "breed": "Breed",
+    "age": "Age",
+    "searchFarm": "Search for Farm",
+    "searchPlaceholder": "Search by farm name or username...",
+    "loading": "Loading farms...",
+    "noFarms": "No farms found matching \"{{query}}\"",
+    "selectFarm": "Select a farm to transfer to",
+    "selected": "Selected",
+    "reason": "Reason for Transfer",
+    "reasonPlaceholder": "Please provide a reason for this transfer...",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "processing": "Processing...",
+    "buttons": {
+      "cancel": "Cancel",
+      "submit": "Submit Transfer",
+      "submitting": "Submitting..."
+    },
+    "messages": {
+      "success": "Transfer request submitted successfully!",
+      "error": "Failed to submit transfer request. Please try again."
+    },
+    "validation": {
+      "farmRequired": "Please select a farm",
+      "reasonRequired": "Please provide a reason for transfer"
+    },
+    "errors": {
+      "selectFarmer": "Please select a farmer",
+      "reasonLength": "Reason must be at least 10 characters",
+      "createFailed": "Failed to create transfer request"
+    }
+  },
+  "sentTransfers": {
+    "title": "Sent Transfer Requests",
+    "subtitle": "Track the status of your transfer requests",
+    "loading": "Loading transfers...",
+    "error": "Failed to load transfers",
+    "noTransfers": "No transfer requests yet",
+    "viewDetails": "View Details"
+  },
+  "transferItem": {
+    "to": "To",
+    "animal": "Animal",
+    "tag": "Tag",
+    "date": "Date",
+    "status": "Status",
+    "reason": "Reason",
+    "viewDetails": "View Details",
+    "cancel": "Cancel Transfer"
+  },
+  "receivedRequests": {
+    "title": "Transfer Requests",
+    "subtitle": "Review and respond to incoming transfer requests",
+    "loading": "Loading requests...",
+    "error": "Failed to load requests",
+    "noRequests": "No transfer requests",
+    "requestCount": "{{count}} request",
+    "requestCount_plural": "{{count}} requests"
+  },
+  "requestCard": {
+    "from": "From",
+    "animal": "Animal",
+    "tag": "Tag",
+    "breed": "Breed",
+    "reason": "Reason",
+    "date": "Date",
+    "status": "Status",
+    "accept": "Accept",
+    "decline": "Decline",
+    "healthy": "Healthy",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "messages": {
+      "acceptSuccess": "Transfer request accepted successfully! The request will now proceed to admin review.",
+      "declineSuccess": "Transfer request declined successfully.",
+      "acceptError": "Failed to accept transfer request",
+      "declineError": "Failed to decline transfer request"
+    }
+  },
+  "adminDashboard": {
+    "title": "Transfer Management",
+    "subtitle": "Review and approve livestock ownership transfers",
+    "loading": "Loading dashboard...",
+    "error": "Failed to fetch transfers",
+    "retry": "Retry",
+    "noTransfers": "No transfers found.",
+    "stats": {
+      "pending": "Pending Transfers",
+      "approved": "Approved Transfer",
+      "rejected": "Rejected Transfer",
+      "total": "Total Transfers"
+    }
+  },
+  "transferTable": {
+    "headers": {
+      "id": "ID",
+      "animalTag": "Animal Tag",
+      "from": "From",
+      "to": "To",
+      "status": "Status",
+      "date": "Date",
+      "action": "Action"
+    },
+    "review": "Review",
+    "noData": "No transfers available"
+  },
+  "reviewTransfer": {
+    "title": "Review Transfer Request",
+    "transferId": "Transfer ID: #{{id}}",
+    "sender": "Sender Information",
+    "receiver": "Receiver Information",
+    "animal": "Animal Information",
+    "name": "Name",
+    "username": "Username",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "tag": "Tag ID",
+    "species": "Species",
+    "breed": "Breed",
+    "age": "Age",
+    "gender": "Gender",
+    "weight": "Weight",
+    "health": "Health Status",
+    "reason": "Transfer Reason",
+    "date": "Request Date",
+    "status": "Current Status",
+    "actions": {
+      "title": "Admin Actions",
+      "approve": "Approve Transfer",
+      "reject": "Reject Transfer",
+      "approveConfirm": "Are you sure you want to approve this transfer?",
+      "rejectConfirm": "Are you sure you want to reject this transfer?",
+      "messages": {
+        "approveSuccess": "Transfer approved successfully!",
+        "rejectSuccess": "Transfer rejected successfully!",
+        "approveError": "Failed to approve transfer",
+        "rejectError": "Failed to reject transfer"
+      }
+    }
+  },
+  "status": {
+    "pending": "Pending",
+    "receiverApproved": "Receiver Approved",
+    "adminApproved": "Admin Approved",
+    "completed": "Completed",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled"
+  },
+  "progressStepper": {
+    "step1": "Request Sent",
+    "step2": "Receiver Review",
+    "step3": "Admin Review",
+    "step4": "Completed"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "approve": "Approve",
+    "reject": "Reject",
+    "accept": "Accept",
+    "decline": "Decline",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "noData": "No data available",
+    "retry": "Retry"
+  },
+  "adminSidebar": {
+    "livestockHub": "LivestockHub",
+    "allUsers": "All Users",
+    "accountVerifications": "Account Verifications",
+    "insurance": "Insurance",
+    "profileTransfer": "Profile Transfer",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "helpSupport": "Help & Support",
+    "logout": "Logout",
+    "logoutConfirm": "Confirm Logout",
+    "logoutMessage": "Are you sure you want to logout?",
+    "yesLogout": "Yes, Logout"
+  },
+  "adminNav": {
+    "dashboard": "Dashboard",
+    "reviewTransfers": "Review Transfers"
+  }
+}

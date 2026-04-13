@@ -1,8 +1,10 @@
 // src/components/vaccination/VaccinationSearchBar.jsx
 import { useState, useEffect, useRef } from "react";
 import { FaSearch, FaTimes } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const VaccinationSearchBar = ({ searchTerm, onSearchChange, allVaccinations }) => {
+  const { t } = useTranslation('vaccination');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const searchRef = useRef(null);
@@ -38,9 +40,9 @@ const VaccinationSearchBar = ({ searchTerm, onSearchChange, allVaccinations }) =
       // Vaccine names
       if (vaccination.vaccine_name?.toLowerCase().includes(search)) {
         const suggestion = {
-          type: 'Vaccine',
+          type: t('search.types.vaccine'),
           value: vaccination.vaccine_name,
-          label: `${vaccination.vaccine_name} (Vaccine)`
+          label: `${vaccination.vaccine_name} (${t('search.types.vaccine')})`
         };
         const key = `vaccine-${vaccination.vaccine_name}`;
         if (!suggestionSet.has(key)) {
@@ -52,9 +54,9 @@ const VaccinationSearchBar = ({ searchTerm, onSearchChange, allVaccinations }) =
       // Vaccine types
       if (vaccination.vaccine_type?.toLowerCase().includes(search)) {
         const suggestion = {
-          type: 'Type',
+          type: t('search.types.type'),
           value: vaccination.vaccine_type,
-          label: `${vaccination.vaccine_type} (Type)`
+          label: `${vaccination.vaccine_type} (${t('search.types.type')})`
         };
         const key = `type-${vaccination.vaccine_type}`;
         if (!suggestionSet.has(key)) {
@@ -66,9 +68,9 @@ const VaccinationSearchBar = ({ searchTerm, onSearchChange, allVaccinations }) =
       // Tag IDs
       if (vaccination.livestock?.tag_id?.toLowerCase().includes(search)) {
         const suggestion = {
-          type: 'Tag',
+          type: t('search.types.tag'),
           value: vaccination.livestock.tag_id,
-          label: `${vaccination.livestock.tag_id} (Tag ID)`
+          label: `${vaccination.livestock.tag_id} (${t('search.types.tag')})`
         };
         const key = `tag-${vaccination.livestock.tag_id}`;
         if (!suggestionSet.has(key)) {
@@ -80,9 +82,9 @@ const VaccinationSearchBar = ({ searchTerm, onSearchChange, allVaccinations }) =
       // Species names
       if (vaccination.livestock?.species_name?.toLowerCase().includes(search)) {
         const suggestion = {
-          type: 'Species',
+          type: t('search.types.species'),
           value: vaccination.livestock.species_name,
-          label: `${vaccination.livestock.species_name} (Species)`
+          label: `${vaccination.livestock.species_name} (${t('search.types.species')})`
         };
         const key = `species-${vaccination.livestock.species_name}`;
         if (!suggestionSet.has(key)) {
@@ -94,9 +96,9 @@ const VaccinationSearchBar = ({ searchTerm, onSearchChange, allVaccinations }) =
       // Status
       if (vaccination.status?.toLowerCase().includes(search)) {
         const suggestion = {
-          type: 'Status',
+          type: t('search.types.status'),
           value: vaccination.status,
-          label: `${vaccination.status.charAt(0).toUpperCase() + vaccination.status.slice(1)} (Status)`
+          label: `${vaccination.status.charAt(0).toUpperCase() + vaccination.status.slice(1)} (${t('search.types.status')})`
         };
         const key = `status-${vaccination.status}`;
         if (!suggestionSet.has(key)) {
@@ -125,7 +127,7 @@ const VaccinationSearchBar = ({ searchTerm, onSearchChange, allVaccinations }) =
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
         <input
           type="text"
-          placeholder="Search by vaccine name, animal tag, species, or status..."
+          placeholder={t('search.placeholder')}
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           onFocus={() => searchTerm && setShowSuggestions(true)}
@@ -161,7 +163,7 @@ const VaccinationSearchBar = ({ searchTerm, onSearchChange, allVaccinations }) =
         {/* No results message */}
         {showSuggestions && searchTerm && suggestions.length === 0 && (
           <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-4">
-            <p className="text-gray-500 text-sm text-center">No suggestions found</p>
+            <p className="text-gray-500 text-sm text-center">{t('search.noSuggestions')}</p>
           </div>
         )}
       </div>

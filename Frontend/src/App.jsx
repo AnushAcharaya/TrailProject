@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import Page from "./pages/LandingPage";
 import AdminPage from "./pages/AdminPage";
+import AccountVerifications from "./pages/AccountVerifications";
 import ProfilePage from "./components/profile/ProfilePage";
 import LivestockPage from "./pages/livestockCrud/LivestockPage";
 import AddLivestockPage from "./pages/livestockCrud/AddLivestockPage";
@@ -55,6 +56,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/" element={<Page />} />
         <Route path="/adminpage" element={<AdminPage />} />
+        <Route path="/admin/account-verifications" element={<AccountVerifications />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/livestock" element={<LivestockPage />} />
         <Route path="/livestock/add" element={<AddLivestockPage />} />

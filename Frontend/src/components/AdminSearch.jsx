@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function FilterBar({ onFilterChange, currentFilter }) {
+  const { t } = useTranslation('admin');
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState(currentFilter || "all");
@@ -15,17 +17,17 @@ export default function FilterBar({ onFilterChange, currentFilter }) {
 
   // Role options
   const roles = [
-    { value: "all", label: "All Roles" },
-    { value: "farmer", label: "Farmer" },
-    { value: "veterinarian", label: "Veterinarian" },
+    { value: "all", label: t('filterBar.roles.all') },
+    { value: "farmer", label: t('filterBar.roles.farmer') },
+    { value: "veterinarian", label: t('filterBar.roles.veterinarian') },
   ];
 
   // Status options
   const statuses = [
-    { value: "all", label: "All Status" },
-    { value: "pending", label: "Pending" },
-    { value: "approved", label: "Approved" },
-    { value: "declined", label: "Declined" },
+    { value: "all", label: t('filterBar.statuses.all') },
+    { value: "pending", label: t('filterBar.statuses.pending') },
+    { value: "approved", label: t('filterBar.statuses.approved') },
+    { value: "declined", label: t('filterBar.statuses.declined') },
   ];
 
   return (
@@ -35,7 +37,7 @@ export default function FilterBar({ onFilterChange, currentFilter }) {
         <div className="relative flex-grow">
           <input
             type="text"
-            placeholder="Search by name, email, or phone..."
+            placeholder={t('filterBar.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"

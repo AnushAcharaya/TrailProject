@@ -1,0 +1,85 @@
+{
+  "appName": "भेटकेयर",
+  "sidebar": {
+    "dashboard": "ड्यासबोर्ड",
+    "farmerProfiles": "किसान प्रोफाइलहरू",
+    "appointments": "भेटघाटहरू",
+    "messages": "सन्देशहरू",
+    "friendRequests": "साथी अनुरोधहरू",
+    "friendsList": "साथीहरूको सूची",
+    "settings": "सेटिङहरू",
+    "logout": "लगआउट"
+  },
+  "dashboard": {
+    "title": "ड्यासबोर्ड",
+    "welcome": "भेटकेयर ड्यासबोर्डमा स्वागत छ",
+    "welcomeMessage": "आफ्नो पशु चिकित्सा अभ्यास कुशलतापूर्वक व्यवस्थापन गर्नुहोस्। उपचारहरू ट्र्याक गर्नुहोस्, भेटघाटहरू निगरानी गर्नुहोस्, र तपाईंको नेटवर्कमा किसानहरूसँग जडान रहनुहोस्।",
+    "stats": {
+      "farmersTreated": "उपचार गरिएका किसानहरू",
+      "animalsTreated": "उपचार गरिएका जनावरहरू",
+      "pendingAppointments": "बाँकी भेटघाटहरू",
+      "todaysAccepted": "आजको स्वीकृत"
+    },
+    "actions": {
+      "searchFarmer": "किसान खोज्नुहोस्",
+      "addTreatment": "उपचार थप्नुहोस्",
+      "addVaccination": "खोप थप्नुहोस्",
+      "viewMedicalHistory": "चिकित्सा इतिहास हेर्नुहोस्"
+    },
+    "recentActivities": "हालको गतिविधिहरू",
+    "pendingTasks": "बाँकी कार्यहरू र सतर्कताहरू",
+    "allTasksComplete": "सबै कार्यहरू पूरा भयो!",
+    "noPendingAlerts": "यस समयमा कुनै बाँकी सतर्कता छैन",
+    "noRecentActivities": "कुनै हालको गतिविधि छैन",
+    "loading": "किसान प्रोफाइलहरू लोड गर्दै...",
+    "retry": "पुन: प्रयास गर्नुहोस्",
+    "errorMessage": "ड्यासबोर्ड डेटा लोड गर्न असफल भयो। कृपया पुन: प्रयास गर्नुहोस्।",
+    "timeAgo": {
+      "justNow": "अहिले भर्खरै",
+      "minutesAgo": "{{count}} मिनेट अघि",
+      "hoursAgo": "{{count}} घण्टा अघि",
+      "daysAgo": "{{count}} दिन अघि"
+    },
+    "alerts": {
+      "overdue": "{{count}} दिन ढिलो भयो",
+      "dueIn": "{{count}} दिनमा"
+    }
+  },
+  "farmerProfiles": {
+    "title": "किसान प्रोफाइलहरू",
+    "welcome": "किसान प्रोफाइलहरूमा स्वागत छ",
+    "welcomeMessage": "तपाईंको नेटवर्कमा किसानहरूसँग व्यवस्थापन र जडान गर्नुहोस्। खोज्नुहोस्, प्रोफाइलहरू हेर्नुहोस्, र तिनीहरूको पशुधन जानकारीसँग अद्यावधिक रहनुहोस्।",
+    "registeredFarmers": "{{count}} दर्ता गरिएका किसानहरू",
+    "loading": "किसान प्रोफाइलहरू लोड गर्दै...",
+    "noFarmersFound": "\"{{query}}\" सँग मिल्ने कुनै किसान फेला परेन",
+    "noRegisteredFarmers": "कुनै दर्ता गरिएका किसानहरू फेला परेनन्",
+    "searchPlaceholder": "नाम, फोन वा किसान आईडी द्वारा खोज्नुहोस्...",
+    "animals": "{{count}} जनावरहरू",
+    "viewAnimals": "जनावरहरू हेर्नुहोस्",
+    "message": "सन्देश",
+    "pending": "बाँकी",
+    "addFriend": "साथी थप्नुहोस्",
+    "sending": "पठाउँदै...",
+    "friendRequestSent": "साथी अनुरोध सफलतापूर्वक पठाइयो!",
+    "messagingComingSoon": "सन्देश सुविधा चाँडै आउँदैछ!"
+  },
+  "friendRequests": {
+    "title": "साथी अनुरोधहरू",
+    "loading": "साथी अनुरोधहरू लोड गर्दै...",
+    "noPendingRequests": "कुनै बाँकी साथी अनुरोधहरू छैनन्",
+    "accept": "स्वीकार गर्नुहोस्",
+    "reject": "अस्वीकार गर्नुहोस्",
+    "requestAccepted": "साथी अनुरोध स्वीकार गरियो!",
+    "requestRejected": "साथी अनुरोध अस्वीकार गरियो"
+  },
+  "friendsList": {
+    "title": "मेरा साथीहरू",
+    "loading": "साथीहरू लोड गर्दै...",
+    "noFriends": "अहिलेसम्म कुनै साथी छैनन्",
+    "noFriendsDescription": "किसानहरूसँग जोडिन साथी अनुरोध पठाउनुहोस्",
+    "message": "सन्देश",
+    "unfriend": "साथी हटाउनुहोस्",
+    "unfriendConfirm": "{{name}} लाई साथी हटाउने?",
+    "friendRemoved": "साथी सफलतापूर्वक हटाइयो"
+  }
+}

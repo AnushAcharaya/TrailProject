@@ -1,0 +1,78 @@
+{
+  "success": {
+    "verifying": {
+      "title": "Verifying Payment",
+      "message": "Please wait while we verify your payment..."
+    },
+    "title": "Payment Successful!",
+    "appointmentMessage": "Your appointment has been confirmed and payment has been processed successfully.",
+    "insuranceMessage": "Your payment has been processed successfully. Please continue with the enrollment process.",
+    "details": {
+      "paymentId": "Payment ID",
+      "status": "Status",
+      "referenceId": "Reference ID"
+    },
+    "redirecting": {
+      "appointment": "Redirecting to appointments page in 3 seconds...",
+      "insurance": "Redirecting back to enrollment in 2 seconds..."
+    },
+    "buttons": {
+      "goToAppointments": "Go to Appointments Now",
+      "continueEnrollment": "Continue Enrollment"
+    }
+  },
+  "failure": {
+    "title": "Payment Failed",
+    "message": "Unfortunately, your payment could not be processed. This could be due to:",
+    "reasons": {
+      "cancelled": "Payment was cancelled",
+      "insufficientBalance": "Insufficient balance in your eSewa account",
+      "networkIssues": "Network or connection issues",
+      "technicalError": "Technical error during payment processing"
+    },
+    "buttons": {
+      "tryAgain": "Try Again",
+      "goToAppointments": "Go to Appointments"
+    },
+    "support": "Need help? Contact support for assistance."
+  },
+  "verification": {
+    "failed": {
+      "title": "Verification Failed",
+      "button": "Go Back"
+    },
+    "invalidParameters": "Invalid payment callback parameters"
+  },
+  "paymentMethod": {
+    "title": "Select Payment Method",
+    "appointmentFee": "Appointment Fee",
+    "methods": {
+      "esewa": {
+        "name": "eSewa",
+        "description": "Pay securely with eSewa",
+        "note": "You will be redirected to eSewa to complete the payment securely."
+      },
+      "cash": {
+        "name": "Cash",
+        "description": "Pay in cash at the clinic",
+        "note": "You will need to pay Rs. {{amount}} in cash when you visit the clinic."
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "proceed": "Proceed",
+      "processing": "Processing..."
+    },
+    "validation": {
+      "selectMethod": "Please select a payment method"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "processing": "Processing...",
+    "verifying": "Verifying...",
+    "redirecting": "Redirecting..."
+  }
+}

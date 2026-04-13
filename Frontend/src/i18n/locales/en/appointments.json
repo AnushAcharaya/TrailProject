@@ -1,0 +1,180 @@
+{
+  "farmer": {
+    "pageTitle": "Vet Appointments",
+    "welcome": "Welcome back, {{name}}!",
+    "requestAppointment": "Request Appointment",
+    "searchPlaceholder": "Search vets by name, specialization, or location...",
+    "stats": {
+      "total": "Total Appointments",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed"
+    },
+    "vets": {
+      "title": "Available Veterinarians",
+      "subtitle": "Browse our network of qualified veterinarians and book an appointment",
+      "loading": "Loading veterinarians...",
+      "noResults": "No veterinarians found matching \"{{query}}\"",
+      "noVets": "No veterinarians available",
+      "appointButton": "Book Appointment",
+      "addFriend": "Add Friend",
+      "sending": "Sending...",
+      "message": "Message",
+      "friendPending": "Pending"
+    },
+    "appointments": {
+      "title": "Your Appointments",
+      "noAppointments": "No appointments yet",
+      "viewDetails": "View Details"
+    }
+  },
+  "vet": {
+    "pageTitle": "Appointments",
+    "title": "Appointment Management",
+    "searchPlaceholder": "Search patients or animals...",
+    "loading": "Loading appointments...",
+    "noAppointments": "No appointments yet.",
+    "noResults": "No appointments found matching your search.",
+    "error": "Failed to load appointments. Please try again.",
+    "requested": "requested",
+    "preferred": "Preferred",
+    "at": "at",
+    "notes": "Notes",
+    "processing": "Processing...",
+    "unknownFarmer": "Unknown Farmer",
+    "unknownAnimal": "Unknown Animal",
+    "paymentStatus": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "failed": "Failed",
+      "notRequired": "Not Required",
+      "unknown": "Unknown"
+    },
+    "paymentMethod": {
+      "esewa": "eSewa",
+      "cash": "Cash",
+      "na": "N/A"
+    },
+    "errors": {
+      "approveFailed": "Failed to approve appointment",
+      "actionFailed": "Failed to {{action}} appointment"
+    },
+    "actions": {
+      "approve": "Approve",
+      "decline": "Decline",
+      "complete": "Complete",
+      "viewDetails": "View Details"
+    },
+    "modal": {
+      "declineTitle": "Decline Appointment",
+      "completeTitle": "Complete Appointment",
+      "declinePrompt": "Please provide a reason for declining this appointment:",
+      "completePrompt": "Please add any notes about this completed appointment:",
+      "notesPlaceholder": "Enter notes here...",
+      "cancel": "Cancel"
+    },
+    "detailsModal": {
+      "title": "Appointment Details",
+      "farmer": "Farmer",
+      "animalType": "Animal Type",
+      "dateTime": "Date & Time",
+      "status": "Status",
+      "paymentMethod": "Payment Method",
+      "paymentStatus": "Payment Status",
+      "appointmentFee": "Appointment Fee",
+      "reason": "Reason",
+      "vetNotes": "Vet Notes",
+      "close": "Close"
+    }
+  },
+  "form": {
+    "title": "Request Appointment",
+    "selectVet": "Select Veterinarian",
+    "required": "*",
+    "vetSearch": "Search veterinarian by name or specialization...",
+    "vetLoading": "Loading veterinarians...",
+    "vetNoResults": "No veterinarians found matching \"{{query}}\"",
+    "vetSelected": "Selected: {{name}}",
+    "animalType": "Animal Type",
+    "selectAnimal": "Select animal type",
+    "animals": {
+      "cattle": "Cattle",
+      "sheep": "Sheep",
+      "goat": "Goat",
+      "pig": "Pig",
+      "poultry": "Poultry"
+    },
+    "reason": "Reason for Visit",
+    "reasonPlaceholder": "Describe the issue or reason for the appointment...",
+    "preferredDate": "Preferred Date",
+    "preferredTime": "Preferred Time",
+    "buttons": {
+      "cancel": "Cancel",
+      "submit": "Request Appointment",
+      "submitting": "Submitting..."
+    },
+    "messages": {
+      "success": "✓ Appointment request submitted successfully! Redirecting...",
+      "error": "Failed to create appointment. Please try again.",
+      "paymentRequired": "Payment required for this appointment"
+    }
+  },
+  "card": {
+    "appointmentId": "Appointment #{{id}}",
+    "farmer": "Farmer",
+    "vet": "Veterinarian",
+    "animal": "Animal",
+    "date": "Date",
+    "time": "Time",
+    "reason": "Reason",
+    "status": "Status",
+    "fee": "Fee",
+    "actions": "Actions"
+  },
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "rejected": "Rejected"
+  },
+  "actions": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "complete": "Mark Complete",
+    "cancel": "Cancel",
+    "reschedule": "Reschedule",
+    "viewDetails": "View Details"
+  },
+  "payment": {
+    "title": "Payment Method",
+    "selectMethod": "Select payment method for your appointment",
+    "methods": {
+      "cash": "Cash Payment",
+      "cashDesc": "Pay at the clinic",
+      "esewa": "eSewa",
+      "esewaDesc": "Pay online with eSewa"
+    },
+    "fee": "Appointment Fee",
+    "buttons": {
+      "cancel": "Cancel",
+      "proceed": "Proceed with Payment"
+    },
+    "messages": {
+      "cashSuccess": "Appointment created! Please pay in cash at the clinic.",
+      "paymentFailed": "Failed to initiate payment. Please try again."
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "noData": "No data available",
+    "search": "Search",
+    "filter": "Filter",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close"
+  }
+}

@@ -11,15 +11,14 @@
   box-sizing: border-box;
 }
 
-/* Header with Title and Button */
+/* Header with Button */
 .livestock-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 2rem;
-  padding: 1.5rem 2rem;
+  padding: 0 2rem;
   gap: 1rem;
-  border-bottom: 2px solid rgba(251, 191, 36, 0.2);
 }
 
 /* Page Title */

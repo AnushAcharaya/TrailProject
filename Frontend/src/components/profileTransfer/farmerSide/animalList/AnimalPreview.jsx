@@ -1,5 +1,9 @@
 // components/profile-transfer/farmer-side/animal-list/components/AnimalPreview.jsx
+import { useTranslation } from 'react-i18next';
+
 export default function AnimalPreview({ animal }) {
+  const { t } = useTranslation('profileTransfer');
+  
   return (
     <div className="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-200/50">
       <div className="flex items-start space-x-4">

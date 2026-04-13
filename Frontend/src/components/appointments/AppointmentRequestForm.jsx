@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FiCalendar, FiUser, FiFileText, FiClock } from "react-icons/fi";
 import { MdPets } from "react-icons/md";
 import { getAllVets } from "../../services/profileApi";
@@ -9,6 +10,7 @@ import PaymentMethodModal from "./PaymentMethodModal";
 import "../../styles/appointments.css";
 
 const AppointmentRequestForm = () => {
+  const { t } = useTranslation('appointments');
   const navigate = useNavigate();
   const [vets, setVets] = useState([]);
   const [isLoadingVets, setIsLoadingVets] = useState(true);
@@ -147,7 +149,7 @@ const AppointmentRequestForm = () => {
       
     } catch (err) {
       console.error("Error creating appointment:", err);
-      setError(err.response?.data?.message || err.response?.data?.detail || "Failed to create appointment. Please try again.");
+      setError(err.response?.data?.message || err.response?.data?.detail || t('form.messages.error'));
       setIsSubmitting(false);
     }
   };
@@ -161,7 +163,7 @@ const AppointmentRequestForm = () => {
         navigate('/appointments', { 
           state: { 
             appointmentCreated: true,
-            message: 'Appointment created! Please pay in cash at the clinic.'
+            message: t('payment.messages.cashSuccess')
           } 
         });
       }, 2000);
@@ -185,7 +187,7 @@ const AppointmentRequestForm = () => {
         }
       } catch (err) {
         console.error('Payment initiation error:', err);
-        setError('Failed to initiate payment. Please try again.');
+        setError(t('payment.messages.paymentFailed'));
         setShowPaymentModal(false);
         setIsSubmitting(false);
       }
@@ -203,7 +205,7 @@ const AppointmentRequestForm = () => {
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-green-800 font-medium">
-              ✓ Appointment request submitted successfully! Redirecting...
+              {t('form.messages.success')}
             </p>
           </div>
         )}
@@ -222,7 +224,7 @@ const AppointmentRequestForm = () => {
             <FiUser className="text-green-600" size={20} />
           </div>
           <label className="block text-sm font-medium text-gray-700">
-            Select Veterinarian <span className="text-red-500">*</span>
+            {t('form.selectVet')} <span className="text-red-500">{t('form.required')}</span>
           </label>
         </div>
         
@@ -233,7 +235,7 @@ const AppointmentRequestForm = () => {
             value={vetSearchQuery}
             onChange={(e) => handleVetSearch(e.target.value)}
             onFocus={() => setShowVetDropdown(true)}
-            placeholder="Search veterinarian by name or specialization..."
+            placeholder={t('form.vetSearch')}
             required
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-700"
           />
@@ -268,14 +270,14 @@ const AppointmentRequestForm = () => {
           {/* No Results Message */}
           {showVetDropdown && !isLoadingVets && vetSearchQuery && filteredVets.length === 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
-              <p className="text-gray-500 text-sm">No veterinarians found matching "{vetSearchQuery}"</p>
+              <p className="text-gray-500 text-sm">{t('form.vetNoResults', { query: vetSearchQuery })}</p>
             </div>
           )}
           
           {/* Loading Message */}
           {isLoadingVets && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
-              <p className="text-gray-500 text-sm">Loading veterinarians...</p>
+              <p className="text-gray-500 text-sm">{t('form.vetLoading')}</p>
             </div>
           )}
         </div>
@@ -284,7 +286,7 @@ const AppointmentRequestForm = () => {
         {selectedVet && (
           <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-sm text-green-800">
-              <span className="font-medium">Selected:</span> {selectedVet.full_name || selectedVet.username}
+              {t('form.vetSelected', { name: selectedVet.full_name || selectedVet.username })}
               {selectedVet.specialization && ` - ${selectedVet.specialization}`}
             </p>
           </div>
@@ -299,7 +301,7 @@ const AppointmentRequestForm = () => {
               <MdPets className="text-blue-600" size={22} />
             </div>
             <label className="block text-sm font-medium text-gray-700">
-              Animal Type <span className="text-red-500">*</span>
+              {t('form.animalType')} <span className="text-red-500">{t('form.required')}</span>
             </label>
           </div>
           <select
@@ -309,12 +311,12 @@ const AppointmentRequestForm = () => {
             required
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-700"
           >
-            <option value="">Select animal type</option>
-            <option value="cattle">Cattle</option>
-            <option value="sheep">Sheep</option>
-            <option value="goat">Goat</option>
-            <option value="pig">Pig</option>
-            <option value="poultry">Poultry</option>
+            <option value="">{t('form.selectAnimal')}</option>
+            <option value="cattle">{t('form.animals.cattle')}</option>
+            <option value="sheep">{t('form.animals.sheep')}</option>
+            <option value="goat">{t('form.animals.goat')}</option>
+            <option value="pig">{t('form.animals.pig')}</option>
+            <option value="poultry">{t('form.animals.poultry')}</option>
           </select>
         </div>
 
@@ -324,7 +326,7 @@ const AppointmentRequestForm = () => {
               <FiFileText className="text-purple-600" size={20} />
             </div>
             <label className="block text-sm font-medium text-gray-700">
-              Reason for Visit <span className="text-red-500">*</span>
+              {t('form.reason')} <span className="text-red-500">{t('form.required')}</span>
             </label>
           </div>
           <textarea
@@ -333,7 +335,7 @@ const AppointmentRequestForm = () => {
             onChange={handleChange}
             required
             rows="4"
-            placeholder="Describe the issue or reason for the appointment..."
+            placeholder={t('form.reasonPlaceholder')}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none text-gray-700"
           />
         </div>
@@ -349,7 +351,7 @@ const AppointmentRequestForm = () => {
                 <FiCalendar className="text-orange-600" size={20} />
               </div>
               <label className="block text-sm font-medium text-gray-700">
-                Preferred Date <span className="text-red-500">*</span>
+                {t('form.preferredDate')} <span className="text-red-500">{t('form.required')}</span>
               </label>
             </div>
             <div className="relative">
@@ -371,7 +373,7 @@ const AppointmentRequestForm = () => {
                 <FiClock className="text-teal-600" size={20} />
               </div>
               <label className="block text-sm font-medium text-gray-700">
-                Preferred Time <span className="text-red-500">*</span>
+                {t('form.preferredTime')} <span className="text-red-500">{t('form.required')}</span>
               </label>
             </div>
             <div className="grid grid-cols-3 gap-2">
@@ -402,14 +404,14 @@ const AppointmentRequestForm = () => {
           disabled={isSubmitting}
           className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Cancel
+          {t('form.buttons.cancel')}
         </button>
         <button
           type="submit"
           disabled={isSubmitting || success}
           className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? "Submitting..." : "Request Appointment"}
+          {isSubmitting ? t('form.buttons.submitting') : t('form.buttons.submit')}
         </button>
       </div>
     </form>

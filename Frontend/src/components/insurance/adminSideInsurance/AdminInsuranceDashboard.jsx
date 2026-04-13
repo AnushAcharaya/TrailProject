@@ -1,14 +1,16 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import EnrollmentInsurances from './EnrollmentInsurances';
 import ClaimInsurances from './ClaimInsurances';
 
 const AdminInsuranceDashboard = () => {
+  const { t } = useTranslation('insurance');
   const [activeTab, setActiveTab] = useState('enrollments');
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Insurance Management</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">{t('admin.dashboard.title')}</h1>
         
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow-sm mb-6">
@@ -21,7 +23,7 @@ const AdminInsuranceDashboard = () => {
                   : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
               }`}
             >
-              Enrollment Insurances
+              {t('admin.dashboard.tabs.enrollments')}
             </button>
             <button
               onClick={() => setActiveTab('claims')}
@@ -31,7 +33,7 @@ const AdminInsuranceDashboard = () => {
                   : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
               }`}
             >
-              Claim Insurances
+              {t('admin.dashboard.tabs.claims')}
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 // ProfileCard.jsx
-import React from "react";
 import { FaUserCircle, FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const BRAND = {
   primary: "#2E7D32",
@@ -14,6 +14,8 @@ const BRAND = {
 };
 
 const ProfileCard = ({ user }) => {
+  const { t } = useTranslation('profile');
+  
   return (
     <div
       className="rounded-lg shadow-sm border p-5 text-center transition-all duration-200"
@@ -58,13 +60,13 @@ const ProfileCard = ({ user }) => {
         className="text-xl font-semibold mt-3"
         style={{ color: BRAND.textDark }}
       >
-        {user?.full_name || "Loading..."}
+        {user?.full_name || t('profileCard.loading')}
       </h2>
       <h4
         className="text-sm font-semibold mt-1 capitalize"
         style={{ color: BRAND.primary }}
       >
-        {user?.role || "Loading..."}
+        {user?.role || t('profileCard.loading')}
       </h4>
       <p className="text-xs" style={{ color: BRAND.textLight }}>
         @{user?.username}
@@ -72,11 +74,11 @@ const ProfileCard = ({ user }) => {
       {/* Gender Display */}
       {user?.gender && (
         <p className="text-xs mt-1" style={{ color: BRAND.textMedium }}>
-          <span className="font-medium">Gender:</span> {user.gender.charAt(0).toUpperCase() + user.gender.slice(1)}
+          <span className="font-medium">{t('profileCard.gender')}</span> {user.gender.charAt(0).toUpperCase() + user.gender.slice(1)}
         </p>
       )}
       <p className="mt-2 text-sm" style={{ color: BRAND.textMedium }}>
-        {user?.bio || "No bio yet"}
+        {user?.bio || t('profileCard.noBio')}
       </p>
 
       {/* Info */}
@@ -85,11 +87,11 @@ const ProfileCard = ({ user }) => {
         <p>{user?.phone}</p>
         <div className="flex items-center justify-center gap-2">
           <FaMapMarkerAlt style={{ color: "#E53935" }} />
-          <span>{user?.location || "No location set"}</span>
+          <span>{user?.location || t('profileCard.noLocation')}</span>
         </div>
         <div className="flex items-center justify-center gap-2">
           <FaCalendarAlt style={{ color: BRAND.primaryLight }} />
-          <span>Joined {user?.date_joined ? new Date(user.date_joined).toLocaleDateString() : "N/A"}</span>
+          <span>{t('profileCard.joined')} {user?.date_joined ? new Date(user.date_joined).toLocaleDateString() : "N/A"}</span>
         </div>
       </div>
     </div>

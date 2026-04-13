@@ -1,13 +1,15 @@
+import { useTranslation } from 'react-i18next';
 import CoverageList from './CoverageList';
 import { FaShieldAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const PlanCard = ({ name, price, months, coverages, id }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('insurance');
 
   const handleEnroll = () => {
-    // Extract coverage text from objects
-    const coverageTexts = coverages.map(c => c.text);
+    // Extract coverage text from objects and translate them
+    const coverageTexts = coverages.map(c => t(`plans.${c.text}`));
     
     // Pass the selected plan data to the enrollment page
     navigate('/farmerinsuranceenroll', {
@@ -30,13 +32,13 @@ const PlanCard = ({ name, price, months, coverages, id }) => {
         <div className="shield-icon">
           <FaShieldAlt />
         </div>
-        <span className="months-badge">{months}</span>
+        <span className="months-badge">{t('plans.duration', { count: months })}</span>
       </div>
       
       <h3 className="plan-name">{name}</h3>
       
       <div className="price-section">
-        <span className="plan-price">{price}</span>
+        <span className="plan-price">{t('plans.price', { amount: price })}</span>
         <div className="coverage-text">Coverage</div>
       </div>
       
@@ -44,13 +46,13 @@ const PlanCard = ({ name, price, months, coverages, id }) => {
       
       <div className="button-group">
         <button className="btn-view-details">
-          View Details
+          {t('plans.buttons.viewDetails')}
         </button>
         <button 
           className="btn-enroll"
           onClick={handleEnroll}
         >
-          Enroll
+          {t('plans.buttons.enrollNow')}
         </button>
       </div>
     </div>

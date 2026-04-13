@@ -1,5 +1,6 @@
 import { FaShieldAlt } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getActiveEnrollments } from '../../../../services/insuranceApi';
 
 const ClaimDetailsForm = ({
@@ -11,6 +12,7 @@ const ClaimDetailsForm = ({
   enrollment,
   onChange
 }) => {
+  const { t } = useTranslation('insurance');
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,14 +36,14 @@ const ClaimDetailsForm = ({
     <div className="form-section">
       <h3 className="section-title">
         <FaShieldAlt className="w-6 h-6 text-emerald-600" />
-        Claim Details
+        {t('submitClaim.form.claimDetails')}
       </h3>
       
       {/* Insurance Enrollment Selection */}
       <div className="form-group">
-        <label className="form-label">Insurance Enrollment *</label>
+        <label className="form-label">{t('submitClaim.form.insuranceEnrollment')} *</label>
         {loading ? (
-          <p className="text-sm text-gray-500">Loading enrollments...</p>
+          <p className="text-sm text-gray-500">{t('submitClaim.form.loadingEnrollments')}</p>
         ) : (
           <select
             className="form-select"
@@ -49,48 +51,48 @@ const ClaimDetailsForm = ({
             onChange={(e) => onChange('enrollment', e.target.value)}
             required
           >
-            <option value="">Select insured livestock...</option>
+            <option value="">{t('submitClaim.form.selectEnrollment')}</option>
             {enrollments.map((enroll) => (
               <option key={enroll.id} value={enroll.id}>
                 {enroll.livestock_details?.tag_id} - {enroll.plan_details?.name} 
-                (Coverage: NPR {enroll.plan_details?.coverage_amount})
+                ({t('submitClaim.form.coverage')}: NPR {enroll.plan_details?.coverage_amount})
               </option>
             ))}
           </select>
         )}
         {!loading && enrollments.length === 0 && (
           <p className="text-sm text-red-500 mt-1">
-            No active insurance enrollments found. Please enroll livestock first.
+            {t('submitClaim.form.noEnrollments')}
           </p>
         )}
       </div>
 
       <div className="form-group">
-        <label className="form-label">Claim Type *</label>
+        <label className="form-label">{t('submitClaim.form.claimType')} *</label>
         <select
           className="form-select"
           value={claimType}
           onChange={(e) => onChange('claimType', e.target.value)}
           required
         >
-          <option value="">Select claim type...</option>
-          <option value="Death">Death</option>
-          <option value="Theft">Theft</option>
-          <option value="Disease">Disease</option>
-          <option value="Accident">Accident</option>
-          <option value="Natural Disaster">Natural Disaster</option>
-          <option value="Other">Other</option>
+          <option value="">{t('submitClaim.form.selectType')}</option>
+          <option value="Death">{t('submitClaim.claimTypes.death')}</option>
+          <option value="Theft">{t('submitClaim.claimTypes.theft')}</option>
+          <option value="Disease">{t('submitClaim.claimTypes.disease')}</option>
+          <option value="Accident">{t('submitClaim.claimTypes.accident')}</option>
+          <option value="Natural Disaster">{t('submitClaim.claimTypes.naturalDisaster')}</option>
+          <option value="Other">{t('submitClaim.claimTypes.other')}</option>
         </select>
       </div>
 
       <div className="form-group">
-        <label className="form-label">Claim Amount (NPR) *</label>
+        <label className="form-label">{t('submitClaim.form.amount')} *</label>
         <input
           type="number"
           className="form-input"
           value={claimAmount || ''}
           onChange={(e) => onChange('claimAmount', e.target.value)}
-          placeholder="Enter claim amount..."
+          placeholder={t('submitClaim.form.amountPlaceholder')}
           min="0"
           step="0.01"
           required
@@ -98,7 +100,7 @@ const ClaimDetailsForm = ({
       </div>
 
       <div className="form-group">
-        <label className="form-label">Incident Date *</label>
+        <label className="form-label">{t('submitClaim.form.incidentDate')} *</label>
         <input
           type="date"
           className="form-input"
@@ -109,22 +111,22 @@ const ClaimDetailsForm = ({
       </div>
 
       <div className="form-group">
-        <label className="form-label">Incident Location *</label>
+        <label className="form-label">{t('submitClaim.form.location')} *</label>
         <input
           type="text"
           className="form-input"
           value={incidentLocation || ''}
           onChange={(e) => onChange('incidentLocation', e.target.value)}
-          placeholder="Enter location where incident occurred..."
+          placeholder={t('submitClaim.form.locationPlaceholder')}
           required
         />
       </div>
 
       <div className="form-group">
-        <label className="form-label">Description *</label>
+        <label className="form-label">{t('submitClaim.form.description')} *</label>
         <textarea
           className="form-input"
-          placeholder="Provide detailed description of the incident..."
+          placeholder={t('submitClaim.form.descriptionPlaceholder')}
           value={description}
           onChange={(e) => onChange('description', e.target.value)}
           rows="4"

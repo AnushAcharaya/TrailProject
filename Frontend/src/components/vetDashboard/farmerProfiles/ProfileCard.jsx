@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { sendFriendRequest, checkFriendshipStatus } from '../../../services/friendsApi';
 
 function ProfileCard({ farmer }) {
   const navigate = useNavigate();
+  const { t } = useTranslation('vetDashboard');
   const [isSendingRequest, setIsSendingRequest] = useState(false);
   const [friendshipStatus, setFriendshipStatus] = useState('none'); // 'none', 'pending', 'friends'
   const [showToast, setShowToast] = useState(false);
@@ -45,7 +47,7 @@ function ProfileCard({ farmer }) {
     
     if (result.success) {
       setFriendshipStatus('pending');
-      showNotification('Friend request sent successfully!', 'success');
+      showNotification(t('farmerProfiles.friendRequestSent'), 'success');
     } else {
       showNotification(result.error, 'error');
       // Reload status in case the error was due to existing request
@@ -56,7 +58,7 @@ function ProfileCard({ farmer }) {
   };
 
   const handleMessage = () => {
-    showNotification('Messaging feature coming soon!', 'info');
+    showNotification(t('farmerProfiles.messagingComingSoon'), 'info');
   };
 
   const renderActionButton = () => {
@@ -67,7 +69,7 @@ function ProfileCard({ farmer }) {
           className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           <FaEnvelope className="w-4 h-4" />
-          Message
+          {t('farmerProfiles.message')}
         </button>
       );
     }
@@ -81,7 +83,7 @@ function ProfileCard({ farmer }) {
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
           </svg>
-          Pending
+          {t('farmerProfiles.pending')}
         </button>
       );
     }
@@ -95,7 +97,7 @@ function ProfileCard({ farmer }) {
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
           <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
         </svg>
-        {isSendingRequest ? 'Sending...' : 'Add Friend'}
+        {isSendingRequest ? t('farmerProfiles.sending') : t('farmerProfiles.addFriend')}
       </button>
     );
   };
@@ -139,7 +141,7 @@ function ProfileCard({ farmer }) {
         </div>
         
         {/* Animals count */}
-        <p className="text-sm text-gray-500 mb-4">{farmer.animal_count || 0} animals</p>
+        <p className="text-sm text-gray-500 mb-4">{t('farmerProfiles.animals', { count: farmer.animal_count || 0 })}</p>
         
         {/* Action Buttons */}
         <div className="flex flex-col gap-2">
@@ -147,7 +149,7 @@ function ProfileCard({ farmer }) {
             onClick={handleViewAnimals}
             className="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors"
           >
-            View Animals
+            {t('farmerProfiles.viewAnimals')}
           </button>
           {renderActionButton()}
         </div>

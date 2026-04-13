@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (RegisterView, VerifyEmailView, ResendVerificationView, SendPhoneOTPView, 
                     VerifyPhoneOTPView, LoginView, ForgotPasswordEmailView, VerifyTokenView, 
-                    ResetPasswordView, AdminUserListView, ApproveUserView, DeclineUserView,
+                    ResetPasswordView, AdminUserListView, AdminDashboardStatsView, ApproveUserView, DeclineUserView,
                     SendLoginOTPView, VerifyLoginOTPView)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -24,6 +24,7 @@ urlpatterns = [
     
     # Admin endpoints
     path('admin/users/', AdminUserListView.as_view(), name='admin-user-list'),
+    path('admin/dashboard/stats/', AdminDashboardStatsView.as_view(), name='admin-dashboard-stats'),
     path('admin/users/<int:user_id>/approve/', ApproveUserView.as_view(), name='approve-user'),
     path('admin/users/<int:user_id>/decline/', DeclineUserView.as_view(), name='decline-user'),
     

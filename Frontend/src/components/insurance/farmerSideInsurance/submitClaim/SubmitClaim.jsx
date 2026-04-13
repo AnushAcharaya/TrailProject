@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ClaimDetailsForm from './ClaimDetailsForm';
 import VaccinationHistory from './VaccinationHistory';
 import MedicalHistory from './MedicalHistory';
@@ -8,6 +9,7 @@ import { FaPaperPlane, FaFileImage, FaCheckCircle } from 'react-icons/fa';
 import { createClaim } from '../../../../services/insuranceApi';
 
 const SubmitClaim = () => {
+  const { t } = useTranslation('insurance');
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     enrollment: '',
@@ -96,7 +98,7 @@ const SubmitClaim = () => {
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-slide-down">
           <div className="bg-emerald-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3">
             <FaCheckCircle className="w-6 h-6" />
-            <span className="font-medium text-lg">Claim submitted successfully!</span>
+            <span className="font-medium text-lg">{t('submitClaim.messages.success')}</span>
           </div>
         </div>
       )}
@@ -117,9 +119,9 @@ const SubmitClaim = () => {
       )}
 
       <div className="main-form-card">
-        <h2 className="form-title">Submit a Claim</h2>
+        <h2 className="form-title">{t('submitClaim.title')}</h2>
         <p className="text-gray-600 mb-8 text-lg">
-          Fill in claim details and vaccination history to attach
+          {t('submitClaim.subtitle')}
         </p>
 
         <div className="form-grid">
@@ -149,7 +151,7 @@ const SubmitClaim = () => {
           
           <div>
             <div className="form-group">
-              <label className="form-label">Upload Images</label>
+              <label className="form-label">{t('submitClaim.form.uploadImage')}</label>
               <FileUpload onFileSelect={handleFileSelect} />
               {formData.uploadedFile && (
                 <div className="file-info">
@@ -185,7 +187,7 @@ const SubmitClaim = () => {
             }
           >
             <FaPaperPlane className="w-5 h-5" />
-            {submitting ? 'Submitting...' : 'Submit Claim'}
+            {submitting ? t('submitClaim.messages.submitting') : t('submitClaim.buttons.submit')}
           </button>
         </div>
       </div>

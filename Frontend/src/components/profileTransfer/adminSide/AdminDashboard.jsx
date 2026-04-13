@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import AdminLayout from './AdminLayout';
 import StatsCard from './StatsCard';
 import TransferTable from './TransferTable';
 import { getTransfers } from '../../../services/profileTransferApi';
 
 function AdminDashboard() {
+  const { t } = useTranslation('profileTransfer');
   const [transfers, setTransfers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState([
-    { value: 0, label: 'Pending Transfers', color: 'yellow' },
-    { value: 0, label: 'Approved Transfer', color: 'blue' },
-    { value: 0, label: 'Rejected Transfer', color: 'red' },
-    { value: 0, label: 'Total Transfers', color: 'green' }
+    { value: 0, label: t('adminDashboard.stats.pending'), color: 'yellow' },
+    { value: 0, label: t('adminDashboard.stats.approved'), color: 'blue' },
+    { value: 0, label: t('adminDashboard.stats.rejected'), color: 'red' },
+    { value: 0, label: t('adminDashboard.stats.total'), color: 'green' }
   ]);
 
   // Fetch transfers on component mount
@@ -41,10 +43,10 @@ function AdminDashboard() {
       const rejectedCount = data.filter(t => t.status === 'Rejected').length;
       
       setStats([
-        { value: pendingCount, label: 'Pending Transfers', color: 'yellow' },
-        { value: approvedCount, label: 'Approved Transfer', color: 'blue' },
-        { value: rejectedCount, label: 'Rejected Transfer', color: 'red' },
-        { value: data.length, label: 'Total Transfers', color: 'green' }
+        { value: pendingCount, label: t('adminDashboard.stats.pending'), color: 'yellow' },
+        { value: approvedCount, label: t('adminDashboard.stats.approved'), color: 'blue' },
+        { value: rejectedCount, label: t('adminDashboard.stats.rejected'), color: 'red' },
+        { value: data.length, label: t('adminDashboard.stats.total'), color: 'green' }
       ]);
       
       // Transform API data to match table format
@@ -89,7 +91,7 @@ function AdminDashboard() {
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading dashboard...</p>
+            <p className="text-gray-600">{t('adminDashboard.loading')}</p>
           </div>
         </div>
       </AdminLayout>
@@ -107,7 +109,7 @@ function AdminDashboard() {
               onClick={fetchTransfers}
               className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
             >
-              Retry
+              {t('adminDashboard.retry')}
             </button>
           </div>
         </div>
@@ -129,7 +131,7 @@ function AdminDashboard() {
         {/* Transfers Table */}
         {transfers.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500 text-lg">No transfers found.</p>
+            <p className="text-gray-500 text-lg">{t('adminDashboard.noTransfers')}</p>
           </div>
         ) : (
           <TransferTable data={transfers} onUpdate={fetchTransfers} />

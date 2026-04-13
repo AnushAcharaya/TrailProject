@@ -1,5 +1,6 @@
 // SettingsTab.jsx
-import React, { useState } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { updatePreferences } from "../../services/profileApi";
 
 // Brand colors (from your palette)
@@ -48,14 +49,18 @@ const ToggleSwitch = ({ checked, onChange, onLabel = "ON", offLabel = "OFF", dis
 };
 
 const SettingsTab = ({ preferences = {}, onUpdate }) => {
+  const { t, i18n } = useTranslation('profile');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState(null);
   
+  // Use i18n's current language as the source of truth
+  const currentLanguage = i18n.language;
+  
   // provide safe defaults so buttons always work
   const {
     theme = "light",
-    language = "en",
+    language = currentLanguage,
     emailNotifications = true,
     pushNotifications = false,
   } = preferences;
@@ -69,7 +74,7 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
     
     if (result.success) {
       onUpdate(result.data);
-      setStatus("Preferences updated successfully!");
+      setStatus(t('settingsTab.messages.success'));
       setTimeout(() => setStatus(null), 2000);
     } else {
       const errorMsg = result.error?.theme?.[0] || 
@@ -77,7 +82,7 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
                        result.error?.email_notifications?.[0] ||
                        result.error?.push_notifications?.[0] ||
                        result.error?.message || 
-                       "Failed to update preferences.";
+                       t('settingsTab.messages.error');
       setError(errorMsg);
       setTimeout(() => setError(null), 3000);
     }
@@ -92,8 +97,16 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
   };
 
   const toggleLanguage = () => {
+    // Determine new language
+    const newLanguage = currentLanguage === "en" ? "ne" : "en";
+    
+    // Update i18n language immediately for UI
+    i18n.changeLanguage(newLanguage);
+    localStorage.setItem('language', newLanguage);
+    
+    // Also update backend preference
     handlePreferenceUpdate({
-      language: language === "en" ? "np" : "en",
+      language: newLanguage === "en" ? "en" : "np",
     });
   };
 
@@ -120,10 +133,10 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
         className="text-lg font-semibold mb-1"
         style={{ color: BRAND.textDark }}
       >
-        Preferences
+        {t('settingsTab.title')}
       </h3>
       <p className="text-xs mb-4" style={{ color: BRAND.textLight }}>
-        Customize your experience with theme, language, and notification settings.
+        {t('settingsTab.subtitle')}
       </p>
 
       {/* Error message */}
@@ -149,17 +162,17 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
         >
           <div>
             <p className="text-sm font-medium" style={{ color: BRAND.textDark }}>
-              Theme
+              {t('settingsTab.theme.label')}
             </p>
             <p className="text-xs" style={{ color: BRAND.textLight }}>
-              Switch between light and dark preview.
+              {t('settingsTab.theme.description')}
             </p>
           </div>
           <ToggleSwitch
             checked={theme === "dark"}
             onChange={toggleTheme}
-            onLabel="DARK"
-            offLabel="LIGHT"
+            onLabel={t('settingsTab.theme.dark')}
+            offLabel={t('settingsTab.theme.light')}
             disabled={loading}
           />
         </div>
@@ -172,20 +185,20 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
         >
           <div>
             <p className="text-sm font-medium" style={{ color: BRAND.textDark }}>
-              Language
+              {t('settingsTab.language.label')}
             </p>
             <p className="text-xs" style={{ color: BRAND.textLight }}>
-              Current language:{" "}
+              {t('settingsTab.language.current')}{" "}
               <span className="font-semibold" style={{ color: BRAND.primary }}>
-                {language === "en" ? "English" : "Nepali"}
+                {currentLanguage === "en" ? t('settingsTab.language.english') : t('settingsTab.language.nepali')}
               </span>
             </p>
           </div>
           <ToggleSwitch
-            checked={language !== "en"}
+            checked={currentLanguage !== "en"}
             onChange={toggleLanguage}
-            onLabel="NP"
-            offLabel="EN"
+            onLabel={t('settingsTab.language.np')}
+            offLabel={t('settingsTab.language.en')}
             disabled={loading}
           />
         </div>
@@ -197,23 +210,31 @@ const SettingsTab = ({ preferences = {}, onUpdate }) => {
           style={{ borderColor: BRAND.border, backgroundColor: BRAND.cardBg }}
         >
           <p className="text-sm font-medium" style={{ color: BRAND.textDark }}>
-            Notifications
+            {t('settingsTab.notifications.label')}
           </p>
 
           <div className="flex items-center justify-between text-xs">
             <span style={{ color: BRAND.textDark }}>
-              Email notifications for activity
+              {t('settingsTab.notifications.email')}
             </span>
             <ToggleSwitch
               checked={emailNotifications}
               onChange={toggleEmail}
+              onLabel={t('settingsTab.notifications.on')}
+              offLabel={t('settingsTab.notifications.off')}
               disabled={loading}
             />
           </div>
 
           <div className="flex items-center justify-between text-xs">
-            <span style={{ color: BRAND.textDark }}>Push notifications</span>
-            <ToggleSwitch checked={pushNotifications} onChange={togglePush} disabled={loading} />
+            <span style={{ color: BRAND.textDark }}>{t('settingsTab.notifications.push')}</span>
+            <ToggleSwitch 
+              checked={pushNotifications} 
+              onChange={togglePush} 
+              onLabel={t('settingsTab.notifications.on')}
+              offLabel={t('settingsTab.notifications.off')}
+              disabled={loading} 
+            />
           </div>
         </div>
       </div>

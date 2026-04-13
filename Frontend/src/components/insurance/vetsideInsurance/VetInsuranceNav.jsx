@@ -1,13 +1,16 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FaClipboardList, FaCheckCircle, FaUser } from 'react-icons/fa';
+import LanguageSwitcher from '../../common/LanguageSwitcher';
 
 const VetInsuranceNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation('insurance');
 
   const navItems = [
-    { path: '/vetinsurancereviewdashboard', icon: FaClipboardList, label: 'Review Dashboard' },
-    { path: '/vetinsuranceverifyclaim', icon: FaCheckCircle, label: 'Verify Claims' }
+    { path: '/vetinsurancereviewdashboard', icon: FaClipboardList, label: t('nav.reviewDashboard') },
+    { path: '/vetinsuranceverifyclaim', icon: FaCheckCircle, label: t('nav.verifyClaims') }
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -20,7 +23,7 @@ const VetInsuranceNav = () => {
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
               <span className="text-emerald-600 font-bold">V</span>
             </div>
-            <span className="font-bold text-lg">Vet Portal</span>
+            <span className="font-bold text-lg">{t('nav.vetPortal')}</span>
           </div>
           <nav className="flex items-center gap-4">
             {navItems.map((item) => (
@@ -38,9 +41,10 @@ const VetInsuranceNav = () => {
               </button>
             ))}
             <div className="w-px h-6 bg-emerald-200 mx-2" />
+            <LanguageSwitcher context="vet" />
             <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/10 transition-all">
               <FaUser className="w-5 h-5" />
-              <span className="text-sm">Vet</span>
+              <span className="text-sm">{t('nav.vetPortal').split(' ')[0]}</span>
             </button>
           </nav>
         </div>

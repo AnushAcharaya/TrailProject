@@ -1,15 +1,19 @@
+import { useTranslation } from 'react-i18next';
+
 function SenderPanel({ transfer }) {
+  const { t } = useTranslation('profileTransfer');
+
   if (!transfer) return null;
 
   const sender = transfer.sender_details || {};
-  const fullName = sender.full_name || sender.username || 'Unknown';
+  const fullName = sender.full_name || sender.username || t('common.noData');
   const phone = sender.phone || sender.phone_number || 'N/A';
   const email = sender.email || 'N/A';
   const farmName = sender.farm_name || 'N/A';
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-      <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">Sender</h3>
+      <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">{t('reviewTransfer.sender')}</h3>
       <div className="flex items-start gap-4 mb-6">
         <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center shadow-sm flex-shrink-0">
           <span className="text-2xl font-bold text-emerald-600">

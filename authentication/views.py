@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
+from rest_framework.permissions import IsAuthenticated
 from .serializers import RegistrationSerializer, EmailVerifySerializer, PhoneSendOTPSerializer, PhoneVerifySerializer
 from .models import EmailVerificationToken, PhoneOTP, CustomUser, PasswordResetToken, LoginOTP
 from django.shortcuts import get_object_or_404
@@ -270,6 +271,89 @@ class AdminUserListView(APIView):
         users = CustomUser.objects.exclude(role='admin').order_by('-date_joined')
         serializer = AdminUserListSerializer(users, many=True, context={'request': request})
         return Response({'success': True, 'users': serializer.data}, status=status.HTTP_200_OK)
+
+
+class AdminDashboardStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        # Check if user is admin
+        if request.user.role != 'admin':
+            return Response({'error': 'Only admins can access this endpoint'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get statistics
+        total_registrations = CustomUser.objects.exclude(role='admin').count()
+        pending_reviews = CustomUser.objects.filter(status='pending').exclude(role='admin').count()
+        approved_accounts = CustomUser.objects.filter(status='approved').exclude(role='admin').count()
+        
+        # Active this week (users who joined in the last 7 days)
+        from datetime import timedelta
+        from django.db.models import Count
+        from django.db.models.functions import TruncMonth, TruncDay
+        import calendar
+        
+        week_ago = timezone.now() - timedelta(days=7)
+        active_this_week = CustomUser.objects.filter(
+            date_joined__gte=week_ago
+        ).exclude(role='admin').count()
+        
+        # Monthly verifications data (last 6 months)
+        six_months_ago = timezone.now() - timedelta(days=180)
+        monthly_verifications = CustomUser.objects.filter(
+            date_joined__gte=six_months_ago
+        ).exclude(role='admin').annotate(
+            month=TruncMonth('date_joined')
+        ).values('month', 'role').annotate(
+            count=Count('id')
+        ).order_by('month')
+        
+        # Process monthly data
+        monthly_data = {}
+        for item in monthly_verifications:
+            month_name = item['month'].strftime('%b')
+            if month_name not in monthly_data:
+                monthly_data[month_name] = {'name': month_name, 'farmers': 0, 'veterinarians': 0}
+            
+            if item['role'] == 'farmer':
+                monthly_data[month_name]['farmers'] = item['count']
+            elif item['role'] == 'vet':
+                monthly_data[month_name]['veterinarians'] = item['count']
+        
+        # Weekly activity data (last 7 days)
+        weekly_activity = CustomUser.objects.filter(
+            date_joined__gte=week_ago
+        ).exclude(role='admin').annotate(
+            day=TruncDay('date_joined')
+        ).values('day').annotate(
+            count=Count('id')
+        ).order_by('day')
+        
+        # Process weekly data
+        weekly_data = []
+        day_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        for i in range(7):
+            day = timezone.now() - timedelta(days=6-i)
+            day_name = day_names[day.weekday()]
+            count = 0
+            
+            for item in weekly_activity:
+                if item['day'].date() == day.date():
+                    count = item['count']
+                    break
+            
+            weekly_data.append({'name': day_name, 'value': count})
+        
+        return Response({
+            'success': True,
+            'stats': {
+                'total_registrations': total_registrations,
+                'pending_reviews': pending_reviews,
+                'approved_accounts': approved_accounts,
+                'active_this_week': active_this_week
+            },
+            'monthly_verifications': list(monthly_data.values()),
+            'weekly_activity': weekly_data
+        }, status=status.HTTP_200_OK)
 
 
 class ApproveUserView(APIView):

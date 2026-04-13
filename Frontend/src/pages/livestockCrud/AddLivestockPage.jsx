@@ -1,11 +1,13 @@
 // src/pages/AddLivestockPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import LivestockForm from "../../components/livestockCrud/LivestockForm";
 import { createLivestock } from "../../services/livestockCrudApi";
 import { FaCheckCircle, FaExclamationCircle, FaTimes } from "react-icons/fa";
 
 const AddLivestockPage = () => {
+  const { t } = useTranslation('livestock');
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [notification, setNotification] = useState(null); // { type: 'success' | 'error', message: string }
@@ -19,7 +21,7 @@ const AddLivestockPage = () => {
     if (result.success) {
       setNotification({
         type: 'success',
-        message: 'Livestock added successfully!'
+        message: t('form.notifications.addSuccess')
       });
       // Redirect after 2 seconds
       setTimeout(() => {
@@ -27,7 +29,7 @@ const AddLivestockPage = () => {
       }, 2000);
     } else {
       // Extract error message from response
-      let errorMessage = "Failed to add livestock. Please try again.";
+      let errorMessage = t('form.notifications.addError');
       
       if (result.error) {
         // Handle different error formats
@@ -95,7 +97,7 @@ const AddLivestockPage = () => {
         {submitting && !notification && (
           <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded flex items-center">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-700 mr-3"></div>
-            Saving livestock...
+            {t('form.messages.saving')}
           </div>
         )}
 

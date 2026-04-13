@@ -2,11 +2,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSyringe } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { getAllLivestock } from "../../services/livestockCrudApi";
 import { getVaccinationById, updateVaccination } from "../../services/vaccinationApi";
 import "./../../styles/vaccination.css";
 
 const EditVaccinationForm = ({ vaccinationId }) => {
+  const { t } = useTranslation('vaccination');
   const navigate = useNavigate();
   const [livestockList, setLivestockList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ const EditVaccinationForm = ({ vaccinationId }) => {
     } else {
       setNotification({ 
         type: 'error', 
-        message: 'Failed to load vaccination data.' 
+        message: t('addForm.messages.loadError')
       });
     }
     
@@ -73,7 +75,7 @@ const EditVaccinationForm = ({ vaccinationId }) => {
     if (result.success) {
       setNotification({ 
         type: 'success', 
-        message: 'Vaccination record updated successfully!' 
+        message: t('addForm.messages.updateSuccess')
       });
       setTimeout(() => {
         navigate('/vaccination');
@@ -81,7 +83,7 @@ const EditVaccinationForm = ({ vaccinationId }) => {
     } else {
       const errorMessage = typeof result.error === 'object' 
         ? Object.entries(result.error).map(([key, value]) => `${key}: ${value}`).join(', ')
-        : result.error?.message || 'Failed to update vaccination record.';
+        : result.error?.message || t('addForm.messages.updateError');
       setNotification({ type: 'error', message: errorMessage });
       setSubmitting(false);
     }
@@ -90,7 +92,7 @@ const EditVaccinationForm = ({ vaccinationId }) => {
   if (loading) {
     return (
       <div className="bg-white p-6 rounded-lg border border-light max-w-2xl mx-auto">
-        <p className="text-center text-gray-600">Loading vaccination data...</p>
+        <p className="text-center text-gray-600">{t('addForm.messages.loadError')}</p>
       </div>
     );
   }
@@ -102,8 +104,8 @@ const EditVaccinationForm = ({ vaccinationId }) => {
           <FaSyringe className="text-green-700" size={24} />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-body">Edit Vaccination Record</h2>
-          <p className="text-sm text-muted">Update vaccination details</p>
+          <h2 className="text-xl font-semibold text-body">{t('addForm.updateTitle')}</h2>
+          <p className="text-sm text-muted">{t('addForm.updateSubtitle')}</p>
         </div>
       </div>
 
@@ -120,7 +122,7 @@ const EditVaccinationForm = ({ vaccinationId }) => {
       <form onSubmit={handleSubmit}>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-body mb-1">Livestock *</label>
+            <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.livestock')} *</label>
             <select
               name="livestock"
               value={formData.livestock}
@@ -128,7 +130,7 @@ const EditVaccinationForm = ({ vaccinationId }) => {
               required
               className="w-full p-2 border border-light rounded"
             >
-              <option value="">Select livestock</option>
+              <option value="">{t('addForm.fields.vaccineTypeSelect')}</option>
               {livestockList.map((animal) => (
                 <option key={animal.id} value={animal.tag_id}>
                   {animal.tag_id} - {animal.species_name}
@@ -138,20 +140,20 @@ const EditVaccinationForm = ({ vaccinationId }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-body mb-1">Vaccine Name *</label>
+            <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.vaccineName')} *</label>
             <input
               type="text"
               name="vaccineName"
               value={formData.vaccineName}
               onChange={handleChange}
-              placeholder="e.g., Foot and Mouth Disease Vaccine"
+              placeholder={t('addForm.fields.vaccineNamePlaceholder')}
               required
               className="w-full p-2 border border-light rounded"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-body mb-1">Vaccine Type *</label>
+            <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.vaccineType')} *</label>
             <select
               name="vaccineType"
               value={formData.vaccineType}
@@ -159,16 +161,16 @@ const EditVaccinationForm = ({ vaccinationId }) => {
               required
               className="w-full p-2 border border-light rounded"
             >
-              <option value="">Select vaccine type</option>
-              <option value="Viral Vaccine">Viral Vaccine</option>
-              <option value="Bacterial Vaccine">Bacterial Vaccine</option>
-              <option value="Clostridial Vaccine">Clostridial Vaccine</option>
+              <option value="">{t('addForm.fields.vaccineTypeSelect')}</option>
+              <option value="Viral Vaccine">{t('addForm.fields.vaccineTypes.viral')}</option>
+              <option value="Bacterial Vaccine">{t('addForm.fields.vaccineTypes.bacterial')}</option>
+              <option value="Clostridial Vaccine">{t('addForm.fields.vaccineTypes.clostridial')}</option>
             </select>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-body mb-1">Date Given *</label>
+              <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.dateGiven')} *</label>
               <input
                 type="date"
                 name="dateGiven"
@@ -179,7 +181,7 @@ const EditVaccinationForm = ({ vaccinationId }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-body mb-1">Next Due Date *</label>
+              <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.nextDueDate')} *</label>
               <input
                 type="date"
                 name="nextDueDate"
@@ -191,19 +193,19 @@ const EditVaccinationForm = ({ vaccinationId }) => {
               />
               {formData.dateGiven && (
                 <p className="text-xs text-gray-500 mt-1">
-                  Must be on or after {new Date(formData.dateGiven).toLocaleDateString()}
+                  {t('addForm.fields.nextDueDateHint', { date: new Date(formData.dateGiven).toLocaleDateString() })}
                 </p>
               )}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-body mb-1">Notes (Optional)</label>
+            <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.notes')}</label>
             <textarea
               name="notes"
               value={formData.notes}
               onChange={handleChange}
-              placeholder="Add any additional notes about this vaccination..."
+              placeholder={t('addForm.fields.notesPlaceholder')}
               rows="3"
               className="w-full p-2 border border-light rounded"
             />
@@ -216,14 +218,14 @@ const EditVaccinationForm = ({ vaccinationId }) => {
               onClick={() => navigate('/vaccination')}
               disabled={submitting}
             >
-              Cancel
+              {t('addForm.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="bg-primary text-white px-4 py-2 rounded hover:bg-green-800 disabled:bg-gray-400"
               disabled={submitting}
             >
-              {submitting ? 'Updating...' : 'Update Vaccination'}
+              {submitting ? t('addForm.buttons.updating') : t('addForm.buttons.update')}
             </button>
           </div>
         </div>

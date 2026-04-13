@@ -1,14 +1,18 @@
+import { useTranslation } from 'react-i18next';
+
 function ActivityCard({ activities, loading }) {
+  const { t } = useTranslation('vetDashboard');
+
   // Helper function to format timestamp to relative time
   const formatRelativeTime = (timestamp) => {
     const now = new Date();
     const activityDate = new Date(timestamp);
     const diffInSeconds = Math.floor((now - activityDate) / 1000);
     
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    if (diffInSeconds < 60) return t('dashboard.timeAgo.justNow');
+    if (diffInSeconds < 3600) return t('dashboard.timeAgo.minutesAgo', { count: Math.floor(diffInSeconds / 60) });
+    if (diffInSeconds < 86400) return t('dashboard.timeAgo.hoursAgo', { count: Math.floor(diffInSeconds / 3600) });
+    return t('dashboard.timeAgo.daysAgo', { count: Math.floor(diffInSeconds / 86400) });
   };
 
   // Get icon based on activity type
@@ -25,7 +29,7 @@ function ActivityCard({ activities, loading }) {
   if (loading) {
     return (
       <div className="bg-white rounded-lg p-6 border border-gray-200">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activities</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.recentActivities')}</h3>
         <div className="space-y-3">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-start space-x-3 py-2 animate-pulse">
@@ -45,9 +49,9 @@ function ActivityCard({ activities, loading }) {
   if (!activities || activities.length === 0) {
     return (
       <div className="bg-white rounded-lg p-6 border border-gray-200">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activities</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.recentActivities')}</h3>
         <div className="text-center py-8 text-gray-500">
-          <p>No recent activities</p>
+          <p>{t('dashboard.noRecentActivities')}</p>
         </div>
       </div>
     );
@@ -55,7 +59,7 @@ function ActivityCard({ activities, loading }) {
 
   return (
     <div className="bg-white rounded-lg p-6 border border-gray-200">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activities</h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.recentActivities')}</h3>
       <div className="space-y-3">
         {activities.map((activity) => (
           <div key={activity.id} className="flex items-start space-x-3 py-2">

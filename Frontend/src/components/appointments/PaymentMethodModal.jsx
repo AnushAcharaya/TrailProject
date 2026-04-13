@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FiX, FiDollarSign } from 'react-icons/fi';
 
 const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodSelect }) => {
+  const { t } = useTranslation('payment');
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -13,7 +15,7 @@ const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodS
 
   const handleProceed = async () => {
     if (!selectedMethod) {
-      alert('Please select a payment method');
+      alert(t('paymentMethod.validation.selectMethod'));
       return;
     }
 
@@ -39,7 +41,7 @@ const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodS
       <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Select Payment Method</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('paymentMethod.title')}</h2>
           <button
             onClick={onClose}
             disabled={isProcessing}
@@ -54,7 +56,7 @@ const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodS
           {/* Appointment Fee Display */}
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-center justify-between">
-              <span className="text-gray-700 font-medium">Appointment Fee:</span>
+              <span className="text-gray-700 font-medium">{t('paymentMethod.appointmentFee')}:</span>
               <span className="text-2xl font-bold text-green-600">Rs. {appointmentFee}</span>
             </div>
           </div>
@@ -76,12 +78,12 @@ const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodS
                 selectedMethod === 'esewa' ? 'bg-green-600' : 'bg-green-100'
               }`}>
                 <span className={`text-lg font-bold ${selectedMethod === 'esewa' ? 'text-white' : 'text-green-600'}`}>
-                  eSewa
+                  {t('paymentMethod.methods.esewa.name')}
                 </span>
               </div>
               <div className="flex-1 text-left">
-                <div className="font-semibold text-gray-900">eSewa</div>
-                <div className="text-sm text-gray-600">Pay securely with eSewa</div>
+                <div className="font-semibold text-gray-900">{t('paymentMethod.methods.esewa.name')}</div>
+                <div className="text-sm text-gray-600">{t('paymentMethod.methods.esewa.description')}</div>
               </div>
               {selectedMethod === 'esewa' && (
                 <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
@@ -109,8 +111,8 @@ const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodS
                 <FiDollarSign className={selectedMethod === 'cash' ? 'text-white' : 'text-gray-600'} size={24} />
               </div>
               <div className="flex-1 text-left">
-                <div className="font-semibold text-gray-900">Cash</div>
-                <div className="text-sm text-gray-600">Pay in cash at the clinic</div>
+                <div className="font-semibold text-gray-900">{t('paymentMethod.methods.cash.name')}</div>
+                <div className="text-sm text-gray-600">{t('paymentMethod.methods.cash.description')}</div>
               </div>
               {selectedMethod === 'cash' && (
                 <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
@@ -126,7 +128,7 @@ const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodS
           {selectedMethod === 'cash' && (
             <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Note:</strong> You will need to pay Rs. {appointmentFee} in cash when you visit the clinic.
+                <strong>{t('paymentMethod.methods.cash.note', { amount: appointmentFee })}</strong>
               </p>
             </div>
           )}
@@ -134,7 +136,7 @@ const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodS
           {selectedMethod === 'esewa' && (
             <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Note:</strong> You will be redirected to eSewa to complete the payment securely.
+                <strong>{t('paymentMethod.methods.esewa.note')}</strong>
               </p>
             </div>
           )}
@@ -148,7 +150,7 @@ const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodS
             disabled={isProcessing}
             className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Cancel
+            {t('paymentMethod.buttons.cancel')}
           </button>
           <button
             type="button"
@@ -156,7 +158,7 @@ const PaymentMethodModal = ({ isOpen, onClose, appointmentData, onPaymentMethodS
             disabled={!selectedMethod || isProcessing}
             className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isProcessing ? 'Processing...' : 'Proceed'}
+            {isProcessing ? t('paymentMethod.buttons.processing') : t('paymentMethod.buttons.proceed')}
           </button>
         </div>
       </div>

@@ -1,4 +1,8 @@
+import { useTranslation } from 'react-i18next';
+
 function StatsGrid({ stats, loading }) {
+  const { t } = useTranslation('vetDashboard');
+
   // Loading skeleton
   if (loading) {
     return (
@@ -20,25 +24,25 @@ function StatsGrid({ stats, loading }) {
   const statsData = [
     { 
       value: stats?.total_farmers || '0', 
-      label: 'Farmers Treated', 
+      label: t('dashboard.stats.farmersTreated'), 
       icon: '👨‍🌾', 
       color: 'bg-blue-500' 
     },
     { 
       value: stats?.total_animals || '0', 
-      label: 'Animals Treated', 
+      label: t('dashboard.stats.animalsTreated'), 
       icon: '🐄', 
       color: 'bg-cyan-500' 
     },
     { 
       value: stats?.pending_treatments || '0', 
-      label: 'Pending Appointments', 
+      label: t('dashboard.stats.pendingAppointments'), 
       icon: '⏳', 
       color: 'bg-yellow-500' 
     },
     { 
       value: stats?.todays_appointments || '0', 
-      label: "Today's Accepted", 
+      label: t('dashboard.stats.todaysAccepted'), 
       icon: '✅', 
       color: 'bg-green-500' 
     }

@@ -1,10 +1,12 @@
 // src/components/medicalHistory/TreatmentForm.jsx
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import PrimaryButton from "./PrimaryButton";
 import { getAllLivestock } from "../../services/livestockCrudApi";
 import "./../../styles/medicalHistory.css";
 
 const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
+  const { t } = useTranslation('medical');
   console.log('[TreatmentForm] initialData:', initialData);
   console.log('[TreatmentForm] initialData.medicines:', initialData?.medicines);
   
@@ -196,7 +198,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
     console.log('[TreatmentForm] hasValidMedicine:', hasValidMedicine);
     
     if (!hasValidMedicine) {
-      alert("Please fill in at least one medicine with name and dosage.");
+      alert(t('form.validation.required'));
       return;
     }
     
@@ -225,13 +227,13 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
       <div className="space-y-5">
         {/* Livestock Search */}
         <div className="relative">
-          <label className="block text-sm font-medium text-body mb-1">Livestock *</label>
+          <label className="block text-sm font-medium text-body mb-1">{t('form.livestock')} *</label>
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => handleLivestockSearch(e.target.value)}
             onFocus={() => setShowDropdown(true)}
-            placeholder="Search by tag number, name, or breed..."
+            placeholder={t('form.livestockPlaceholder')}
             required
             className="w-full p-2 border border-light rounded focus:outline-none focus:ring-2 focus:ring-primary"
           />
@@ -246,11 +248,11 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
                   className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                 >
                   <div className="font-medium text-gray-900">
-                    Tag: {animal.tag_id}
+                    {t('form.livestockInfo.tag')}: {animal.tag_id}
                   </div>
                   <div className="text-sm text-gray-600">
-                    <span>Breed: {animal.breed_name} ({animal.species_name})</span>
-                    {animal.age && <span> | Age: {animal.age} years</span>}
+                    <span>{t('form.livestockInfo.breed')}: {animal.breed_name} ({animal.species_name})</span>
+                    {animal.age && <span> | {t('form.livestockInfo.age')}: {animal.age} {t('form.livestockInfo.years')}</span>}
                   </div>
                 </div>
               ))}
@@ -260,20 +262,20 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
           {/* No Results Message */}
           {showDropdown && searchTerm && filteredLivestock.length === 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
-              <p className="text-gray-500 text-sm">No livestock found matching "{searchTerm}"</p>
+              <p className="text-gray-500 text-sm">{t('form.noLivestock', { search: searchTerm })}</p>
             </div>
           )}
         </div>
 
         {/* Treatment Name */}
         <div>
-          <label className="block text-sm font-medium text-body mb-1">Treatment Name *</label>
+          <label className="block text-sm font-medium text-body mb-1">{t('form.treatmentName')} *</label>
           <input
             type="text"
             name="treatmentName"
             value={formData.treatmentName}
             onChange={handleChange}
-            placeholder="e.g., Deworming, Infection Treatment"
+            placeholder={t('form.treatmentNamePlaceholder')}
             required
             className="w-full p-2 border border-light rounded"
           />
@@ -281,12 +283,12 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
 
         {/* Diagnosis */}
         <div>
-          <label className="block text-sm font-medium text-body mb-1">Diagnosis / Description</label>
+          <label className="block text-sm font-medium text-body mb-1">{t('form.diagnosis')}</label>
           <textarea
             name="diagnosis"
             value={formData.diagnosis}
             onChange={handleChange}
-            placeholder="Describe condition or treatment plan"
+            placeholder={t('form.diagnosisPlaceholder')}
             rows="3"
             className="w-full p-2 border border-light rounded"
           />
@@ -295,13 +297,13 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
         {/* Medicines Section */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium text-body">Medicines *</label>
+            <label className="block text-sm font-medium text-body">{t('form.medicines')} *</label>
             <button
               type="button"
               onClick={addMedicine}
               className="text-secondary text-sm font-medium"
             >
-              + Add Another
+              {t('form.addAnother')}
             </button>
           </div>
 
@@ -310,12 +312,12 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
                 {/* Medicine Name */}
                 <div className="md:col-span-2">
-                  <label className="block text-xs text-muted mb-1">What medicine?</label>
+                  <label className="block text-xs text-muted mb-1">{t('form.medicineName')}</label>
                   <input
                     type="text"
                     value={med.name}
                     onChange={(e) => handleMedicineChange(index, "name", e.target.value)}
-                    placeholder="e.g., Ivermectin"
+                    placeholder={t('form.medicineNamePlaceholder')}
                     required
                     className="w-full p-2 border border-light rounded text-sm"
                   />
@@ -323,12 +325,12 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
 
                 {/* Dosage */}
                 <div>
-                  <label className="block text-xs text-muted mb-1">How much each time?</label>
+                  <label className="block text-xs text-muted mb-1">{t('form.dosage')}</label>
                   <input
                     type="text"
                     value={med.dosage}
                     onChange={(e) => handleMedicineChange(index, "dosage", e.target.value)}
-                    placeholder="e.g., 5 mL"
+                    placeholder={t('form.dosagePlaceholder')}
                     required
                     className="w-full p-2 border border-light rounded text-sm"
                   />
@@ -336,22 +338,22 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
 
                 {/* Frequency */}
                 <div>
-                  <label className="block text-xs text-muted mb-1">How many times per day?</label>
+                  <label className="block text-xs text-muted mb-1">{t('form.frequency')}</label>
                   <select
                     value={med.frequency}
                     onChange={(e) => handleMedicineChange(index, "frequency", Number(e.target.value))}
                     className="w-full p-2 border border-light rounded text-sm"
                   >
-                    <option value={1}>Once</option>
-                    <option value={2}>Twice</option>
-                    <option value={3}>Three times</option>
+                    <option value={1}>{t('form.frequencyOptions.once')}</option>
+                    <option value={2}>{t('form.frequencyOptions.twice')}</option>
+                    <option value={3}>{t('form.frequencyOptions.three')}</option>
                   </select>
                 </div>
               </div>
 
               {/* Schedule Type Toggle */}
               <div className="mb-3">
-                <label className="block text-xs text-muted mb-1">How to schedule doses?</label>
+                <label className="block text-xs text-muted mb-1">{t('form.scheduleType')}</label>
                 <div className="flex gap-4">
                   <label className="inline-flex items-center">
                     <input
@@ -361,7 +363,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
                       onChange={() => handleMedicineChange(index, "scheduleType", "interval")}
                       className="mr-2"
                     />
-                    <span className="text-sm">Every X hours</span>
+                    <span className="text-sm">{t('form.scheduleInterval')}</span>
                   </label>
                   <label className="inline-flex items-center">
                     <input
@@ -371,7 +373,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
                       onChange={() => handleMedicineChange(index, "scheduleType", "exact")}
                       className="mr-2"
                     />
-                    <span className="text-sm">Set exact times</span>
+                    <span className="text-sm">{t('form.scheduleExact')}</span>
                   </label>
                 </div>
               </div>
@@ -380,7 +382,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
               {med.scheduleType === "interval" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-muted mb-1">Start time</label>
+                    <label className="block text-xs text-muted mb-1">{t('form.startTime')}</label>
                     <input
                       type="time"
                       value={med.startTime}
@@ -389,7 +391,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-muted mb-1">Every how many hours?</label>
+                    <label className="block text-xs text-muted mb-1">{t('form.intervalHours')}</label>
                     <input
                       type="number"
                       min="1"
@@ -405,7 +407,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {[1, 2, 3].slice(0, med.frequency).map((i) => (
                     <div key={i}>
-                      <label className="block text-xs text-muted mb-1">Time {i}</label>
+                      <label className="block text-xs text-muted mb-1">{t('form.exactTime', { number: i })}</label>
                       <input
                         type="time"
                         value={med.exactTimes[i - 1] || ""}
@@ -423,7 +425,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
 
               {/* Duration */}
               <div className="mt-3">
-                <label className="block text-xs text-muted mb-1">For how many days?</label>
+                <label className="block text-xs text-muted mb-1">{t('form.duration')}</label>
                 <div className="flex gap-2">
                   <input
                     type="number"
@@ -432,14 +434,14 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
                     onChange={(e) => handleMedicineChange(index, "duration", Number(e.target.value))}
                     className="w-24 p-2 border border-light rounded text-sm"
                   />
-                  <span className="text-sm text-muted self-center">days</span>
+                  <span className="text-sm text-muted self-center">{t('form.durationDays')}</span>
                   {formData.medicines.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeMedicine(index)}
                       className="text-red-500 text-sm self-end ml-auto"
                     >
-                      Remove
+                      {t('form.remove')}
                     </button>
                   )}
                 </div>
@@ -448,8 +450,8 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
               {/* Preview Message */}
               <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-700">
                 {med.scheduleType === "interval"
-                  ? `Doses every ${med.intervalHours} hours starting ${med.startTime}`
-                  : `Doses at: ${med.exactTimes.slice(0, med.frequency).join(", ")}`}
+                  ? t('form.schedulePreview.interval', { hours: med.intervalHours, time: med.startTime })
+                  : t('form.schedulePreview.exact', { times: med.exactTimes.slice(0, med.frequency).join(", ") })}
               </div>
             </div>
           ))}
@@ -457,20 +459,20 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
 
         {/* Vet Name */}
         <div>
-          <label className="block text-sm font-medium text-body mb-1">Veterinarian Name</label>
+          <label className="block text-sm font-medium text-body mb-1">{t('form.vetName')}</label>
           <input
             type="text"
             name="vetName"
             value={formData.vetName}
             onChange={handleChange}
-            placeholder="e.g., Dr. Smith"
+            placeholder={t('form.vetNamePlaceholder')}
             className="w-full p-2 border border-light rounded"
           />
         </div>
 
         {/* Treatment Date */}
         <div>
-          <label className="block text-sm font-medium text-body mb-1">Treatment Start Date *</label>
+          <label className="block text-sm font-medium text-body mb-1">{t('form.treatmentDate')} *</label>
           <input
             type="date"
             name="treatmentDate"
@@ -484,7 +486,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
         {/* Next Treatment Date (Optional) */}
         <div>
           <label className="block text-sm font-medium text-body mb-1">
-            Next Follow-up
+            {t('form.nextTreatmentDate')}
           </label>
           <input
             type="date"
@@ -497,7 +499,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
 
         {/* Treatment Status */}
         <div>
-          <label className="block text-sm font-medium text-body mb-1">Treatment Status *</label>
+          <label className="block text-sm font-medium text-body mb-1">{t('form.status')} *</label>
           <select
             name="status"
             value={formData.status}
@@ -505,14 +507,14 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
             required
             className="w-full p-2 border border-light rounded"
           >
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
+            <option value="In Progress">{t('card.status.inProgress')}</option>
+            <option value="Completed">{t('card.status.completed')}</option>
           </select>
         </div>
 
         {/* Document Upload */}
         <div>
-          <label className="block text-sm font-medium text-body mb-1">Upload Medical Document (Optional)</label>
+          <label className="block text-sm font-medium text-body mb-1">{t('form.document')}</label>
           <input
             type="file"
             name="document"
@@ -529,10 +531,10 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
             className="btn-secondary"
             onClick={() => window.history.back()}
           >
-            Cancel
+            {t('buttons.cancel')}
           </button>
           <PrimaryButton type="submit">
-            {isEdit ? "Update Treatment" : "Save Treatment"}
+            {isEdit ? t('buttons.update') : t('buttons.save')}
           </PrimaryButton>
         </div>
       </div>

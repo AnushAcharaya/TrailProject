@@ -1,14 +1,17 @@
 import { FiActivity, FiClock, FiAlertTriangle, FiGrid } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import "../../styles/farmerdashboard.css";
 
-const cards = [
-  { title: "Total Livestock", value: "324", icon: <FiGrid />, color: "bg-blue-50", iconColor: "text-blue-600" },
-  { title: "Upcoming Vaccinations", value: "18", icon: <FiClock />, color: "bg-green-50", iconColor: "text-green-600" },
-  { title: "Under Treatment", value: "6", icon: <FiActivity />, color: "bg-yellow-50", iconColor: "text-yellow-600" },
-  { title: "Overdue Tasks", value: "3", icon: <FiAlertTriangle />, color: "bg-red-50", iconColor: "text-red-600" },
-];
-
 const SummaryCards = () => {
+  const { t } = useTranslation('dashboard');
+  
+  const cards = [
+    { title: t('stats.totalLivestock'), value: "324", icon: <FiGrid />, color: "bg-blue-50", iconColor: "text-blue-600" },
+    { title: t('stats.upcomingVaccinations'), value: "18", icon: <FiClock />, color: "bg-green-50", iconColor: "text-green-600" },
+    { title: t('stats.underTreatment'), value: "6", icon: <FiActivity />, color: "bg-yellow-50", iconColor: "text-yellow-600" },
+    { title: t('stats.overdueTasks'), value: "3", icon: <FiAlertTriangle />, color: "bg-red-50", iconColor: "text-red-600" },
+  ];
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
       {cards.map((card, index) => (

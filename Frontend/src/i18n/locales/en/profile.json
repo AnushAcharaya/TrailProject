@@ -1,0 +1,114 @@
+{
+  "page": {
+    "title": "Account Settings",
+    "subtitle": "Manage your profile and security.",
+    "loading": "Loading profile...",
+    "error": "Error",
+    "retry": "Retry"
+  },
+  "tabs": {
+    "profile": "Profile",
+    "security": "Security",
+    "preferences": "Preferences"
+  },
+  "profileTab": {
+    "title": "Profile information",
+    "subtitle": "Update your profile information. Fields from registration are read-only.",
+    "photo": {
+      "label": "Profile Photo",
+      "upload": "Upload Photo",
+      "format": "JPG, PNG or GIF (max 2MB)"
+    },
+    "registration": {
+      "title": "Registration Information (Read-only)",
+      "fullName": "Full Name:",
+      "username": "Username:",
+      "email": "Email:",
+      "phone": "Phone:",
+      "role": "Role:",
+      "address": "Address:",
+      "farmName": "Farm Name:",
+      "specialization": "Specialization:"
+    },
+    "fields": {
+      "location": "Location",
+      "locationPlaceholder": "Kathmandu, Nepal",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "bio": "Bio",
+      "bioPlaceholder": "Write a short bio about yourself..."
+    },
+    "buttons": {
+      "save": "Save changes",
+      "saving": "Saving..."
+    },
+    "messages": {
+      "success": "Profile updated successfully!",
+      "error": "Failed to update profile."
+    }
+  },
+  "passwordTab": {
+    "title": "Change password",
+    "subtitle": "Update your password. Make sure it's at least 8 characters long.",
+    "fields": {
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "currentPlaceholder": "••••••••",
+      "newPlaceholder": "At least 8 characters",
+      "confirmPlaceholder": "Repeat new password"
+    },
+    "buttons": {
+      "update": "Update password",
+      "updating": "Updating..."
+    },
+    "messages": {
+      "success": "Password changed successfully!",
+      "minLength": "New password must be at least 8 characters.",
+      "mismatch": "New password and confirm password do not match.",
+      "same": "New password must be different from current password.",
+      "error": "Failed to change password."
+    }
+  },
+  "settingsTab": {
+    "title": "Preferences",
+    "subtitle": "Customize your experience with theme, language, and notification settings.",
+    "theme": {
+      "label": "Theme",
+      "description": "Switch between light and dark preview.",
+      "dark": "DARK",
+      "light": "LIGHT"
+    },
+    "language": {
+      "label": "Language",
+      "current": "Current language:",
+      "english": "English",
+      "nepali": "Nepali",
+      "np": "NP",
+      "en": "EN"
+    },
+    "notifications": {
+      "label": "Notifications",
+      "email": "Email notifications for activity",
+      "push": "Push notifications",
+      "on": "ON",
+      "off": "OFF"
+    },
+    "messages": {
+      "success": "Preferences updated successfully!",
+      "error": "Failed to update preferences."
+    }
+  },
+  "profileCard": {
+    "loading": "Loading...",
+    "noBio": "No bio yet",
+    "noLocation": "No location set",
+    "joined": "Joined",
+    "gender": "Gender:"
+  },
+  "logout": {
+    "button": "Logout"
+  }
+}

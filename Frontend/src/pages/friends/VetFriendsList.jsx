@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import { getFriends, removeFriend } from "../../services/friendsApi";
 import { FaUsers, FaEnvelope, FaUserTimes } from "react-icons/fa";
 
 const VetFriendsList = () => {
+  const { t } = useTranslation('vetDashboard');
   const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +44,7 @@ const VetFriendsList = () => {
   };
 
   const handleRemoveFriend = async (friendshipId, friendName) => {
-    if (!confirm(`Unfriend ${friendName}?`)) {
+    if (!confirm(t('friendsList.unfriendConfirm', { name: friendName }))) {
       return;
     }
 
@@ -51,7 +53,7 @@ const VetFriendsList = () => {
     
     if (result.success) {
       setFriends(friends.filter(f => f.id !== friendshipId));
-      showNotification('Friend removed successfully', 'success');
+      showNotification(t('friendsList.friendRemoved'), 'success');
     } else {
       showNotification(result.error, 'error');
     }
@@ -64,23 +66,18 @@ const VetFriendsList = () => {
   };
 
   return (
-    <VetLayout pageTitle="My Friends">
+    <VetLayout>
       <div className="max-w-4xl mx-auto p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <FaUsers className="text-3xl text-emerald-600" />
-          <h1 className="text-3xl font-bold text-gray-800">My Friends</h1>
-        </div>
-
         {isLoading ? (
           <div className="text-center py-12 text-gray-600">
-            Loading friends...
+            {t('friendsList.loading')}
           </div>
         ) : friends.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <FaUsers className="text-6xl text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg">No friends yet</p>
+            <p className="text-gray-600 text-lg">{t('friendsList.noFriends')}</p>
             <p className="text-gray-500 text-sm mt-2">
-              Send friend requests to farmers to connect with them
+              {t('friendsList.noFriendsDescription')}
             </p>
           </div>
         ) : (
@@ -121,16 +118,16 @@ const VetFriendsList = () => {
                       className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium flex items-center justify-center gap-2"
                     >
                       <FaEnvelope />
-                      Message
+                      {t('friendsList.message')}
                     </button>
                     <button
                       onClick={() => handleRemoveFriend(friendship.id, friend.full_name || friend.username)}
                       disabled={removingId === friendship.id}
                       className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium flex items-center justify-center gap-2 disabled:opacity-50"
-                      title="Unfriend"
+                      title={t('friendsList.unfriend')}
                     >
                       <FaUserTimes />
-                      Unfriend
+                      {t('friendsList.unfriend')}
                     </button>
                   </div>
                 </div>

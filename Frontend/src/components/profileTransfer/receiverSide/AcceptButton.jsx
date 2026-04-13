@@ -1,5 +1,9 @@
 // components/profile-transfer/farmer-side/send-transfer/components/AcceptButton.jsx
+import { useTranslation } from 'react-i18next';
+
 export default function AcceptButton({ onClick, loading }) {
+  const { t } = useTranslation('profileTransfer');
+
   return (
     <button 
       onClick={onClick}
@@ -9,12 +13,12 @@ export default function AcceptButton({ onClick, loading }) {
       {loading ? (
         <>
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-          <span>Processing...</span>
+          <span>{t('common.loading')}</span>
         </>
       ) : (
         <>
           <span>✓</span>
-          <span>Accept</span>
+          <span>{t('requestCard.accept')}</span>
         </>
       )}
     </button>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getClaims, updateClaimStatus } from '../../../services/insuranceApi';
 import { FaEye, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
 const ClaimInsurances = () => {
+  const { t } = useTranslation('insurance');
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -63,30 +65,30 @@ const ClaimInsurances = () => {
     : claims.filter(c => c.status === filter);
 
   if (loading) {
-    return <div className="text-center py-8">Loading claims...</div>;
+    return <div className="text-center py-8">{t('admin.claims.loading')}</div>;
   }
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Claim Insurances</h2>
+        <h2 className="text-2xl font-bold text-gray-800">{t('admin.claims.title')}</h2>
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
         >
-          <option value="all">All Status</option>
-          <option value="Submitted">Submitted</option>
-          <option value="Under Review">Under Review</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
-          <option value="Paid">Paid</option>
+          <option value="all">{t('admin.claims.filters.all')}</option>
+          <option value="Submitted">{t('admin.claims.filters.submitted')}</option>
+          <option value="Under Review">{t('admin.claims.filters.underReview')}</option>
+          <option value="Approved">{t('admin.claims.filters.approved')}</option>
+          <option value="Rejected">{t('admin.claims.filters.rejected')}</option>
+          <option value="Paid">{t('admin.claims.filters.paid')}</option>
         </select>
       </div>
 
       {filteredClaims.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
-          No claims found
+          {t('admin.claims.noClaims')}
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -94,25 +96,25 @@ const ClaimInsurances = () => {
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Claim ID
+                  {t('admin.claims.table.claimId')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Farmer
+                  {t('admin.claims.table.farmer')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
+                  {t('admin.claims.table.type')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
+                  {t('admin.claims.table.amount')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
+                  {t('admin.claims.table.date')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('admin.claims.table.status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('admin.claims.table.actions')}
                 </th>
               </tr>
             </thead>
@@ -149,7 +151,7 @@ const ClaimInsurances = () => {
                       onClick={() => handleViewClaim(claim)}
                       className="text-emerald-600 hover:text-emerald-900 flex items-center gap-1"
                     >
-                      <FaEye /> View
+                      <FaEye /> {t('admin.claims.table.view')}
                     </button>
                   </td>
                 </tr>
@@ -165,7 +167,7 @@ const ClaimInsurances = () => {
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-2xl font-bold text-gray-800">Claim Details</h3>
+                <h3 className="text-2xl font-bold text-gray-800">{t('admin.claims.modal.title')}</h3>
                 <button
                   onClick={() => setShowModal(false)}
                   className="text-gray-500 hover:text-gray-700"
@@ -177,11 +179,11 @@ const ClaimInsurances = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Claim ID</label>
+                    <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.claimId')}</label>
                     <p className="text-gray-900">#{selectedClaim.id}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Status</label>
+                    <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.status')}</label>
                     <p>
                       <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedClaim.status)}`}>
                         {selectedClaim.status}
@@ -189,36 +191,36 @@ const ClaimInsurances = () => {
                     </p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Farmer</label>
+                    <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.farmer')}</label>
                     <p className="text-gray-900">{selectedClaim.farmer_details?.full_name}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Claim Type</label>
+                    <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.claimType')}</label>
                     <p className="text-gray-900">{selectedClaim.claim_type}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Claim Amount</label>
+                    <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.claimAmount')}</label>
                     <p className="text-gray-900">NPR {selectedClaim.claim_amount?.toLocaleString()}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Incident Date</label>
+                    <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.incidentDate')}</label>
                     <p className="text-gray-900">{new Date(selectedClaim.incident_date).toLocaleDateString()}</p>
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Incident Location</label>
+                  <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.incidentLocation')}</label>
                   <p className="text-gray-900">{selectedClaim.incident_location}</p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Description</label>
+                  <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.description')}</label>
                   <p className="text-gray-900">{selectedClaim.description}</p>
                 </div>
 
                 {selectedClaim.incident_image && (
                   <div className="border-t pt-4">
-                    <label className="text-sm font-medium text-gray-500 block mb-2">Incident Image</label>
+                    <label className="text-sm font-medium text-gray-500 block mb-2">{t('admin.claims.modal.incidentImage')}</label>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <a
                         href={selectedClaim.incident_image.startsWith('http') ? selectedClaim.incident_image : `http://localhost:8000${selectedClaim.incident_image}`}
@@ -230,7 +232,7 @@ const ClaimInsurances = () => {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z" />
                         </svg>
-                        View/Download Incident Image
+                        {t('admin.claims.modal.viewDownloadImage')}
                       </a>
                       {selectedClaim.incident_image.match(/\.(jpg|jpeg|png|gif)$/i) && (
                         <div className="mt-3">
@@ -248,7 +250,7 @@ const ClaimInsurances = () => {
 
                 {selectedClaim.vaccination_history && (
                   <div className="border-t pt-4">
-                    <label className="text-sm font-medium text-gray-500 block mb-2">Vaccination History</label>
+                    <label className="text-sm font-medium text-gray-500 block mb-2">{t('admin.claims.modal.vaccinationHistory')}</label>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <a
                         href={selectedClaim.vaccination_history.startsWith('http') ? selectedClaim.vaccination_history : `http://localhost:8000${selectedClaim.vaccination_history}`}
@@ -260,7 +262,7 @@ const ClaimInsurances = () => {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        View/Download Vaccination History
+                        {t('admin.claims.modal.viewDownloadVaccination')}
                       </a>
                     </div>
                   </div>
@@ -268,7 +270,7 @@ const ClaimInsurances = () => {
 
                 {selectedClaim.medical_history && (
                   <div className="border-t pt-4">
-                    <label className="text-sm font-medium text-gray-500 block mb-2">Medical History</label>
+                    <label className="text-sm font-medium text-gray-500 block mb-2">{t('admin.claims.modal.medicalHistory')}</label>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <a
                         href={selectedClaim.medical_history.startsWith('http') ? selectedClaim.medical_history : `http://localhost:8000${selectedClaim.medical_history}`}
@@ -280,7 +282,7 @@ const ClaimInsurances = () => {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        View/Download Medical History
+                        {t('admin.claims.modal.viewDownloadMedical')}
                       </a>
                     </div>
                   </div>
@@ -288,7 +290,7 @@ const ClaimInsurances = () => {
 
                 {selectedClaim.admin_notes && (
                   <div className="border-t pt-4">
-                    <label className="text-sm font-medium text-gray-500">Admin Notes</label>
+                    <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.adminNotes')}</label>
                     <p className="text-gray-900">{selectedClaim.admin_notes}</p>
                   </div>
                 )}
@@ -296,19 +298,19 @@ const ClaimInsurances = () => {
                 {/* Admin Actions - Can approve/reject at any status except already approved/rejected/paid */}
                 {!['Approved', 'Rejected', 'Paid'].includes(selectedClaim.status) && (
                   <div className="border-t pt-4 mt-6">
-                    <label className="text-sm font-medium text-gray-500 block mb-2">Admin Actions</label>
+                    <label className="text-sm font-medium text-gray-500 block mb-2">{t('admin.claims.modal.adminActions')}</label>
                     <div className="flex gap-3">
                       <button
                         onClick={() => handleUpdateStatus(selectedClaim.id, 'Approved')}
                         className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
                       >
-                        <FaCheckCircle /> Approve Claim
+                        <FaCheckCircle /> {t('admin.claims.modal.approveClaim')}
                       </button>
                       <button
                         onClick={() => handleUpdateStatus(selectedClaim.id, 'Rejected')}
                         className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
                       >
-                        <FaTimesCircle /> Reject Claim
+                        <FaTimesCircle /> {t('admin.claims.modal.rejectClaim')}
                       </button>
                     </div>
                   </div>

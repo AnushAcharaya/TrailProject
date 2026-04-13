@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { FiClock, FiAlertCircle, FiCheckCircle, FiXCircle } from "react-icons/fi";
 import { getAppointmentStats } from "../../services/appointmentApi";
 import "../../styles/appointments.css";
 
 const StatCards = () => {
+  const { t } = useTranslation('appointments');
   const [stats, setStats] = useState({
     upcoming: 0,
     pending: 0,
@@ -29,7 +31,7 @@ const StatCards = () => {
 
   const statCards = [
     { 
-      label: "Upcoming", 
+      label: t('status.confirmed'),
       value: stats.upcoming, 
       color: "green",
       icon: <FiClock size={24} />,
@@ -37,7 +39,7 @@ const StatCards = () => {
       iconColor: "text-green-600"
     },
     { 
-      label: "Pending", 
+      label: t('status.pending'),
       value: stats.pending, 
       color: "yellow",
       icon: <FiAlertCircle size={24} />,
@@ -45,7 +47,7 @@ const StatCards = () => {
       iconColor: "text-yellow-600"
     },
     { 
-      label: "Completed", 
+      label: t('status.completed'),
       value: stats.completed, 
       color: "blue",
       icon: <FiCheckCircle size={24} />,
@@ -53,7 +55,7 @@ const StatCards = () => {
       iconColor: "text-blue-600"
     },
     { 
-      label: "Cancelled", 
+      label: t('status.cancelled'),
       value: stats.cancelled, 
       color: "red",
       icon: <FiXCircle size={24} />,

@@ -1,5 +1,6 @@
 // components/profileTransfer/farmerSide/animalList/AnimalList.jsx
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaFilter, FaChevronDown } from 'react-icons/fa';
 import AnimalCard from './AnimalCard';
 import TransferModal from './TransferModal';
@@ -7,6 +8,7 @@ import SearchBar from './SearchBar';
 import { getAllLivestock, getAllSpecies } from '../../../../services/livestockCrudApi';
 
 export default function AnimalList() {
+  const { t } = useTranslation('profileTransfer');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecies, setSelectedSpecies] = useState('All Species');
   const [isTransferOpen, setIsTransferOpen] = useState(false);
@@ -89,7 +91,7 @@ export default function AnimalList() {
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your animals...</p>
+          <p className="text-gray-600">{t('animalList.loading')}</p>
         </div>
       </div>
     );
@@ -105,7 +107,7 @@ export default function AnimalList() {
             onClick={fetchLivestock}
             className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
           >
-            Retry
+            {t('animalList.retry')}
           </button>
         </div>
       </div>
@@ -117,8 +119,8 @@ export default function AnimalList() {
       {/* Header - Smaller height */}
       <div className="bg-white border-b border-gray-200 px-8 py-4">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">My Animals</h1>
-          <p className="text-sm text-gray-600">Manage your livestock and initiate ownership transfers</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">{t('animalList.title')}</h1>
+          <p className="text-sm text-gray-600">{t('animalList.subtitle')}</p>
         </div>
       </div>
 
@@ -158,8 +160,8 @@ export default function AnimalList() {
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">
                 {animals.length === 0 
-                  ? 'No animals found. Add some livestock to get started!' 
-                  : 'No animals found matching your search.'}
+                  ? t('animalList.noAnimals')
+                  : t('animalList.noResults')}
               </p>
             </div>
           )}

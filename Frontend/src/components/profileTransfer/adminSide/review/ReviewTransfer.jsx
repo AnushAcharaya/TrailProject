@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaArrowLeft } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../AdminLayout';
@@ -9,6 +10,7 @@ import ActionSection from './ActionSection';
 import { getTransferById } from '../../../../services/profileTransferApi';
 
 function ReviewTransfer() {
+  const { t } = useTranslation('profileTransfer');
   const navigate = useNavigate();
   const { transferId } = useParams();
   const [transfer, setTransfer] = useState(null);
@@ -39,7 +41,7 @@ function ReviewTransfer() {
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading transfer details...</p>
+            <p className="text-gray-600">{t('reviewTransfer.loading')}</p>
           </div>
         </div>
       </AdminLayout>
@@ -56,7 +58,7 @@ function ReviewTransfer() {
               onClick={() => navigate('/profile-transfer/admin/dashboard')}
               className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
             >
-              Back to Dashboard
+              {t('reviewTransfer.backToDashboard')}
             </button>
           </div>
         </div>
@@ -69,12 +71,12 @@ function ReviewTransfer() {
       <AdminLayout>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
-            <p className="text-gray-600 mb-4">Transfer not found</p>
+            <p className="text-gray-600 mb-4">{t('reviewTransfer.notFound')}</p>
             <button 
               onClick={() => navigate('/profile-transfer/admin/dashboard')}
               className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
             >
-              Back to Dashboard
+              {t('reviewTransfer.backToDashboard')}
             </button>
           </div>
         </div>
@@ -94,8 +96,8 @@ function ReviewTransfer() {
             <FaArrowLeft className="text-gray-600" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Transfer Review</h1>
-            <p className="text-sm text-gray-600">ID: TR-{transfer.id}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t('reviewTransfer.title')}</h1>
+            <p className="text-sm text-gray-600">{t('reviewTransfer.id')}: TR-{transfer.id}</p>
           </div>
           <div className="ml-auto">
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${

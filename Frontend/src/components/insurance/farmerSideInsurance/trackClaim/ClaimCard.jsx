@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import StatusBadge from './StatusBadge';
 import StatusListItem from './StatusListItem';
 
@@ -16,17 +17,19 @@ const ClaimCard = ({
   vetNotes,
   adminNotes
 }) => {
+  const { t } = useTranslation('insurance');
+  
   const getStatusLabel = (status) => {
     const labels = {
-      'submitted': 'Submitted',
-      'under-review': 'Under Review',
-      'verification': 'Pending Verification',
-      'verified': 'Verified',
-      'approved': 'Approved',
-      'rejected': 'Rejected',
-      'paid': 'Paid'
+      'submitted': t('trackClaim.status.submitted'),
+      'under-review': t('trackClaim.status.underReview'),
+      'verification': t('trackClaim.status.pendingVerification'),
+      'verified': t('trackClaim.status.approved'),
+      'approved': t('trackClaim.status.approved'),
+      'rejected': t('trackClaim.status.rejected'),
+      'paid': t('trackClaim.status.paid')
     };
-    return labels[status] || 'Submitted';
+    return labels[status] || t('trackClaim.status.submitted');
   };
 
   const formatDate = (dateString) => {
@@ -52,7 +55,7 @@ const ClaimCard = ({
       {/* Header */}
       <div className="claim-header">
         <div>
-          <h3 className="claim-number">CLM-{claimNumber}</h3>
+          <h3 className="claim-number">{t('trackClaim.claimNumber', { number: claimNumber })}</h3>
         </div>
         <div className={`claim-status-badge status-${overallStatus}`}>
           {getStatusLabel(overallStatus)}
@@ -77,22 +80,22 @@ const ClaimCard = ({
 
       {/* Claim Information */}
       <div className="claim-info-section">
-        <h4 className="section-title">Claim Information</h4>
+        <h4 className="section-title">{t('submitClaim.form.claimDetails')}</h4>
         <div className="info-grid">
           <div className="info-item">
-            <span className="info-label">Claim Type:</span>
+            <span className="info-label">{t('verify.claimDetails.type')}:</span>
             <span className="info-value">{claimType || 'N/A'}</span>
           </div>
           <div className="info-item">
-            <span className="info-label">Claim Amount:</span>
+            <span className="info-label">{t('verify.claimDetails.amount')}:</span>
             <span className="info-value">{formatCurrency(claimAmount)}</span>
           </div>
           <div className="info-item">
-            <span className="info-label">Incident Date:</span>
+            <span className="info-label">{t('verify.claimDetails.incidentDate')}:</span>
             <span className="info-value">{formatDate(incidentDate)}</span>
           </div>
           <div className="info-item">
-            <span className="info-label">Incident Location:</span>
+            <span className="info-label">{t('verify.claimDetails.location')}:</span>
             <span className="info-value">{incidentLocation || 'N/A'}</span>
           </div>
         </div>
@@ -100,7 +103,7 @@ const ClaimCard = ({
 
       {/* Incident Details */}
       <div className="incident-details">
-        <h4 className="incident-title">Incident Description</h4>
+        <h4 className="incident-title">{t('verify.claimDetails.description')}</h4>
         <p className="incident-description">
           {incidentDetails}
         </p>
@@ -109,7 +112,7 @@ const ClaimCard = ({
       {/* Supporting Documents */}
       {(supportingDocument || vaccinationHistory || medicalHistory) && (
         <div className="documents-section">
-          <h4 className="section-title">Supporting Documents</h4>
+          <h4 className="section-title">{t('submitClaim.form.uploadImage')}</h4>
           <div className="documents-list">
             {supportingDocument && (
               <div className="document-item">
@@ -120,7 +123,7 @@ const ClaimCard = ({
                   rel="noopener noreferrer"
                   className="document-link"
                 >
-                  Treatment/Incident Document
+                  {t('submitClaim.form.uploadImage')}
                 </a>
               </div>
             )}
@@ -133,7 +136,7 @@ const ClaimCard = ({
                   rel="noopener noreferrer"
                   className="document-link"
                 >
-                  Vaccination History
+                  {t('verify.vaccinationHistory.title')}
                 </a>
               </div>
             )}
@@ -146,7 +149,7 @@ const ClaimCard = ({
                   rel="noopener noreferrer"
                   className="document-link"
                 >
-                  Medical History
+                  {t('verify.medicalHistory.title')}
                 </a>
               </div>
             )}
@@ -157,7 +160,7 @@ const ClaimCard = ({
       {/* Vet Notes */}
       {vetNotes && (
         <div className="notes-section">
-          <h4 className="section-title">Veterinarian Notes</h4>
+          <h4 className="section-title">{t('verify.decision.notes')}</h4>
           <p className="notes-content">{vetNotes}</p>
         </div>
       )}
@@ -165,7 +168,7 @@ const ClaimCard = ({
       {/* Admin Notes */}
       {adminNotes && (
         <div className="notes-section">
-          <h4 className="section-title">Admin Notes</h4>
+          <h4 className="section-title">{t('verify.decision.notes')}</h4>
           <p className="notes-content">{adminNotes}</p>
         </div>
       )}

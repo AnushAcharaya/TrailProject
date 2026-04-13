@@ -1,5 +1,6 @@
 // PasswordTab.jsx
-import React, { useState } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { changePassword } from "../../services/profileApi";
 
 const BRAND = {
@@ -15,6 +16,7 @@ const BRAND = {
 };
 
 const PasswordTab = () => {
+  const { t } = useTranslation('profile');
   const [data, setData] = useState({
     old_password: "",
     new_password: "",
@@ -26,13 +28,13 @@ const PasswordTab = () => {
 
   const validatePassword = () => {
     if (data.new_password.length < 8) {
-      return "New password must be at least 8 characters.";
+      return t('passwordTab.messages.minLength');
     }
     if (data.new_password !== data.confirm_password) {
-      return "New password and confirm password do not match.";
+      return t('passwordTab.messages.mismatch');
     }
     if (data.new_password === data.old_password) {
-      return "New password must be different from current password.";
+      return t('passwordTab.messages.same');
     }
     return null;
   };
@@ -52,7 +54,7 @@ const PasswordTab = () => {
     const result = await changePassword(data);
     
     if (result.success) {
-      setStatus(result.message || "Password changed successfully!");
+      setStatus(result.message || t('passwordTab.messages.success'));
       // Clear form
       setData({
         old_password: "",
@@ -66,7 +68,7 @@ const PasswordTab = () => {
                        result.error?.confirm_password?.[0] ||
                        result.error?.error ||
                        result.error?.message || 
-                       "Failed to change password.";
+                       t('passwordTab.messages.error');
       setError(errorMsg);
     }
     
@@ -84,10 +86,10 @@ const PasswordTab = () => {
         className="text-lg font-semibold mb-1"
         style={{ color: BRAND.textDark }}
       >
-        Change password
+        {t('passwordTab.title')}
       </h3>
       <p className="text-xs mb-4" style={{ color: BRAND.textLight }}>
-        Update your password. Make sure it's at least 8 characters long.
+        {t('passwordTab.subtitle')}
       </p>
 
       <div className="space-y-3 mb-3">
@@ -96,11 +98,11 @@ const PasswordTab = () => {
             className="block text-xs font-medium mb-1"
             style={{ color: BRAND.textMedium }}
           >
-            Current password
+            {t('passwordTab.fields.current')}
           </label>
           <input
             type="password"
-            placeholder="••••••••"
+            placeholder={t('passwordTab.fields.currentPlaceholder')}
             value={data.old_password}
             onChange={(e) =>
               setData({ ...data, old_password: e.target.value })
@@ -138,11 +140,11 @@ const PasswordTab = () => {
             className="block text-xs font-medium mb-1"
             style={{ color: BRAND.textMedium }}
           >
-            New password
+            {t('passwordTab.fields.new')}
           </label>
           <input
             type="password"
-            placeholder="At least 8 characters"
+            placeholder={t('passwordTab.fields.newPlaceholder')}
             value={data.new_password}
             onChange={(e) =>
               setData({ ...data, new_password: e.target.value })
@@ -180,11 +182,11 @@ const PasswordTab = () => {
             className="block text-xs font-medium mb-1"
             style={{ color: BRAND.textMedium }}
           >
-            Confirm new password
+            {t('passwordTab.fields.confirm')}
           </label>
           <input
             type="password"
-            placeholder="Repeat new password"
+            placeholder={t('passwordTab.fields.confirmPlaceholder')}
             value={data.confirm_password}
             onChange={(e) =>
               setData({ ...data, confirm_password: e.target.value })
@@ -260,7 +262,7 @@ const PasswordTab = () => {
           e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
         }}
       >
-        {loading ? "Updating..." : "Update password"}
+        {loading ? t('passwordTab.buttons.updating') : t('passwordTab.buttons.update')}
       </button>
     </div>
   );

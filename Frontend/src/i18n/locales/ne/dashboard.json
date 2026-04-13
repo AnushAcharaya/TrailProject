@@ -1,0 +1,51 @@
+{
+  "title": "ड्यासबोर्ड",
+  "appName": "फार्मकेयर",
+  "search": {
+    "placeholder": "ट्याग ID वा नामद्वारा पशुधन खोज्नुहोस्..."
+  },
+  "sidebar": {
+    "dashboard": "ड्यासबोर्ड",
+    "vetAppointment": "पशु चिकित्सक भेट",
+    "messages": "सन्देशहरू",
+    "friendRequests": "साथी अनुरोधहरू",
+    "friends": "साथीहरू",
+    "livestock": "पशुधन",
+    "vaccination": "खोप",
+    "medicalHistory": "चिकित्सा इतिहास",
+    "reports": "रिपोर्टहरू",
+    "insurance": "बीमा",
+    "profileTransfer": "प्रोफाइल स्थानान्तरण",
+    "settings": "सेटिङहरू",
+    "logout": "लगआउट"
+  },
+  "stats": {
+    "totalLivestock": "कुल पशुधन",
+    "upcomingVaccinations": "आगामी खोपहरू",
+    "underTreatment": "उपचार अन्तर्गत",
+    "overdueTasks": "बाँकी कार्यहरू"
+  },
+  "charts": {
+    "livestockDistribution": "पशुधन वितरण",
+    "totalAnimals": "प्रकार अनुसार कुल जनावरहरू",
+    "chartVisualization": "यहाँ चार्ट दृश्य",
+    "vaccinationStatus": "खोप स्थिति",
+    "monthlyVaccinated": "मासिक खोप लगाइएको बनाम बाँकी",
+    "barChartVisualization": "यहाँ बार चार्ट दृश्य"
+  },
+  "recentActivity": {
+    "title": "हालको गतिविधि",
+    "viewAll": "सबै हेर्नुहोस्",
+    "hoursAgo": "घण्टा अघि",
+    "cattleVaccinated": "गाई #A142 खोप लगाइयो",
+    "overdueVaccination": "बाँकी खोप - भेडा #B203",
+    "healthCheckCompleted": "स्वास्थ्य जाँच पूरा भयो - बाख्रा #C089"
+  },
+  "notifications": {
+    "count": "३"
+  },
+  "profile": {
+    "name": "जोन डो",
+    "initials": "JD"
+  }
+}

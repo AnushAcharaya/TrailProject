@@ -1,5 +1,6 @@
 // components/profileTransfer/farmerSide/animalList/TransferModal.jsx
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaTimes } from 'react-icons/fa';
 import AnimalPreview from './AnimalPreview';
 import FarmSearch from './FarmSearch';
@@ -7,6 +8,7 @@ import ReasonTextArea from './ReasonTextArea';
 import { createTransfer } from '../../../../services/profileTransferApi';
 
 export default function TransferModal({ animal, onClose, onTransferSuccess }) {
+  const { t } = useTranslation('profileTransfer');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [reason, setReason] = useState('');
@@ -21,12 +23,12 @@ export default function TransferModal({ animal, onClose, onTransferSuccess }) {
   const handleSubmit = async () => {
     // Validation
     if (!selectedFarmer) {
-      setError('Please select a farmer to transfer to');
+      setError(t('transferModal.errors.selectFarmer'));
       return;
     }
 
     if (!reason || reason.trim().length < 10) {
-      setError('Please provide a reason (at least 10 characters)');
+      setError(t('transferModal.errors.reasonLength'));
       return;
     }
 
@@ -48,7 +50,7 @@ export default function TransferModal({ animal, onClose, onTransferSuccess }) {
       onClose();
     } catch (err) {
       console.error('Error creating transfer:', err);
-      setError(err.response?.data?.message || 'Failed to create transfer request');
+      setError(err.response?.data?.message || t('transferModal.errors.createFailed'));
     } finally {
       setLoading(false);
     }
@@ -61,7 +63,7 @@ export default function TransferModal({ animal, onClose, onTransferSuccess }) {
         <div className="p-6 pb-4 border-b border-emerald-100">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              Transfer Ownership
+              {t('transferModal.title')}
             </h2>
             <button
               onClick={onClose}
@@ -85,7 +87,7 @@ export default function TransferModal({ animal, onClose, onTransferSuccess }) {
             {selectedFarmer && (
               <div className="mt-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
                 <p className="text-sm text-emerald-700">
-                  Selected: <span className="font-semibold">{selectedFarmer.full_name || selectedFarmer.email}</span>
+                  {t('transferModal.selected')}: <span className="font-semibold">{selectedFarmer.full_name || selectedFarmer.email}</span>
                 </p>
               </div>
             )}
@@ -108,7 +110,7 @@ export default function TransferModal({ animal, onClose, onTransferSuccess }) {
               disabled={loading}
               className="flex-1 py-3.5 px-6 bg-white/80 backdrop-blur-sm hover:bg-white border border-emerald-200 text-emerald-700 font-semibold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Cancel
+              {t('transferModal.cancel')}
             </button>
             <button 
               onClick={handleSubmit}
@@ -118,10 +120,10 @@ export default function TransferModal({ animal, onClose, onTransferSuccess }) {
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Processing...</span>
+                  <span>{t('transferModal.processing')}</span>
                 </>
               ) : (
-                'Continue'
+                t('transferModal.continue')
               )}
             </button>
           </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import FarmerLayout from '../../../components/farmerDashboard/FarmerLayout';
 import StatusBadge from '../../../components/insurance/farmerSideInsurance/dashboard/StatusBadge';
 import ClaimCard from '../../../components/insurance/farmerSideInsurance/dashboard/ClaimCard';
@@ -7,6 +8,7 @@ import { getEnrollments, getMyClaims } from '../../../services/insuranceApi';
 import '../../../styles/farmerSideInsurance/dashboard.css';
 
 const Dashboard = () => {
+  const { t } = useTranslation('insurance');
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEnrollmentId, setSelectedEnrollmentId] = useState(null);
@@ -95,7 +97,7 @@ const Dashboard = () => {
   };
 
   return (
-    <FarmerLayout pageTitle="Insurance Dashboard">
+    <FarmerLayout pageTitle={t('nav.dashboard')}>
       {selectedEnrollmentId && (
         <EnrollmentDetailsModal
           enrollmentId={selectedEnrollmentId}
@@ -108,8 +110,8 @@ const Dashboard = () => {
           <section className="section-card mb-8">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="welcome-title">Welcome back, Farmer!</h1>
-                <p className="text-gray-600 text-lg">Manage your insurance claims and coverage</p>
+                <h1 className="welcome-title">{t('dashboard.welcome')}</h1>
+                <p className="text-gray-600 text-lg">{t('dashboard.subtitle')}</p>
               </div>
               <StatusBadge status="approved" size="large" />
             </div>
@@ -118,10 +120,10 @@ const Dashboard = () => {
           {/* Status Indicators */}
           <section className="grid grid-cols-4 gap-6 mb-8">
             {[
-              { label: 'Total Claims', value: stats.totalClaims, status: 'completed', color: 'emerald' },
-              { label: 'Pending', value: stats.pending, status: 'pending', color: 'yellow' },
-              { label: 'Approved', value: stats.approved, status: 'approved', color: 'emerald' },
-              { label: 'Enrollments', value: stats.totalEnrollments, status: 'active', color: 'gray' }
+              { label: t('dashboard.stats.totalClaims'), value: stats.totalClaims, status: 'completed', color: 'emerald' },
+              { label: t('dashboard.stats.pending'), value: stats.pending, status: 'pending', color: 'yellow' },
+              { label: t('dashboard.stats.approved'), value: stats.approved, status: 'approved', color: 'emerald' },
+              { label: t('dashboard.stats.enrollments'), value: stats.totalEnrollments, status: 'active', color: 'gray' }
             ].map((item, idx) => (
               <div key={idx} className="section-card p-6 text-center">
                 <div className="flex justify-center mb-4">
@@ -137,17 +139,17 @@ const Dashboard = () => {
           <section className="section-card">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                Recent Insurance Activities
+                {t('dashboard.recentActivities')}
               </h2>
               <button className="text-emerald-600 hover:text-emerald-800 font-semibold flex items-center gap-2">
-                See All <span>→</span>
+                {t('dashboard.seeAll')} <span>→</span>
               </button>
             </div>
             
             {loading ? (
-              <div className="text-center py-8 text-gray-500">Loading activities...</div>
+              <div className="text-center py-8 text-gray-500">{t('dashboard.loading')}</div>
             ) : recentActivities.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">No recent activities</div>
+              <div className="text-center py-8 text-gray-500">{t('dashboard.noActivities')}</div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {recentActivities.map((activity) => (

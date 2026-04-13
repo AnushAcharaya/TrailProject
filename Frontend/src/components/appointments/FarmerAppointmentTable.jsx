@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { getAppointments, cancelAppointment, formatAppointmentDate, formatAppointmentTime } from "../../services/appointmentApi";
 import "../../styles/appointments.css";
 
 const FarmerAppointmentTable = () => {
+  const { t } = useTranslation('appointments');
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +30,7 @@ const FarmerAppointmentTable = () => {
   };
 
   const handleCancelAppointment = async (id) => {
-    if (!window.confirm("Are you sure you want to cancel this appointment?")) {
+    if (!window.confirm(t('actions.cancel') + "?")) {
       return;
     }
 
@@ -39,7 +41,7 @@ const FarmerAppointmentTable = () => {
       await loadAppointments();
     } catch (err) {
       console.error("Failed to cancel appointment:", err);
-      alert("Failed to cancel appointment. Please try again.");
+      alert(t('form.messages.error'));
     } finally {
       setCancellingId(null);
     }
@@ -61,14 +63,25 @@ const FarmerAppointmentTable = () => {
     return classes[status] || 'badge badge-gray';
   };
 
+  const getStatusLabel = (status) => {
+    const statusMap = {
+      'Pending': t('status.pending'),
+      'Approved': t('status.confirmed'),
+      'Completed': t('status.completed'),
+      'Cancelled': t('status.cancelled'),
+      'Declined': t('status.rejected'),
+    };
+    return statusMap[status] || status;
+  };
+
   const getPaymentStatusBadge = (paymentStatus) => {
     const statusMap = {
-      'paid': { label: '✓ Paid', class: 'badge badge-green' },
-      'pending': { label: '⏳ Pending', class: 'badge badge-yellow' },
-      'failed': { label: '✗ Failed', class: 'badge badge-red' },
-      'not_required': { label: 'Not Required', class: 'badge badge-gray' },
+      'paid': { label: '✓ ' + t('payment.methods.esewa'), class: 'badge badge-green' },
+      'pending': { label: '⏳ ' + t('status.pending'), class: 'badge badge-yellow' },
+      'failed': { label: '✗ ' + t('payment.messages.paymentFailed'), class: 'badge badge-red' },
+      'not_required': { label: t('common.noData'), class: 'badge badge-gray' },
     };
-    return statusMap[paymentStatus] || { label: 'Unknown', class: 'badge badge-gray' };
+    return statusMap[paymentStatus] || { label: t('common.noData'), class: 'badge badge-gray' };
   };
 
   const getPaymentMethodLabel = (appointment) => {
@@ -86,7 +99,7 @@ const FarmerAppointmentTable = () => {
   if (isLoading) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-        <p className="text-gray-600">Loading appointments...</p>
+        <p className="text-gray-600">{t('common.loading')}</p>
       </div>
     );
   }
@@ -99,7 +112,7 @@ const FarmerAppointmentTable = () => {
           onClick={loadAppointments}
           className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
-          Retry
+          {t('common.next')}
         </button>
       </div>
     );
@@ -108,7 +121,7 @@ const FarmerAppointmentTable = () => {
   if (appointments.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-        <p className="text-gray-600">No appointments found. Request your first appointment!</p>
+        <p className="text-gray-600">{t('farmer.appointments.noAppointments')}</p>
       </div>
     );
   }
@@ -116,16 +129,17 @@ const FarmerAppointmentTable = () => {
   return (
     <>
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        {/* Desktop Table View */}
         <table className="app-table">
           <thead>
             <tr>
-              <th>Veterinarian</th>
-              <th>Animal</th>
-              <th>Date & Time</th>
-              <th>Status</th>
-              <th>Payment Method</th>
-              <th>Payment Status</th>
-              <th className="text-right">Actions</th>
+              <th>{t('card.vet')}</th>
+              <th>{t('card.animal')}</th>
+              <th>{t('card.date')} / {t('card.time')}</th>
+              <th>{t('card.status')}</th>
+              <th>{t('payment.title')}</th>
+              <th>{t('payment.title')} {t('card.status')}</th>
+              <th className="text-right">{t('card.actions')}</th>
             </tr>
           </thead>
 
@@ -144,11 +158,18 @@ const FarmerAppointmentTable = () => {
                 </td>
                 <td className="capitalize">{appointment.animal_type}</td>
                 <td>
-                  {formatAppointmentDate(appointment.preferred_date)} · {formatAppointmentTime(appointment.preferred_time)}
+                  <div>
+                    <div className="font-medium text-gray-900">
+                      {formatAppointmentDate(appointment.preferred_date)}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {formatAppointmentTime(appointment.preferred_time)}
+                    </div>
+                  </div>
                 </td>
                 <td>
                   <span className={getStatusBadgeClass(appointment.status)}>
-                    {appointment.status}
+                    {getStatusLabel(appointment.status)}
                   </span>
                 </td>
                 <td>
@@ -162,28 +183,104 @@ const FarmerAppointmentTable = () => {
                   </span>
                 </td>
                 <td className="text-right">
-                  <div className="flex justify-end gap-2">
+                  <div className="action-buttons-grid">
                     <button
                       onClick={() => handleViewDetails(appointment)}
                       className="text-green-600 hover:text-green-700 font-medium"
                     >
-                      Details
+                      {t('actions.viewDetails')}
                     </button>
-                    {(appointment.status === 'Pending' || appointment.status === 'Approved') && (
-                      <button
-                        onClick={() => handleCancelAppointment(appointment.id)}
-                        disabled={cancellingId === appointment.id}
-                        className="text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
-                      >
-                        {cancellingId === appointment.id ? 'Cancelling...' : 'Cancel'}
-                      </button>
-                    )}
+                    <div className="action-button-slot">
+                      {(appointment.status === 'Pending' || appointment.status === 'Approved') && (
+                        <button
+                          onClick={() => handleCancelAppointment(appointment.id)}
+                          disabled={cancellingId === appointment.id}
+                          className="text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
+                        >
+                          {cancellingId === appointment.id ? t('common.loading') : t('actions.cancel')}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        {/* Mobile Card View */}
+        <div className="mobile-appointment-list">
+          {appointments.map((appointment) => (
+            <div key={appointment.id} className="mobile-appointment-card">
+              <div className="mobile-card-header">
+                <div className="mobile-card-vet">
+                  <div className="mobile-card-vet-name">
+                    {appointment.veterinarian_details?.full_name || 'N/A'}
+                  </div>
+                  <div className="mobile-card-vet-email">
+                    {appointment.veterinarian_details?.email}
+                  </div>
+                </div>
+                <span className={getStatusBadgeClass(appointment.status)}>
+                  {getStatusLabel(appointment.status)}
+                </span>
+              </div>
+
+              <div className="mobile-card-body">
+                <div className="mobile-card-row">
+                  <span className="mobile-card-label">{t('card.animal')}</span>
+                  <span className="mobile-card-value capitalize">{appointment.animal_type}</span>
+                </div>
+
+                <div className="mobile-card-row">
+                  <span className="mobile-card-label">{t('card.date')}</span>
+                  <span className="mobile-card-value">
+                    {formatAppointmentDate(appointment.preferred_date)}
+                  </span>
+                </div>
+
+                <div className="mobile-card-row">
+                  <span className="mobile-card-label">{t('card.time')}</span>
+                  <span className="mobile-card-value">
+                    {formatAppointmentTime(appointment.preferred_time)}
+                  </span>
+                </div>
+
+                <div className="mobile-card-row">
+                  <span className="mobile-card-label">{t('payment.title')}</span>
+                  <span className="mobile-card-value">
+                    {getPaymentMethodLabel(appointment)}
+                  </span>
+                </div>
+
+                <div className="mobile-card-row">
+                  <span className="mobile-card-label">{t('payment.title')} {t('card.status')}</span>
+                  <span className={getPaymentStatusBadge(appointment.payment_status).class}>
+                    {getPaymentStatusBadge(appointment.payment_status).label}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mobile-card-actions">
+                <button
+                  onClick={() => handleViewDetails(appointment)}
+                  className="mobile-btn-view"
+                >
+                  {t('actions.viewDetails')}
+                </button>
+                {(appointment.status === 'Pending' || appointment.status === 'Approved') && (
+                  <button
+                    onClick={() => handleCancelAppointment(appointment.id)}
+                    disabled={cancellingId === appointment.id}
+                    className="mobile-btn-cancel"
+                  >
+                    {cancellingId === appointment.id ? t('common.loading') : t('actions.cancel')}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Details Modal */}
@@ -198,7 +295,7 @@ const FarmerAppointmentTable = () => {
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Appointment Details</h2>
+                <h2 className="text-2xl font-bold text-gray-800">{t('actions.viewDetails')}</h2>
                 <button
                   onClick={() => setShowDetailsModal(false)}
                   className="text-gray-400 hover:text-gray-600"
@@ -209,41 +306,41 @@ const FarmerAppointmentTable = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Veterinarian</label>
+                  <label className="text-sm font-medium text-gray-500">{t('card.vet')}</label>
                   <p className="text-gray-900">{selectedAppointment.veterinarian_details?.full_name}</p>
                   <p className="text-sm text-gray-600">{selectedAppointment.veterinarian_details?.email}</p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Animal Type</label>
+                  <label className="text-sm font-medium text-gray-500">{t('form.animalType')}</label>
                   <p className="text-gray-900 capitalize">{selectedAppointment.animal_type}</p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Date & Time</label>
+                  <label className="text-sm font-medium text-gray-500">{t('card.date')} & {t('card.time')}</label>
                   <p className="text-gray-900">
                     {formatAppointmentDate(selectedAppointment.preferred_date)} at {formatAppointmentTime(selectedAppointment.preferred_time)}
                   </p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Status</label>
+                  <label className="text-sm font-medium text-gray-500">{t('card.status')}</label>
                   <p>
                     <span className={getStatusBadgeClass(selectedAppointment.status)}>
-                      {selectedAppointment.status}
+                      {getStatusLabel(selectedAppointment.status)}
                     </span>
                   </p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Payment Method</label>
+                  <label className="text-sm font-medium text-gray-500">{t('payment.title')}</label>
                   <p className="text-gray-900 font-medium">
                     {getPaymentMethodLabel(selectedAppointment)}
                   </p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Payment Status</label>
+                  <label className="text-sm font-medium text-gray-500">{t('payment.title')} {t('card.status')}</label>
                   <p>
                     <span className={getPaymentStatusBadge(selectedAppointment.payment_status).class}>
                       {getPaymentStatusBadge(selectedAppointment.payment_status).label}
@@ -253,19 +350,19 @@ const FarmerAppointmentTable = () => {
 
                 {selectedAppointment.appointment_fee && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Appointment Fee</label>
+                    <label className="text-sm font-medium text-gray-500">{t('payment.fee')}</label>
                     <p className="text-gray-900 font-semibold">Rs. {selectedAppointment.appointment_fee}</p>
                   </div>
                 )}
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Reason for Visit</label>
+                  <label className="text-sm font-medium text-gray-500">{t('form.reason')}</label>
                   <p className="text-gray-900">{selectedAppointment.reason}</p>
                 </div>
 
                 {selectedAppointment.vet_notes && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Vet Notes</label>
+                    <label className="text-sm font-medium text-gray-500">{t('card.vet')} Notes</label>
                     <p className="text-gray-900">{selectedAppointment.vet_notes}</p>
                   </div>
                 )}
@@ -275,7 +372,7 @@ const FarmerAppointmentTable = () => {
                     onClick={() => setShowDetailsModal(false)}
                     className="px-6 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
                   >
-                    Close
+                    {t('common.close')}
                   </button>
                 </div>
               </div>

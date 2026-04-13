@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import { getReceivedRequests, acceptFriendRequest, rejectFriendRequest } from "../../services/friendsApi";
 import { FaUserPlus, FaCheck, FaTimes } from "react-icons/fa";
 
 const VetFriendRequests = () => {
+  const { t } = useTranslation('vetDashboard');
   const [requests, setRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
@@ -45,7 +47,7 @@ const VetFriendRequests = () => {
     
     if (result.success) {
       setRequests(requests.filter(req => req.id !== requestId));
-      showNotification('Friend request accepted!', 'success');
+      showNotification(t('friendRequests.requestAccepted'), 'success');
     } else {
       showNotification(result.error, 'error');
     }
@@ -59,7 +61,7 @@ const VetFriendRequests = () => {
     
     if (result.success) {
       setRequests(requests.filter(req => req.id !== requestId));
-      showNotification('Friend request rejected', 'success');
+      showNotification(t('friendRequests.requestRejected'), 'success');
     } else {
       showNotification(result.error, 'error');
     }
@@ -68,21 +70,16 @@ const VetFriendRequests = () => {
   };
 
   return (
-    <VetLayout pageTitle="Friend Requests">
+    <VetLayout pageTitle={t('friendRequests.title')}>
       <div className="max-w-4xl mx-auto p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <FaUserPlus className="text-3xl text-emerald-600" />
-          <h1 className="text-3xl font-bold text-gray-800">Friend Requests</h1>
-        </div>
-
         {isLoading ? (
           <div className="text-center py-12 text-gray-600">
-            Loading friend requests...
+            {t('friendRequests.loading')}
           </div>
         ) : requests.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <FaUserPlus className="text-6xl text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg">No pending friend requests</p>
+            <p className="text-gray-600 text-lg">{t('friendRequests.noPendingRequests')}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -115,7 +112,7 @@ const VetFriendRequests = () => {
                     className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium flex items-center gap-2 disabled:opacity-50"
                   >
                     <FaCheck />
-                    Accept
+                    {t('friendRequests.accept')}
                   </button>
                   <button
                     onClick={() => handleReject(request.id)}
@@ -123,7 +120,7 @@ const VetFriendRequests = () => {
                     className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium flex items-center gap-2 disabled:opacity-50"
                   >
                     <FaTimes />
-                    Reject
+                    {t('friendRequests.reject')}
                   </button>
                 </div>
               </div>

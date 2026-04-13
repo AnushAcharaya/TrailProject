@@ -1,6 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { FaShieldAlt, FaHeartbeat, FaVirus, FaCrown } from 'react-icons/fa';
 
 const CoverageList = ({ coverages }) => {
+  const { t } = useTranslation('insurance');
+  
   const icons = {
     accident: <FaShieldAlt />,
     theft: <FaHeartbeat />,
@@ -13,7 +16,7 @@ const CoverageList = ({ coverages }) => {
       {coverages.map((item, idx) => (
         <div key={idx} className="coverage-item">
           <span className="coverage-icon">{icons[item.icon]}</span>
-          <span className="coverage-text-item">{item.text}</span>
+          <span className="coverage-text-item">{t(`plans.${item.text}`)}</span>
         </div>
       ))}
     </div>

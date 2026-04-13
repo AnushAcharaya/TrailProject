@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FaTimes, FaFileAlt, FaCalendarAlt, FaMoneyBillWave, FaShieldAlt, FaPaw, FaMapMarkerAlt, FaFileDownload } from 'react-icons/fa';
 import { getClaimById } from '../../../../services/insuranceApi';
 import '../../../../styles/farmerSideInsurance/trackClaim.css';
 
 const TrackClaim = () => {
+  const { t } = useTranslation('insurance');
   const { claimId } = useParams();
   const navigate = useNavigate();
   const [claim, setClaim] = useState(null);
@@ -50,11 +52,11 @@ const TrackClaim = () => {
 
   const getStatusBadge = (status) => {
     const badges = {
-      'Submitted': { text: 'Submitted', className: 'status-badge-submitted' },
-      'Under Review': { text: 'Under Review', className: 'status-badge-review' },
-      'Approved': { text: 'Approved', className: 'status-badge-approved' },
-      'Rejected': { text: 'Rejected', className: 'status-badge-rejected' },
-      'Paid': { text: 'Paid', className: 'status-badge-paid' }
+      'Submitted': { text: t('trackClaim.status.submitted'), className: 'status-badge-submitted' },
+      'Under Review': { text: t('trackClaim.status.underReview'), className: 'status-badge-review' },
+      'Approved': { text: t('trackClaim.status.approved'), className: 'status-badge-approved' },
+      'Rejected': { text: t('trackClaim.status.rejected'), className: 'status-badge-rejected' },
+      'Paid': { text: t('trackClaim.status.paid'), className: 'status-badge-paid' }
     };
     return badges[status] || { text: status, className: 'status-badge-default' };
   };
@@ -69,7 +71,7 @@ const TrackClaim = () => {
         <div className="modal-content">
           <div className="modal-loading">
             <div className="spinner"></div>
-            <p>Loading claim details...</p>
+            <p>{t('common.loading')}</p>
           </div>
         </div>
       </div>
@@ -81,8 +83,8 @@ const TrackClaim = () => {
       <div className="modal-overlay">
         <div className="modal-content">
           <div className="modal-error">
-            <p>{error || 'Claim not found'}</p>
-            <button onClick={handleClose} className="btn-close-error">Close</button>
+            <p>{error || t('trackClaim.noClaims')}</p>
+            <button onClick={handleClose} className="btn-close-error">{t('common.close')}</button>
           </div>
         </div>
       </div>
@@ -97,8 +99,8 @@ const TrackClaim = () => {
           <div className="modal-header-content">
             <FaFileAlt className="modal-icon" />
             <div>
-              <h2>Claim Details</h2>
-              <p className="modal-subtitle">Claim ID: CLM-{claim.id}</p>
+              <h2>{t('trackClaim.buttons.viewDetails')}</h2>
+              <p className="modal-subtitle">{t('trackClaim.claimNumber', { number: claim.id })}</p>
             </div>
           </div>
           <button onClick={handleClose} className="btn-close-modal">
@@ -112,17 +114,17 @@ const TrackClaim = () => {
           <div className="detail-section">
             <div className="section-header">
               <FaShieldAlt className="section-icon" />
-              <h3>Status Information</h3>
+              <h3>{t('verify.claimDetails.submittedDate')}</h3>
             </div>
             <div className="detail-grid">
               <div className="detail-item">
-                <label>Current Status</label>
+                <label>{t('admin.claims.headers.status')}</label>
                 <span className={`modal-claim-badge ${getStatusBadge(claim.status).className}`}>
                   {getStatusBadge(claim.status).text}
                 </span>
               </div>
               <div className="detail-item">
-                <label>Submission Date</label>
+                <label>{t('verify.claimDetails.submittedDate')}</label>
                 <div className="detail-value">
                   <FaCalendarAlt className="inline-icon" />
                   {formatDate(claim.created_at)}
@@ -135,26 +137,26 @@ const TrackClaim = () => {
           <div className="detail-section">
             <div className="section-header">
               <FaFileAlt className="section-icon" />
-              <h3>Claim Information</h3>
+              <h3>{t('submitClaim.form.claimDetails')}</h3>
             </div>
             <div className="detail-grid">
               <div className="detail-item">
-                <label>Claim Type</label>
+                <label>{t('verify.claimDetails.type')}</label>
                 <div className="detail-value highlight">{claim.claim_type || 'N/A'}</div>
               </div>
               <div className="detail-item">
-                <label>Claim Amount</label>
+                <label>{t('verify.claimDetails.amount')}</label>
                 <div className="detail-value highlight">{formatCurrency(claim.claim_amount)}</div>
               </div>
               <div className="detail-item">
-                <label>Incident Date</label>
+                <label>{t('verify.claimDetails.incidentDate')}</label>
                 <div className="detail-value">
                   <FaCalendarAlt className="inline-icon" />
                   {formatDate(claim.incident_date)}
                 </div>
               </div>
               <div className="detail-item">
-                <label>Incident Location</label>
+                <label>{t('verify.claimDetails.location')}</label>
                 <div className="detail-value">
                   <FaMapMarkerAlt className="inline-icon" />
                   {claim.incident_location || 'N/A'}
@@ -167,10 +169,10 @@ const TrackClaim = () => {
           <div className="detail-section">
             <div className="section-header">
               <FaFileAlt className="section-icon" />
-              <h3>Incident Description</h3>
+              <h3>{t('verify.claimDetails.description')}</h3>
             </div>
             <div className="notes-content">
-              {claim.description || 'No description provided'}
+              {claim.description || t('common.noData')}
             </div>
           </div>
 
@@ -179,23 +181,23 @@ const TrackClaim = () => {
             <div className="detail-section">
               <div className="section-header">
                 <FaPaw className="section-icon" />
-                <h3>Livestock Information</h3>
+                <h3>{t('verify.livestockProfile.title')}</h3>
               </div>
               <div className="detail-grid">
                 <div className="detail-item">
-                  <label>Tag ID</label>
+                  <label>{t('verify.livestockProfile.tagId')}</label>
                   <div className="detail-value highlight">{claim.enrollment_details.livestock_details?.tag_id || 'N/A'}</div>
                 </div>
                 <div className="detail-item">
-                  <label>Species</label>
+                  <label>{t('verify.livestockProfile.species')}</label>
                   <div className="detail-value">{claim.enrollment_details.livestock_details?.species_name || 'N/A'}</div>
                 </div>
                 <div className="detail-item">
-                  <label>Breed</label>
+                  <label>{t('verify.livestockProfile.breed')}</label>
                   <div className="detail-value">{claim.enrollment_details.livestock_details?.breed_name || 'N/A'}</div>
                 </div>
                 <div className="detail-item">
-                  <label>Age</label>
+                  <label>{t('verify.livestockProfile.age')}</label>
                   <div className="detail-value">{claim.enrollment_details.livestock_details?.age ? `${claim.enrollment_details.livestock_details.age} years` : 'N/A'}</div>
                 </div>
               </div>
@@ -207,7 +209,7 @@ const TrackClaim = () => {
             <div className="detail-section">
               <div className="section-header">
                 <FaFileDownload className="section-icon" />
-                <h3>Supporting Documents</h3>
+                <h3>{t('submitClaim.form.uploadImage')}</h3>
               </div>
               <div className="documents-list">
                 {claim.incident_image && (
@@ -219,7 +221,7 @@ const TrackClaim = () => {
                     download
                   >
                     <span className="document-icon">📄</span>
-                    <span>Incident Image</span>
+                    <span>{t('submitClaim.form.uploadImage')}</span>
                     <FaFileDownload className="download-icon" />
                   </a>
                 )}
@@ -232,7 +234,7 @@ const TrackClaim = () => {
                     download
                   >
                     <span className="document-icon">💉</span>
-                    <span>Vaccination History</span>
+                    <span>{t('verify.vaccinationHistory.title')}</span>
                     <FaFileDownload className="download-icon" />
                   </a>
                 )}
@@ -245,7 +247,7 @@ const TrackClaim = () => {
                     download
                   >
                     <span className="document-icon">🏥</span>
-                    <span>Medical History</span>
+                    <span>{t('verify.medicalHistory.title')}</span>
                     <FaFileDownload className="download-icon" />
                   </a>
                 )}
@@ -258,14 +260,14 @@ const TrackClaim = () => {
             <div className="detail-section">
               <div className="section-header">
                 <FaFileAlt className="section-icon" />
-                <h3>Admin Notes</h3>
+                <h3>{t('verify.decision.notes')}</h3>
               </div>
               <div className="notes-content admin-notes">
                 {claim.admin_notes}
               </div>
               {claim.decision_date && (
                 <div className="notes-meta">
-                  Decision made on: {formatDate(claim.decision_date)}
+                  {t('trackClaim.timeline.decision')}: {formatDate(claim.decision_date)}
                 </div>
               )}
             </div>
@@ -276,7 +278,7 @@ const TrackClaim = () => {
             <div className="detail-section">
               <div className="section-header">
                 <FaMoneyBillWave className="section-icon" />
-                <h3>Approved Amount</h3>
+                <h3>{t('trackClaim.status.approved')} {t('trackClaim.details.amount')}</h3>
               </div>
               <div className="approved-amount">
                 {formatCurrency(claim.approved_amount)}
@@ -288,7 +290,7 @@ const TrackClaim = () => {
         {/* Footer */}
         <div className="modal-footer">
           <button onClick={handleClose} className="btn-close-footer">
-            Close
+            {t('common.close')}
           </button>
         </div>
       </div>

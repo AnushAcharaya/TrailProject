@@ -1,0 +1,51 @@
+{
+  "title": "Dashboard",
+  "appName": "FarmCare",
+  "search": {
+    "placeholder": "Search livestock by tag ID or name..."
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "vetAppointment": "Vet Appointment",
+    "messages": "Messages",
+    "friendRequests": "Friend Requests",
+    "friends": "Friends",
+    "livestock": "Livestock",
+    "vaccination": "Vaccination",
+    "medicalHistory": "Medical History",
+    "reports": "Reports",
+    "insurance": "Insurance",
+    "profileTransfer": "Profile Transfer",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "stats": {
+    "totalLivestock": "Total Livestock",
+    "upcomingVaccinations": "Upcoming Vaccinations",
+    "underTreatment": "Under Treatment",
+    "overdueTasks": "Overdue Tasks"
+  },
+  "charts": {
+    "livestockDistribution": "Livestock Distribution",
+    "totalAnimals": "Total Animals by Type",
+    "chartVisualization": "Chart Visualization here",
+    "vaccinationStatus": "Vaccination Status",
+    "monthlyVaccinated": "Monthly vaccinated vs overdue",
+    "barChartVisualization": "Bar Chart Visualization here"
+  },
+  "recentActivity": {
+    "title": "Recent Activity",
+    "viewAll": "View All",
+    "hoursAgo": "hours ago",
+    "cattleVaccinated": "Cattle #A142 Vaccinated",
+    "overdueVaccination": "Overdue Vaccination - Sheep #B203",
+    "healthCheckCompleted": "Health Check Completed - Goat #C089"
+  },
+  "notifications": {
+    "count": "3"
+  },
+  "profile": {
+    "name": "John Doe",
+    "initials": "JD"
+  }
+}

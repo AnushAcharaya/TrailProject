@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import SearchBar from "../../components/appointments/SearchBar";
 import VetAppointmentCard from "../../components/appointments/VetAppointmentCard";
@@ -6,6 +7,7 @@ import { getAppointments } from "../../services/appointmentApi";
 import "../../styles/appointments.css";
 
 const VetAppointments = () => {
+  const { t } = useTranslation('appointments');
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +34,7 @@ const VetAppointments = () => {
       setFilteredAppointments(appointmentsList);
     } catch (err) {
       console.error("Error loading appointments:", err);
-      setError("Failed to load appointments. Please try again.");
+      setError(t('vet.errors.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -75,20 +77,20 @@ const VetAppointments = () => {
   };
 
   return (
-    <VetLayout pageTitle="Appointments">
+    <VetLayout pageTitle={t('vet.title')}>
       <div className="app-page">
         <SearchBar 
-          placeholder="Search patients or animals..." 
+          placeholder={t('vet.searchPlaceholder')}
           onSearch={handleSearch}
         />
 
         <h1 className="app-title mb-6">
-          Appointment Management
+          {t('vet.pageTitle')}
         </h1>
 
         {isLoading && (
           <div className="text-center py-8">
-            <p className="text-gray-500">Loading appointments...</p>
+            <p className="text-gray-500">{t('vet.loading')}</p>
           </div>
         )}
 
@@ -101,7 +103,7 @@ const VetAppointments = () => {
         {!isLoading && !error && Array.isArray(filteredAppointments) && filteredAppointments.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500">
-              {searchQuery ? "No appointments found matching your search." : "No appointments yet."}
+              {searchQuery ? t('vet.noResults') : t('vet.noAppointments')}
             </p>
           </div>
         )}

@@ -1,0 +1,436 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "insurance": "Insurance",
+    "enroll": "Enroll",
+    "claims": "Claims",
+    "reviewDashboard": "Review Dashboard",
+    "verifyClaims": "Verify Claims",
+    "farmerPortal": "Farmer Portal",
+    "vetPortal": "Vet Portal"
+  },
+  "dashboard": {
+    "welcome": "Welcome back, Farmer!",
+    "subtitle": "Manage your insurance claims and coverage",
+    "stats": {
+      "totalClaims": "Total Claims",
+      "pending": "Pending",
+      "approved": "Approved",
+      "enrollments": "Enrollments"
+    },
+    "recentActivities": "Recent Insurance Activities",
+    "seeAll": "See All",
+    "loading": "Loading activities...",
+    "noActivities": "No recent activities"
+  },
+  "plans": {
+    "title": "Insurance Plans",
+    "subtitle": "Choose the right coverage for your livestock",
+    "price": "NPR {{amount}}",
+    "duration": "{{count}} months",
+    "coverage": {
+      "accident": "Accident Coverage",
+      "theft": "Theft Protection",
+      "disease": "Disease Coverage",
+      "vaccination": "Vaccination",
+      "premium": "Premium Services",
+      "support": "24/7 Support"
+    },
+    "buttons": {
+      "viewDetails": "View Details",
+      "enrollNow": "Enroll Now"
+    }
+  },
+  "enroll": {
+    "steps": {
+      "selectLivestock": "Select Livestock",
+      "selectPlan": "Select Plan & Pay",
+      "uploadProof": "Upload Proof",
+      "reviewSubmit": "Review & Submit"
+    },
+    "selectLivestock": {
+      "title": "Select Livestock",
+      "subtitle": "Choose the livestock you want to insure from your registered animals.",
+      "loading": "Loading livestock...",
+      "tryAgain": "Try Again",
+      "noLivestock": "No livestock found. Please add livestock first.",
+      "selectPlaceholder": "Select livestock...",
+      "next": "Next →"
+    },
+    "livestockDetails": {
+      "title": "Livestock Details",
+      "name": "Name",
+      "type": "Type",
+      "breed": "Breed",
+      "tag": "Tag",
+      "age": "Age",
+      "healthStatus": "Health Status"
+    },
+    "selectPlan": {
+      "title": "Select Plan",
+      "subtitle": "Choose an insurance plan that best fits your needs.",
+      "preSelectedSubtitle": "Your selected plan is shown below. You can change it if needed.",
+      "selectedBadge": "✓ Selected from Plans",
+      "changePlan": "Change Plan",
+      "selectPlaceholder": "Select plan...",
+      "months": "months",
+      "back": "← Back",
+      "proceedToPayment": "Proceed to Payment →",
+      "processing": "Processing...",
+      "errors": {
+        "selectPlan": "Please select a plan first",
+        "livestockMissing": "Livestock information is missing",
+        "paymentFailed": "Failed to initiate payment. Please try again."
+      }
+    },
+    "uploadProof": {
+      "title": "Upload Payment Proof",
+      "subtitle": "Upload a screenshot of your successful eSewa payment",
+      "clickToUpload": "Click to upload payment screenshot",
+      "fileTypes": "PNG, JPG up to 5MB",
+      "paymentScreenshot": "Payment Screenshot",
+      "paymentProofAlt": "Payment proof",
+      "important": "Important",
+      "instructions": {
+        "clearMessage": "Make sure the screenshot clearly shows the payment success message",
+        "transactionVisible": "Transaction ID and amount should be visible",
+        "verification": "This will be verified by our team"
+      },
+      "back": "← Back",
+      "next": "Next →",
+      "errors": {
+        "invalidType": "Please upload an image file (JPG, PNG, etc.)",
+        "fileTooLarge": "File size must be less than 5MB"
+      }
+    },
+    "review": {
+      "title": "Review & Submit",
+      "subtitle": "Review your enrollment details before submitting.",
+      "selectedLivestock": "Selected Livestock",
+      "selectedPlan": "Selected Plan",
+      "paymentProof": "Payment Proof",
+      "name": "Name",
+      "type": "Type",
+      "tag": "Tag",
+      "breed": "Breed",
+      "paymentProofAlt": "Payment proof",
+      "screenshotUploaded": "Screenshot uploaded successfully",
+      "noPaymentProof": "No payment proof uploaded",
+      "totalPremium": "Total Premium",
+      "coveragePeriod": "Coverage period: 12 months",
+      "back": "← Back",
+      "submitEnrollment": "Submit Enrollment",
+      "submitting": "Submitting..."
+    },
+    "messages": {
+      "paymentCompleted": "Payment completed! Please upload your payment screenshot.",
+      "completeAllSteps": "Please complete all steps including payment proof upload",
+      "enrollmentSuccess": "Enrollment submitted successfully! Awaiting admin verification.",
+      "enrollmentFailed": "Failed to submit enrollment. Please try again."
+    }
+  },
+  "submitClaim": {
+    "title": "Submit Insurance Claim",
+    "subtitle": "Fill in claim details and vaccination history to attach",
+    "form": {
+      "claimDetails": "Claim Details",
+      "insuranceEnrollment": "Insurance Enrollment",
+      "loadingEnrollments": "Loading enrollments...",
+      "selectEnrollment": "Select insured livestock...",
+      "coverage": "Coverage",
+      "noEnrollments": "No active insurance enrollments found. Please enroll livestock first.",
+      "claimType": "Claim Type",
+      "selectType": "Select claim type...",
+      "description": "Description",
+      "descriptionPlaceholder": "Provide detailed description of the incident...",
+      "incidentDate": "Incident Date",
+      "location": "Incident Location",
+      "locationPlaceholder": "Enter location where incident occurred...",
+      "amount": "Claim Amount (NPR)",
+      "amountPlaceholder": "Enter claim amount...",
+      "uploadImage": "Upload Images",
+      "uploadInstructions": "Drop files here or click to upload",
+      "fileTypes": "JPG, PNG, PDF (Max 5MB)",
+      "selectFiles": "Select Files",
+      "invalidFileType": "Please upload a valid document file (.txt, .pdf, .doc, .docx)",
+      "dropVaccinationFile": "Drop vaccination history file here or click to upload",
+      "dropMedicalFile": "Drop medical history file here or click to upload",
+      "fileFormats": "TXT, PDF, DOC, DOCX (Downloaded from Reports)"
+    },
+    "claimTypes": {
+      "accident": "Accident",
+      "theft": "Theft",
+      "disease": "Disease",
+      "death": "Death",
+      "naturalDisaster": "Natural Disaster",
+      "other": "Other"
+    },
+    "sections": {
+      "vaccinationHistory": "Vaccination History",
+      "medicalHistory": "Medical History",
+      "noVaccinations": "No vaccination records found",
+      "noMedical": "No medical records found"
+    },
+    "buttons": {
+      "submit": "Submit Claim",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "submitting": "Submitting claim...",
+      "success": "Claim submitted successfully!",
+      "error": "Failed to submit claim. Please try again."
+    },
+    "validation": {
+      "typeRequired": "Please select a claim type",
+      "descriptionRequired": "Please provide a description",
+      "dateRequired": "Please select incident date",
+      "locationRequired": "Please provide location",
+      "amountRequired": "Please enter claim amount",
+      "imageRequired": "Please upload incident image"
+    }
+  },
+  "trackClaim": {
+    "title": "Track Claims",
+    "claimNumber": "Claim #{{number}}",
+    "status": {
+      "submitted": "Submitted",
+      "underReview": "Under Review",
+      "pendingVerification": "Pending Verification",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "paid": "Paid"
+    },
+    "details": {
+      "type": "Type",
+      "amount": "Amount",
+      "date": "Date",
+      "livestock": "Livestock",
+      "description": "Description"
+    },
+    "timeline": {
+      "submitted": "Claim submitted",
+      "reviewing": "Under review by admin",
+      "verification": "Sent to vet for verification",
+      "decision": "Decision made",
+      "payment": "Payment processed"
+    },
+    "buttons": {
+      "viewDetails": "View Details",
+      "back": "Back to Claims"
+    },
+    "noClaims": "No claims found"
+  },
+  "verify": {
+    "title": "Verify Claim",
+    "livestockProfile": {
+      "title": "Livestock Profile",
+      "tagId": "Tag ID",
+      "species": "Species",
+      "breed": "Breed",
+      "age": "Age",
+      "gender": "Gender",
+      "weight": "Weight",
+      "health": "Health Status"
+    },
+    "vaccinationHistory": {
+      "title": "Vaccination History",
+      "vaccine": "Vaccine",
+      "date": "Date",
+      "vet": "Veterinarian",
+      "nextDue": "Next Due",
+      "noRecords": "No vaccination records"
+    },
+    "medicalHistory": {
+      "title": "Medical History",
+      "diagnosis": "Diagnosis",
+      "treatment": "Treatment",
+      "date": "Date",
+      "vet": "Veterinarian",
+      "noRecords": "No medical records"
+    },
+    "claimDetails": {
+      "title": "Claim Details",
+      "amount": "Claim Amount",
+      "type": "Claim Type",
+      "description": "Description",
+      "incidentDate": "Incident Date",
+      "location": "Location",
+      "submittedBy": "Submitted By",
+      "submittedDate": "Submitted Date"
+    },
+    "decision": {
+      "title": "Verification Decision",
+      "notes": "Verification Notes",
+      "notesPlaceholder": "Add your verification notes here",
+      "approve": "Approve Claim",
+      "reject": "Reject Claim",
+      "approveConfirm": "Are you sure you want to approve this claim?",
+      "rejectConfirm": "Are you sure you want to reject this claim?",
+      "success": "Verification submitted successfully",
+      "error": "Failed to submit verification"
+    }
+  },
+  "reviewDashboard": {
+    "title": "Claims Review Dashboard",
+    "stats": {
+      "pendingReview": "Pending Review",
+      "verifiedClaims": "Verified Claims",
+      "rejectedClaims": "Rejected Claims"
+    },
+    "claimCard": {
+      "claimNumber": "CLM-{{number}}",
+      "farmer": "Farmer",
+      "livestock": "Livestock",
+      "created": "Created",
+      "reviewClaim": "Review Claim"
+    },
+    "noClaims": "No claims to review"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Insurance Management",
+      "tabs": {
+        "enrollments": "Enrollment Insurances",
+        "claims": "Claim Insurances"
+      }
+    },
+    "enrollment": {
+      "title": "Enrollment Insurances",
+      "loading": "Loading enrollments...",
+      "noEnrollments": "No enrollments found",
+      "filters": {
+        "all": "All Status",
+        "active": "Active",
+        "pending": "Pending",
+        "expired": "Expired",
+        "cancelled": "Cancelled"
+      },
+      "table": {
+        "farmer": "Farmer",
+        "livestock": "Livestock",
+        "plan": "Plan",
+        "coverage": "Coverage",
+        "period": "Period",
+        "status": "Status",
+        "actions": "Actions",
+        "view": "View"
+      },
+      "modal": {
+        "title": "Enrollment Details",
+        "enrollmentId": "Enrollment ID",
+        "status": "Status",
+        "farmerInfo": "Farmer Information",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "livestockInfo": "Livestock Information",
+        "tagId": "Tag ID",
+        "species": "Species",
+        "breed": "Breed",
+        "age": "Age",
+        "years": "years",
+        "insurancePlan": "Insurance Plan",
+        "planName": "Plan Name",
+        "planType": "Plan Type",
+        "coverageAmount": "Coverage Amount",
+        "premiumPaid": "Premium Paid",
+        "coveragePeriod": "Coverage Period",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "enrollmentDate": "Enrollment Date",
+        "paymentDate": "Payment Date",
+        "notes": "Notes",
+        "approve": "Approve",
+        "reject": "Reject",
+        "approving": "Approving...",
+        "rejecting": "Rejecting..."
+      }
+    },
+    "enrollments": {
+      "title": "Enrollment Management",
+      "headers": {
+        "id": "ID",
+        "farmer": "Farmer",
+        "livestock": "Livestock",
+        "plan": "Plan",
+        "date": "Date",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "claims": {
+      "title": "Claim Management",
+      "loading": "Loading claims...",
+      "noClaims": "No claims found",
+      "filters": {
+        "all": "All Status",
+        "submitted": "Submitted",
+        "underReview": "Under Review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "paid": "Paid"
+      },
+      "table": {
+        "claimId": "Claim ID",
+        "farmer": "Farmer",
+        "type": "Type",
+        "amount": "Amount",
+        "date": "Date",
+        "status": "Status",
+        "actions": "Actions",
+        "view": "View"
+      },
+      "modal": {
+        "title": "Claim Details",
+        "claimId": "Claim ID",
+        "status": "Status",
+        "farmer": "Farmer",
+        "claimType": "Claim Type",
+        "claimAmount": "Claim Amount",
+        "incidentDate": "Incident Date",
+        "incidentLocation": "Incident Location",
+        "description": "Description",
+        "incidentImage": "Incident Image",
+        "vaccinationHistory": "Vaccination History",
+        "medicalHistory": "Medical History",
+        "adminNotes": "Admin Notes",
+        "adminActions": "Admin Actions",
+        "approveClaim": "Approve Claim",
+        "rejectClaim": "Reject Claim",
+        "viewDownloadImage": "View/Download Image",
+        "viewDownloadVaccination": "View/Download Vaccination History",
+        "viewDownloadMedical": "View/Download Medical History"
+      },
+      "headers": {
+        "id": "ID",
+        "farmer": "Farmer",
+        "livestock": "Livestock",
+        "type": "Type",
+        "amount": "Amount",
+        "status": "Status",
+        "verification": "Verification",
+        "actions": "Actions"
+      }
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "noData": "No data available",
+    "selectOption": "Select an option"
+  }
+}

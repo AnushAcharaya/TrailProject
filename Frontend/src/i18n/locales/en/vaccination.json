@@ -1,0 +1,107 @@
+{
+  "page": {
+    "title": "Vaccination Schedule",
+    "subtitle": "Manage and track livestock vaccinations",
+    "loading": "Loading vaccinations...",
+    "noResults": "No {status} vaccinations found."
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "farmerProfiles": "Farmer Profiles",
+    "animals": "Animals",
+    "vaccinations": "Vaccinations"
+  },
+  "search": {
+    "placeholder": "Search by vaccine name, animal tag, species, or status...",
+    "noSuggestions": "No suggestions found",
+    "types": {
+      "vaccine": "Vaccine",
+      "type": "Type",
+      "tag": "Tag ID",
+      "species": "Species",
+      "status": "Status"
+    }
+  },
+  "summary": {
+    "upcoming": "Upcoming",
+    "completed": "Completed",
+    "overdue": "Overdue"
+  },
+  "tabs": {
+    "upcoming": "Upcoming",
+    "completed": "Completed",
+    "overdue": "Overdue"
+  },
+  "card": {
+    "given": "Given",
+    "due": "Due",
+    "notes": "Notes",
+    "markCompleted": "Mark Completed",
+    "marking": "Marking...",
+    "addVaccine": "Add Vaccine",
+    "edit": "Edit vaccination",
+    "cannotAdd": "Cannot add vaccine - vaccination is completed",
+    "addTooltip": "Add vaccine for this animal",
+    "status": {
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "overdue": "Overdue"
+    },
+    "confirmModal": {
+      "title": "Confirm Mark as Completed",
+      "message": "Are you sure you want to mark this vaccination as completed?",
+      "yes": "Yes",
+      "no": "No"
+    }
+  },
+  "addForm": {
+    "title": "Add Vaccination Record",
+    "subtitle": "Record a new vaccination for your livestock",
+    "updateTitle": "Edit Vaccination Record",
+    "updateSubtitle": "Update vaccination details",
+    "fields": {
+      "livestock": "Livestock",
+      "livestockPlaceholder": "Search by tag ID, breed, or species...",
+      "loadingLivestock": "Loading livestock...",
+      "noLivestock": "No livestock found matching \"{search}\"",
+      "vaccineName": "Vaccine Name",
+      "vaccineNamePlaceholder": "e.g., Foot and Mouth Disease Vaccine",
+      "vaccineType": "Vaccine Type",
+      "vaccineTypeSelect": "Select vaccine type",
+      "vaccineTypes": {
+        "viral": "Viral Vaccine",
+        "bacterial": "Bacterial Vaccine",
+        "clostridial": "Clostridial Vaccine"
+      },
+      "dateGiven": "Date Given",
+      "nextDueDate": "Next Due Date",
+      "nextDueDateHint": "Must be on or after {date}",
+      "notes": "Notes (Optional)",
+      "notesPlaceholder": "Add any additional notes about this vaccination..."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save Vaccination",
+      "saving": "Saving...",
+      "update": "Update Vaccination",
+      "updating": "Updating..."
+    },
+    "messages": {
+      "createSuccess": "Vaccination record created successfully!",
+      "updateSuccess": "Vaccination record updated successfully!",
+      "createError": "Failed to create vaccination record.",
+      "updateError": "Failed to update vaccination record.",
+      "loadError": "Failed to load vaccination data."
+    },
+    "livestockInfo": {
+      "tag": "Tag",
+      "breed": "Breed",
+      "species": "Species",
+      "age": "Age",
+      "years": "years"
+    }
+  },
+  "buttons": {
+    "addVaccination": "Add Vaccination"
+  }
+}

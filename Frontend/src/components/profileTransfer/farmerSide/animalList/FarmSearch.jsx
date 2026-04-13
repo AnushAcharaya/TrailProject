@@ -1,9 +1,11 @@
 // components/profile-transfer/farmer-side/animal-list/components/FarmerSearch.jsx
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaSearch, FaUser } from 'react-icons/fa';
 import { searchFarmers } from '../../../../services/profileTransferApi';
 
 export default function FarmerSearch({ searchTerm, onSearchChange, onFarmerSelect }) {
+  const { t } = useTranslation('profileTransfer');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -63,7 +65,7 @@ export default function FarmerSearch({ searchTerm, onSearchChange, onFarmerSelec
       <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 text-lg z-10" />
       <input
         type="text"
-        placeholder="Search Farmer by Name/Phone/Farmer ID"
+        placeholder={t('transferModal.searchPlaceholder')}
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
@@ -106,7 +108,7 @@ export default function FarmerSearch({ searchTerm, onSearchChange, onFarmerSelec
             </ul>
           ) : (
             <div className="p-4 text-center text-gray-500">
-              No farmers found
+              {t('transferModal.noFarms', { query: searchTerm })}
             </div>
           )}
         </div>

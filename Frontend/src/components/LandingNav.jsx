@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Stethoscope, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import LanguageSwitcher from "./common/LanguageSwitcher";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,6 +35,9 @@ const Navbar = () => {
 
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center space-x-4">
+          {/* Language Switcher */}
+          <LanguageSwitcher />
+          
           <Link to="/login">
             <button className="text-sm text-gray-700 hover:text-green-700 transition">
               Sign In
@@ -88,6 +92,11 @@ const Navbar = () => {
           </a>
 
           <hr />
+
+          {/* Language Switcher for Mobile */}
+          <div className="py-2">
+            <LanguageSwitcher />
+          </div>
 
           <Link to="/login" onClick={() => setIsOpen(false)}>
             <button className="text-sm text-gray-700 hover:text-green-700 text-left w-full">

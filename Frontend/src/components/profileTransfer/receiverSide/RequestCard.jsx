@@ -1,5 +1,6 @@
 // components/profile-transfer/receiver-side/received-requests/components/RequestCard.jsx
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaUser } from 'react-icons/fa';
 import { MdPets } from 'react-icons/md';
 import AcceptButton from './AcceptButton';
@@ -7,6 +8,7 @@ import DeclineButton from './DeclineButton';
 import { receiverApproveTransfer, receiverRejectTransfer } from '../../../services/profileTransferApi';
 
 export default function RequestCard({ request, onUpdate }) {
+  const { t } = useTranslation('profileTransfer');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -34,7 +36,7 @@ export default function RequestCard({ request, onUpdate }) {
       setActionCompleted(true);
       
       // Show success message
-      setSuccess('Transfer request accepted successfully! The request will now proceed to admin review.');
+      setSuccess(t('requestCard.messages.acceptSuccess'));
       
       // Refresh the list to show updated status
       setTimeout(() => {
@@ -44,7 +46,7 @@ export default function RequestCard({ request, onUpdate }) {
       }, 2000);
     } catch (err) {
       console.error('Error accepting transfer:', err);
-      const errorMessage = err.response?.data?.error || 'Failed to accept transfer. Please try again.';
+      const errorMessage = err.response?.data?.error || t('requestCard.messages.acceptError');
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -65,7 +67,7 @@ export default function RequestCard({ request, onUpdate }) {
       setActionCompleted(true);
       
       // Show success message
-      setSuccess('Transfer request rejected successfully.');
+      setSuccess(t('requestCard.messages.declineSuccess'));
       
       // Refresh the list after a short delay to show success message
       setTimeout(() => {
@@ -75,7 +77,7 @@ export default function RequestCard({ request, onUpdate }) {
       }, 1500);
     } catch (err) {
       console.error('Error rejecting transfer:', err);
-      const errorMessage = err.response?.data?.error || 'Failed to reject transfer. Please try again.';
+      const errorMessage = err.response?.data?.error || t('requestCard.messages.declineError');
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -101,7 +103,7 @@ export default function RequestCard({ request, onUpdate }) {
               <h3 className="text-xl font-bold text-gray-900">{request.animalName}</h3>
               <p className="text-sm text-gray-600">{request.animalTag} - {request.animalBreed}</p>
               <span className="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                Healthy
+                {t('requestCard.healthy')}
               </span>
             </div>
           </div>
@@ -110,7 +112,7 @@ export default function RequestCard({ request, onUpdate }) {
           <div className="mb-3">
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
               <FaUser className="text-gray-400" />
-              <span className="font-medium">From:</span>
+              <span className="font-medium">{t('requestCard.from')}:</span>
               <span className="font-semibold text-gray-900">{request.senderName}</span>
             </div>
           </div>
@@ -120,7 +122,7 @@ export default function RequestCard({ request, onUpdate }) {
             <div className="flex items-start gap-2 text-sm text-gray-600">
               <MdPets className="text-gray-400 mt-0.5" />
               <div>
-                <span className="font-medium">Reason:</span>
+                <span className="font-medium">{t('requestCard.reason')}:</span>
                 <p className="text-gray-700 mt-1">{request.reason}</p>
               </div>
             </div>
@@ -151,14 +153,14 @@ export default function RequestCard({ request, onUpdate }) {
           {(isReceiverApproved || (actionCompleted && success && success.includes('accepted'))) && (
             <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg font-medium flex items-center gap-2">
               <span>✓</span>
-              <span>Accepted</span>
+              <span>{t('requestCard.accepted')}</span>
             </div>
           )}
           
           {(isRejected || (actionCompleted && success && success.includes('rejected'))) && (
             <div className="px-4 py-2 bg-red-100 text-red-800 rounded-lg font-medium flex items-center gap-2">
               <span>✕</span>
-              <span>Rejected</span>
+              <span>{t('requestCard.rejected')}</span>
             </div>
           )}
           
@@ -180,7 +182,7 @@ export default function RequestCard({ request, onUpdate }) {
             <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-sm">
               ✓
             </div>
-            <span className="text-sm font-medium text-gray-700">Request Created</span>
+            <span className="text-sm font-medium text-gray-700">{t('progressStepper.step1')}</span>
           </div>
           
           {/* Connector line 1-2 */}
@@ -201,7 +203,7 @@ export default function RequestCard({ request, onUpdate }) {
                 2
               </div>
             )}
-            <span className="text-sm font-medium text-gray-700">Receiver Approval</span>
+            <span className="text-sm font-medium text-gray-700">{t('progressStepper.step2')}</span>
           </div>
           
           {/* Connector line 2-3 */}
@@ -222,7 +224,7 @@ export default function RequestCard({ request, onUpdate }) {
                 3
               </div>
             )}
-            <span className={`text-sm font-medium ${isAdminApproved || isCompleted || isReceiverApproved || (actionCompleted && success && success.includes('accepted')) ? 'text-gray-700' : 'text-gray-500'}`}>Admin Approval</span>
+            <span className={`text-sm font-medium ${isAdminApproved || isCompleted || isReceiverApproved || (actionCompleted && success && success.includes('accepted')) ? 'text-gray-700' : 'text-gray-500'}`}>{t('progressStepper.step3')}</span>
           </div>
           
           {/* Connector line 3-4 */}
@@ -239,7 +241,7 @@ export default function RequestCard({ request, onUpdate }) {
                 4
               </div>
             )}
-            <span className={`text-sm font-medium ${isCompleted ? 'text-gray-700' : isAdminApproved ? 'text-gray-700' : 'text-gray-500'}`}>Transfer Completed</span>
+            <span className={`text-sm font-medium ${isCompleted ? 'text-gray-700' : isAdminApproved ? 'text-gray-700' : 'text-gray-500'}`}>{t('progressStepper.step4')}</span>
           </div>
         </div>
       </div>

@@ -1,10 +1,12 @@
 // src/pages/EditLivestockPage.jsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import LivestockForm from "../../components/livestockCrud/LivestockForm";
 import { getLivestockById, updateLivestock } from "../../services/livestockCrudApi";
 
 const EditLivestockPage = () => {
+  const { t } = useTranslation('livestock');
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -25,7 +27,7 @@ const EditLivestockPage = () => {
     if (result.success) {
       setLivestockData(result.data);
     } else {
-      setError(result.error?.message || "Failed to load livestock");
+      setError(result.error?.message || t('form.notifications.loadError'));
     }
     setLoading(false);
   };
@@ -37,7 +39,7 @@ const EditLivestockPage = () => {
     if (result.success) {
       navigate("/livestock");
     } else {
-      alert(result.error?.message || "Failed to update livestock. Please try again.");
+      alert(result.error?.message || t('form.notifications.updateError'));
       setSubmitting(false);
     }
   };
@@ -45,7 +47,7 @@ const EditLivestockPage = () => {
   if (loading) {
     return (
       <div className="form-page-container text-center py-10">
-        <p className="text-gray-600">Loading livestock data...</p>
+        <p className="text-gray-600">{t('form.messages.loadingData')}</p>
       </div>
     );
   }
@@ -61,7 +63,7 @@ const EditLivestockPage = () => {
             onClick={() => navigate("/livestock")}
             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
           >
-            Back to List
+            {t('form.messages.backToList')}
           </button>
         </div>
       </div>
@@ -71,7 +73,7 @@ const EditLivestockPage = () => {
   if (!livestockData) {
     return (
       <div className="form-page-container text-center py-10">
-        <p className="text-gray-600">Livestock not found</p>
+        <p className="text-gray-600">{t('form.messages.notFound')}</p>
       </div>
     );
   }
@@ -81,7 +83,7 @@ const EditLivestockPage = () => {
       <div className="max-w-4xl mx-auto p-6">
         {submitting && (
           <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
-            Updating livestock...
+            {t('form.messages.updating')}
           </div>
         )}
         <LivestockForm

@@ -1,13 +1,18 @@
-import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaBell, FaCalendarCheck, FaUserFriends } from 'react-icons/fa';
+import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaBell, FaCalendarCheck, FaUserFriends, FaEnvelope } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getUserProfile } from '../../services/profileApi';
+import { getReceivedRequests } from '../../services/friendsApi';
+import LanguageSwitcher from '../common/LanguageSwitcher';
 
 function FarmerLayout({ children, pageTitle = "Dashboard" }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation(['insurance', 'profileTransfer', 'dashboard']);
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [friendRequestCount, setFriendRequestCount] = useState(0);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -49,7 +54,15 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
 
   useEffect(() => {
     fetchProfile();
+    loadFriendRequestCount();
   }, [fetchProfile]);
+
+  const loadFriendRequestCount = async () => {
+    const result = await getReceivedRequests();
+    if (result.success) {
+      setFriendRequestCount(result.data.length);
+    }
+  };
 
   // Listen for login events to force profile refresh (only for this tab)
   useEffect(() => {
@@ -127,16 +140,18 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
   };
 
   const menuItems = [
-    { name: "Dashboard", icon: FaHome, path: "/farmerpage" },
-    { name: "Vet Appointment", icon: FaCalendarCheck, path: "/farmerappointment" },
-    { name: "Friends", icon: FaUserFriends, path: "/farmer/friends/list" },
-    { name: "Livestock", icon: FaPaw, path: "/livestock" },
-    { name: "Vaccination", icon: FaSyringe, path: "/vaccination", state: { from: 'farmer' } },
-    { name: "Medical History", icon: FaNotesMedical, path: "/medical/history", state: { from: 'farmer' } },
-    { name: "Reports", icon: FaChartLine, path: "/reports" },
-    { name: "Insurance", icon: FaShieldAlt, path: "/farmerinsurancedashboard" },
-    { name: "Profile Transfer", icon: FaExchangeAlt, path: "/profile-transfer/farmer/animals" },
-    { name: "Settings", icon: FaCog, path: "/profile" },
+    { name: t('dashboard:sidebar.dashboard'), icon: FaHome, path: "/farmerpage" },
+    { name: t('dashboard:sidebar.vetAppointment'), icon: FaCalendarCheck, path: "/farmerappointment" },
+    { name: t('dashboard:sidebar.messages'), icon: FaEnvelope, path: "/messages", badge: 5, badgeColor: "bg-blue-500" },
+    { name: t('dashboard:sidebar.friendRequests'), icon: FaUserFriends, path: "/farmer/friends/requests", badge: friendRequestCount, badgeColor: "bg-green-500" },
+    { name: t('dashboard:sidebar.friends'), icon: FaUserFriends, path: "/farmer/friends/list" },
+    { name: t('dashboard:sidebar.livestock'), icon: FaPaw, path: "/livestock" },
+    { name: t('dashboard:sidebar.vaccination'), icon: FaSyringe, path: "/vaccination", state: { from: 'farmer' } },
+    { name: t('dashboard:sidebar.medicalHistory'), icon: FaNotesMedical, path: "/medical/history", state: { from: 'farmer' } },
+    { name: t('dashboard:sidebar.reports'), icon: FaChartLine, path: "/reports" },
+    { name: t('dashboard:sidebar.insurance'), icon: FaShieldAlt, path: "/farmerinsurancedashboard" },
+    { name: t('dashboard:sidebar.profileTransfer'), icon: FaExchangeAlt, path: "/profile-transfer/farmer/animals" },
+    { name: t('dashboard:sidebar.settings'), icon: FaCog, path: "/profile" },
   ];
 
   const handleNavigation = (item) => {
@@ -149,20 +164,20 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Dark Green Sidebar */}
-      <div className="w-64 bg-emerald-900 flex flex-col py-6 px-4">
+      {/* Dark Green Sidebar - Fixed and Non-scrollable */}
+      <div className="w-64 bg-emerald-900 flex flex-col py-6 px-4 fixed left-0 top-0 h-screen">
         <div className="flex items-center space-x-3 mb-8 px-2">
           <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
             <span className="text-emerald-900 font-bold text-lg">F</span>
           </div>
-          <span className="text-white font-bold text-xl">FarmCare</span>
+          <span className="text-white font-bold text-xl">{t('dashboard:appName')}</span>
         </div>
         
         <nav className="space-y-2 flex-1">
           {menuItems.map((item, index) => {
             // Check if current path matches the menu item
             // For Friends, check if path starts with /farmer/friends
-            const isActive = item.name === "Friends" 
+            const isActive = item.name === "Friends" || item.name === "Friend Requests"
               ? location.pathname.startsWith('/farmer/friends')
               : location.pathname === item.path;
             
@@ -170,14 +185,21 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
               <div
                 key={index}
                 onClick={() => handleNavigation(item)}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+                className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer transition-colors ${
                   isActive
                     ? 'bg-emerald-700'
                     : 'hover:bg-emerald-700'
                 }`}
               >
-                <item.icon className="text-white text-xl" />
-                <span className="text-white font-medium">{item.name}</span>
+                <div className="flex items-center space-x-3">
+                  <item.icon className="text-white text-xl" />
+                  <span className="text-white font-medium">{item.name}</span>
+                </div>
+                {item.badge > 0 && (
+                  <span className={`${item.badgeColor} text-white text-xs font-semibold px-2 py-1 rounded-full min-w-[20px] text-center`}>
+                    {item.badge}
+                  </span>
+                )}
               </div>
             );
           })}
@@ -190,24 +212,24 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
             className="flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors bg-red-600 hover:bg-red-700 w-full"
           >
             <FaSignOutAlt className="text-white text-xl" />
-            <span className="text-white font-medium">Logout</span>
+            <span className="text-white font-medium">{t('dashboard:sidebar.logout')}</span>
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col ml-64">
         {/* Top Navigation */}
-        <div className={`px-8 py-4 flex items-center justify-between ${
-          location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer')
-            ? 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-500 shadow-2xl' 
-            : 'bg-white border-b border-gray-200'
-        }`}>
-          <div className="flex items-center gap-8">
-            <h1 className={`text-2xl font-bold ${
-              location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer') ? 'text-white' : 'text-gray-800'
-            }`}>{pageTitle}</h1>
-            
+        <div className="px-8 py-4 flex items-center bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-500 shadow-2xl">
+          {/* Left: Page Title - Hide on Profile Transfer pages */}
+          <div className="flex-1">
+            {!location.pathname.startsWith('/profile-transfer') && (
+              <h1 className="text-2xl font-bold text-white">{pageTitle}</h1>
+            )}
+          </div>
+
+          {/* Center: Navigation Tabs */}
+          <div className="flex-1 flex justify-center">
             {/* Profile Transfer Navigation Tabs - Only show on Profile Transfer pages */}
             {location.pathname.startsWith('/profile-transfer') && (
               <nav className="flex items-center gap-1">
@@ -220,7 +242,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                   }`}
                 >
                   <FaPaw className="text-base" />
-                  <span>My Animals</span>
+                  <span>{t('profileTransfer:nav.myAnimals')}</span>
                 </button>
                 <button
                   onClick={() => navigate('/profile-transfer/farmer/sent')}
@@ -231,7 +253,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                   }`}
                 >
                   <FaExchangeAlt className="text-base" />
-                  <span>Sent Transfers</span>
+                  <span>{t('profileTransfer:nav.sentTransfers')}</span>
                 </button>
                 <button
                   onClick={() => navigate('/profile-transfer/receiver/requests')}
@@ -242,7 +264,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                   }`}
                 >
                   <FaExchangeAlt className="text-base" />
-                  <span>Requests</span>
+                  <span>{t('profileTransfer:nav.requests')}</span>
                 </button>
               </nav>
             )}
@@ -258,7 +280,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                       : 'hover:bg-white/10 text-emerald-50'
                   }`}
                 >
-                  Dashboard
+                  {t('insurance:nav.dashboard')}
                 </button>
                 <button
                   onClick={() => navigate('/farmerinsuranceplan')}
@@ -268,7 +290,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                       : 'hover:bg-white/10 text-emerald-50'
                   }`}
                 >
-                  Insurance
+                  {t('insurance:nav.insurance')}
                 </button>
                 <button
                   onClick={() => navigate('/farmerinsuranceenroll')}
@@ -278,7 +300,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                       : 'hover:bg-white/10 text-emerald-50'
                   }`}
                 >
-                  Enroll
+                  {t('insurance:nav.enroll')}
                 </button>
                 <button
                   onClick={() => navigate('/farmerinsurancesubmitclaim')}
@@ -288,45 +310,33 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                       : 'hover:bg-white/10 text-emerald-50'
                   }`}
                 >
-                  Claims
+                  {t('insurance:nav.claims')}
                 </button>
               </nav>
             )}
           </div>
           
-          <div className="flex items-center space-x-6">
+          {/* Right: Notification Bell, Language Switcher and Profile */}
+          <div className="flex-1 flex items-center justify-end space-x-6">
             {/* Notification Bell */}
             <div className="relative cursor-pointer">
-              <FaBell className={location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer') ? 'text-white text-xl' : 'text-gray-600 text-xl'} />
+              <FaBell className="text-white text-xl" />
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
                 3
               </span>
             </div>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher context="farmer" />
             
             {/* Profile with Name Below */}
-            <div className="flex items-center space-x-4">
-              {/* Manual Refresh Button (for debugging) */}
-              <button
-                onClick={() => {
-                  console.log('[FarmerLayout] Manual refresh button clicked');
-                  setLoading(true);
-                  fetchProfile();
-                }}
-                className="text-xs px-3 py-1 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-700 transition-colors"
-                title="Refresh profile data"
-              >
-                Refresh
-              </button>
-              
-              <div 
-                onClick={() => navigate('/profile')}
-                className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
-              >
+            <div 
+              onClick={() => navigate('/profile')}
+              className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
+            >
               {loading ? (
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-1 animate-pulse ${
-                  location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer') ? 'bg-white/30' : 'bg-gray-300'
-                }`}>
-                  <span className={location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer') ? 'text-white font-semibold' : 'text-gray-500 font-semibold'}>...</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center mb-1 animate-pulse bg-white/30">
+                  <span className="text-white font-semibold">...</span>
                 </div>
               ) : profileData?.profile_image_url || profileData?.profile_image ? (
                 <img 
@@ -337,23 +347,16 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
                     e.target.style.display = 'none';
                   }}
                   onLoad={() => console.log('[FarmerLayout] Image loaded successfully')}
-                  className={`w-10 h-10 rounded-full object-cover mb-1 border-2 ${
-                    location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer') ? 'border-white' : 'border-emerald-600'
-                  }`}
+                  className="w-10 h-10 rounded-full object-cover mb-1 border-2 border-white"
                 />
               ) : (
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-1 ${
-                  location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer') ? 'bg-white' : 'bg-emerald-600'
-                }`}>
-                  <span className={location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer') ? 'text-emerald-600 font-semibold' : 'text-white font-semibold'}>{getUserInitials()}</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center mb-1 bg-white">
+                  <span className="text-emerald-600 font-semibold">{getUserInitials()}</span>
                 </div>
               )}
-              <span className={`text-xs font-medium ${
-                location.pathname.startsWith('/farmerinsurance') || location.pathname.startsWith('/profile-transfer') ? 'text-white' : 'text-gray-700'
-              }`}>
+              <span className="text-xs font-medium text-white">
                 {loading ? 'Loading...' : getDisplayName()}
               </span>
-            </div>
             </div>
           </div>
         </div>

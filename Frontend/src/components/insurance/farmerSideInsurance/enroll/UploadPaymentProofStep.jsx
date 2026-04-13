@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { FaUpload, FaImage, FaTimes } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 const UploadPaymentProofStep = ({ paymentProof, onProofUpload, onNext, onBack }) => {
+  const { t } = useTranslation('insurance');
   const [preview, setPreview] = useState(paymentProof?.preview || null);
   const [error, setError] = useState('');
 
@@ -12,13 +14,13 @@ const UploadPaymentProofStep = ({ paymentProof, onProofUpload, onNext, onBack })
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      setError('Please upload an image file (JPG, PNG, etc.)');
+      setError(t('enroll.uploadProof.errors.invalidType'));
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setError('File size must be less than 5MB');
+      setError(t('enroll.uploadProof.errors.fileTooLarge'));
       return;
     }
 
@@ -44,9 +46,9 @@ const UploadPaymentProofStep = ({ paymentProof, onProofUpload, onNext, onBack })
 
   return (
     <div className="form-card">
-      <h2 className="form-title">Upload Payment Proof</h2>
+      <h2 className="form-title">{t('enroll.uploadProof.title')}</h2>
       <p className="form-subtitle">
-        Upload a screenshot of your successful eSewa payment
+        {t('enroll.uploadProof.subtitle')}
       </p>
 
       <div className="upload-section">
@@ -60,15 +62,15 @@ const UploadPaymentProofStep = ({ paymentProof, onProofUpload, onNext, onBack })
             />
             <div className="upload-content">
               <FaUpload className="upload-icon" />
-              <p className="upload-text">Click to upload payment screenshot</p>
-              <p className="upload-hint">PNG, JPG up to 5MB</p>
+              <p className="upload-text">{t('enroll.uploadProof.clickToUpload')}</p>
+              <p className="upload-hint">{t('enroll.uploadProof.fileTypes')}</p>
             </div>
           </label>
         ) : (
           <div className="preview-container">
             <div className="preview-header">
               <FaImage className="text-emerald-600" />
-              <span className="preview-title">Payment Screenshot</span>
+              <span className="preview-title">{t('enroll.uploadProof.paymentScreenshot')}</span>
               <button
                 type="button"
                 onClick={handleRemove}
@@ -80,7 +82,7 @@ const UploadPaymentProofStep = ({ paymentProof, onProofUpload, onNext, onBack })
             <div className="preview-image-wrapper">
               <img
                 src={preview}
-                alt="Payment proof"
+                alt={t('enroll.uploadProof.paymentProofAlt')}
                 className="preview-image"
               />
             </div>
@@ -95,24 +97,24 @@ const UploadPaymentProofStep = ({ paymentProof, onProofUpload, onNext, onBack })
       </div>
 
       <div className="info-box">
-        <p className="info-title">Important:</p>
+        <p className="info-title">{t('enroll.uploadProof.important')}:</p>
         <ul className="info-list">
-          <li>Make sure the screenshot clearly shows the payment success message</li>
-          <li>Transaction ID and amount should be visible</li>
-          <li>This will be verified by our team</li>
+          <li>{t('enroll.uploadProof.instructions.clearMessage')}</li>
+          <li>{t('enroll.uploadProof.instructions.transactionVisible')}</li>
+          <li>{t('enroll.uploadProof.instructions.verification')}</li>
         </ul>
       </div>
 
       <div className="btn-container">
         <button className="btn-back" onClick={onBack}>
-          ← Back
+          {t('enroll.uploadProof.back')}
         </button>
         <button
           className="btn-next"
           onClick={onNext}
           disabled={!preview}
         >
-          Next →
+          {t('enroll.uploadProof.next')}
         </button>
       </div>
     </div>

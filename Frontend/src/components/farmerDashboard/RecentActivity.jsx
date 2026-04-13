@@ -1,34 +1,37 @@
 import { FiCheckCircle, FiAlertCircle } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import "../../styles/farmerdashboard.css";
 
-const activities = [
-  {
-    title: "Cattle #A142 Vaccinated",
-    time: "2 hours ago",
-    type: "success",
-    icon: <FiCheckCircle />,
-  },
-  {
-    title: "Overdue Vaccination - Sheep #B203",
-    time: "4 hours ago",
-    type: "warning",
-    icon: <FiAlertCircle />,
-  },
-  {
-    title: "Health Check Completed - Goat #C089",
-    time: "6 hours ago",
-    type: "success",
-    icon: <FiCheckCircle />,
-  },
-];
-
 const RecentActivity = () => {
+  const { t } = useTranslation('dashboard');
+  
+  const activities = [
+    {
+      title: t('recentActivity.cattleVaccinated'),
+      time: `2 ${t('recentActivity.hoursAgo')}`,
+      type: "success",
+      icon: <FiCheckCircle />,
+    },
+    {
+      title: t('recentActivity.overdueVaccination'),
+      time: `4 ${t('recentActivity.hoursAgo')}`,
+      type: "warning",
+      icon: <FiAlertCircle />,
+    },
+    {
+      title: t('recentActivity.healthCheckCompleted'),
+      time: `6 ${t('recentActivity.hoursAgo')}`,
+      type: "success",
+      icon: <FiCheckCircle />,
+    },
+  ];
+
   return (
     <div className="bg-white rounded-xl p-4 sm:p-6 card-shadow">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-slate-700 text-sm sm:text-base">Recent Activity</h3>
+        <h3 className="font-semibold text-slate-700 text-sm sm:text-base">{t('recentActivity.title')}</h3>
         <button className="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium">
-          View All
+          {t('recentActivity.viewAll')}
         </button>
       </div>
 

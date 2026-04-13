@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import PlanDetails from './PlanDetails';
 import { initiatePayment, redirectToEsewa } from '../../../../services/paymentApi';
 import Toast from '../../../common/Toast';
 
-const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected, livestock }) => {
+const SelectPlanStep = ({ plan, onPlanSelect, onBack, preSelected, livestock }) => {
+  const { t } = useTranslation('insurance');
   const [isProcessing, setIsProcessing] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -46,7 +48,7 @@ const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected, lives
   const handleProceedToPayment = async () => {
     if (!plan) {
       setToast({
-        message: 'Please select a plan first',
+        message: t('enroll.selectPlan.errors.selectPlan'),
         type: 'error'
       });
       return;
@@ -54,7 +56,7 @@ const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected, lives
 
     if (!livestock) {
       setToast({
-        message: 'Livestock information is missing',
+        message: t('enroll.selectPlan.errors.livestockMissing'),
         type: 'error'
       });
       return;
@@ -94,7 +96,7 @@ const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected, lives
     } catch (error) {
       console.error('Error initiating payment:', error);
       setToast({
-        message: 'Failed to initiate payment. Please try again.',
+        message: t('enroll.selectPlan.errors.paymentFailed'),
         type: 'error'
       });
       setIsProcessing(false);
@@ -103,24 +105,24 @@ const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected, lives
 
   return (
     <div className="form-card">
-      <h2 className="form-title">Select Plan</h2>
+      <h2 className="form-title">{t('enroll.selectPlan.title')}</h2>
       <p className="form-subtitle">
         {preSelected 
-          ? 'Your selected plan is shown below. You can change it if needed.'
-          : 'Choose an insurance plan that best fits your needs.'}
+          ? t('enroll.selectPlan.preSelectedSubtitle')
+          : t('enroll.selectPlan.subtitle')}
       </p>
 
       {preSelected && plan ? (
         <div className="pre-selected-plan">
           <div className="selected-badge">
-            <span>✓ Selected from Plans</span>
+            <span>{t('enroll.selectPlan.selectedBadge')}</span>
           </div>
           <PlanDetails plan={plan} />
           <button 
             className="btn-change-plan"
             onClick={() => onPlanSelect(null)}
           >
-            Change Plan
+            {t('enroll.selectPlan.changePlan')}
           </button>
         </div>
       ) : (
@@ -136,10 +138,10 @@ const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected, lives
                 onPlanSelect(selected);
               }}
             >
-              <option value="">Select plan...</option>
+              <option value="">{t('enroll.selectPlan.selectPlaceholder')}</option>
               {planOptions.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.name} - ${item.price}/12 months
+                  {item.name} - ${item.price}/12 {t('enroll.selectPlan.months')}
                 </option>
               ))}
             </select>
@@ -152,14 +154,14 @@ const SelectPlanStep = ({ plan, onPlanSelect, onNext, onBack, preSelected, lives
 
       <div className="btn-container">
         <button className="btn-back" onClick={onBack} disabled={isProcessing}>
-          ← Back
+          {t('enroll.selectPlan.back')}
         </button>
         <button
           className="btn-next"
           onClick={handleProceedToPayment}
           disabled={!plan || isProcessing}
         >
-          {isProcessing ? 'Processing...' : 'Proceed to Payment →'}
+          {isProcessing ? t('enroll.selectPlan.processing') : t('enroll.selectPlan.proceedToPayment')}
         </button>
       </div>
 

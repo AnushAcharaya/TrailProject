@@ -1,0 +1,436 @@
+{
+  "nav": {
+    "dashboard": "ड्यासबोर्ड",
+    "insurance": "बीमा",
+    "enroll": "दर्ता गर्नुहोस्",
+    "claims": "दावीहरू",
+    "reviewDashboard": "समीक्षा ड्यासबोर्ड",
+    "verifyClaims": "दावी प्रमाणित गर्नुहोस्",
+    "farmerPortal": "किसान पोर्टल",
+    "vetPortal": "पशु चिकित्सक पोर्टल"
+  },
+  "dashboard": {
+    "welcome": "फेरि स्वागत छ, किसान!",
+    "subtitle": "आफ्नो बीमा दावी र कभरेज व्यवस्थापन गर्नुहोस्",
+    "stats": {
+      "totalClaims": "कुल दावीहरू",
+      "pending": "विचाराधीन",
+      "approved": "स्वीकृत",
+      "enrollments": "दर्ताहरू"
+    },
+    "recentActivities": "हालैका बीमा गतिविधिहरू",
+    "seeAll": "सबै हेर्नुहोस्",
+    "loading": "गतिविधिहरू लोड गर्दै...",
+    "noActivities": "हालैका गतिविधिहरू छैनन्"
+  },
+  "plans": {
+    "title": "बीमा योजनाहरू",
+    "subtitle": "आफ्नो पशुधनको लागि सही कभरेज छान्नुहोस्",
+    "price": "रु {{amount}}",
+    "duration": "{{count}} महिना",
+    "coverage": {
+      "accident": "दुर्घटना कभरेज",
+      "theft": "चोरी सुरक्षा",
+      "disease": "रोग कभरेज",
+      "vaccination": "खोप",
+      "premium": "प्रिमियम सेवाहरू",
+      "support": "२४/७ समर्थन"
+    },
+    "buttons": {
+      "viewDetails": "विवरण हेर्नुहोस्",
+      "enrollNow": "अहिले दर्ता गर्नुहोस्"
+    }
+  },
+  "enroll": {
+    "steps": {
+      "selectLivestock": "पशुधन छान्नुहोस्",
+      "selectPlan": "योजना छान्नुहोस् र भुक्तानी गर्नुहोस्",
+      "uploadProof": "प्रमाण अपलोड गर्नुहोस्",
+      "reviewSubmit": "समीक्षा र पेश गर्नुहोस्"
+    },
+    "selectLivestock": {
+      "title": "पशुधन छान्नुहोस्",
+      "subtitle": "आफ्नो दर्ता गरिएका जनावरहरूबाट बीमा गर्न चाहनुभएको पशुधन छान्नुहोस्।",
+      "loading": "पशुधन लोड गर्दै...",
+      "tryAgain": "फेरि प्रयास गर्नुहोस्",
+      "noLivestock": "कुनै पशुधन फेला परेन। कृपया पहिले पशुधन थप्नुहोस्।",
+      "selectPlaceholder": "पशुधन छान्नुहोस्...",
+      "next": "अर्को →"
+    },
+    "livestockDetails": {
+      "title": "पशुधन विवरण",
+      "name": "नाम",
+      "type": "प्रकार",
+      "breed": "नस्ल",
+      "tag": "ट्याग",
+      "age": "उमेर",
+      "healthStatus": "स्वास्थ्य स्थिति"
+    },
+    "selectPlan": {
+      "title": "योजना छान्नुहोस्",
+      "subtitle": "आफ्नो आवश्यकता अनुसार उत्तम बीमा योजना छान्नुहोस्।",
+      "preSelectedSubtitle": "तपाईंको चयन गरिएको योजना तल देखाइएको छ। आवश्यक भएमा तपाईं यसलाई परिवर्तन गर्न सक्नुहुन्छ।",
+      "selectedBadge": "✓ योजनाहरूबाट चयन गरिएको",
+      "changePlan": "योजना परिवर्तन गर्नुहोस्",
+      "selectPlaceholder": "योजना छान्नुहोस्...",
+      "months": "महिना",
+      "back": "← पछाडि",
+      "proceedToPayment": "भुक्तानीमा जानुहोस् →",
+      "processing": "प्रशोधन गर्दै...",
+      "errors": {
+        "selectPlan": "कृपया पहिले योजना छान्नुहोस्",
+        "livestockMissing": "पशुधन जानकारी हराइरहेको छ",
+        "paymentFailed": "भुक्तानी सुरु गर्न असफल भयो। कृपया फेरि प्रयास गर्नुहोस्।"
+      }
+    },
+    "uploadProof": {
+      "title": "भुक्तानी प्रमाण अपलोड गर्नुहोस्",
+      "subtitle": "आफ्नो सफल eSewa भुक्तानीको स्क्रिनसट अपलोड गर्नुहोस्",
+      "clickToUpload": "भुक्तानी स्क्रिनसट अपलोड गर्न क्लिक गर्नुहोस्",
+      "fileTypes": "PNG, JPG ५MB सम्म",
+      "paymentScreenshot": "भुक्तानी स्क्रिनसट",
+      "paymentProofAlt": "भुक्तानी प्रमाण",
+      "important": "महत्त्वपूर्ण",
+      "instructions": {
+        "clearMessage": "स्क्रिनसटले भुक्तानी सफलता सन्देश स्पष्ट रूपमा देखाउने सुनिश्चित गर्नुहोस्",
+        "transactionVisible": "लेनदेन आईडी र रकम देखिने हुनुपर्छ",
+        "verification": "यो हाम्रो टोलीद्वारा प्रमाणित गरिनेछ"
+      },
+      "back": "← पछाडि",
+      "next": "अर्को →",
+      "errors": {
+        "invalidType": "कृपया छवि फाइल अपलोड गर्नुहोस् (JPG, PNG, आदि)",
+        "fileTooLarge": "फाइल साइज ५MB भन्दा कम हुनुपर्छ"
+      }
+    },
+    "review": {
+      "title": "समीक्षा र पेश गर्नुहोस्",
+      "subtitle": "पेश गर्नु अघि आफ्नो दर्ता विवरण समीक्षा गर्नुहोस्।",
+      "selectedLivestock": "चयन गरिएको पशुधन",
+      "selectedPlan": "चयन गरिएको योजना",
+      "paymentProof": "भुक्तानी प्रमाण",
+      "name": "नाम",
+      "type": "प्रकार",
+      "tag": "ट्याग",
+      "breed": "नस्ल",
+      "paymentProofAlt": "भुक्तानी प्रमाण",
+      "screenshotUploaded": "स्क्रिनसट सफलतापूर्वक अपलोड गरियो",
+      "noPaymentProof": "कुनै भुक्तानी प्रमाण अपलोड गरिएको छैन",
+      "totalPremium": "कुल प्रिमियम",
+      "coveragePeriod": "कभरेज अवधि: १२ महिना",
+      "back": "← पछाडि",
+      "submitEnrollment": "दर्ता पेश गर्नुहोस्",
+      "submitting": "पेश गर्दै..."
+    },
+    "messages": {
+      "paymentCompleted": "भुक्तानी पूरा भयो! कृपया आफ्नो भुक्तानी स्क्रिनसट अपलोड गर्नुहोस्।",
+      "completeAllSteps": "कृपया भुक्तानी प्रमाण अपलोड सहित सबै चरणहरू पूरा गर्नुहोस्",
+      "enrollmentSuccess": "दर्ता सफलतापूर्वक पेश गरियो! प्रशासक प्रमाणीकरणको प्रतीक्षा गर्दै।",
+      "enrollmentFailed": "दर्ता पेश गर्न असफल भयो। कृपया फेरि प्रयास गर्नुहोस्।"
+    }
+  },
+  "submitClaim": {
+    "title": "बीमा दावी पेश गर्नुहोस्",
+    "subtitle": "दावी विवरण र खोप इतिहास संलग्न गर्न भर्नुहोस्",
+    "form": {
+      "claimDetails": "दावी विवरण",
+      "insuranceEnrollment": "बीमा दर्ता",
+      "loadingEnrollments": "दर्ताहरू लोड गर्दै...",
+      "selectEnrollment": "बीमा गरिएको पशुधन छान्नुहोस्...",
+      "coverage": "कभरेज",
+      "noEnrollments": "कुनै सक्रिय बीमा दर्ता फेला परेन। कृपया पहिले पशुधन दर्ता गर्नुहोस्।",
+      "claimType": "दावी प्रकार",
+      "selectType": "दावी प्रकार छान्नुहोस्...",
+      "description": "विवरण",
+      "descriptionPlaceholder": "घटनाको विस्तृत विवरण प्रदान गर्नुहोस्...",
+      "incidentDate": "घटना मिति",
+      "location": "घटना स्थान",
+      "locationPlaceholder": "घटना भएको स्थान प्रविष्ट गर्नुहोस्...",
+      "amount": "दावी रकम (रु)",
+      "amountPlaceholder": "दावी रकम प्रविष्ट गर्नुहोस्...",
+      "uploadImage": "छविहरू अपलोड गर्नुहोस्",
+      "uploadInstructions": "यहाँ फाइलहरू छोड्नुहोस् वा अपलोड गर्न क्लिक गर्नुहोस्",
+      "fileTypes": "JPG, PNG, PDF (अधिकतम ५MB)",
+      "selectFiles": "फाइलहरू छान्नुहोस्",
+      "invalidFileType": "कृपया मान्य कागजात फाइल अपलोड गर्नुहोस् (.txt, .pdf, .doc, .docx)",
+      "dropVaccinationFile": "खोप इतिहास फाइल यहाँ छोड्नुहोस् वा अपलोड गर्न क्लिक गर्नुहोस्",
+      "dropMedicalFile": "चिकित्सा इतिहास फाइल यहाँ छोड्नुहोस् वा अपलोड गर्न क्लिक गर्नुहोस्",
+      "fileFormats": "TXT, PDF, DOC, DOCX (रिपोर्टबाट डाउनलोड गरिएको)"
+    },
+    "claimTypes": {
+      "accident": "दुर्घटना",
+      "theft": "चोरी",
+      "disease": "रोग",
+      "death": "मृत्यु",
+      "naturalDisaster": "प्राकृतिक प्रकोप",
+      "other": "अन्य"
+    },
+    "sections": {
+      "vaccinationHistory": "खोप इतिहास",
+      "medicalHistory": "चिकित्सा इतिहास",
+      "noVaccinations": "कुनै खोप रेकर्ड फेला परेन",
+      "noMedical": "कुनै चिकित्सा रेकर्ड फेला परेन"
+    },
+    "buttons": {
+      "submit": "दावी पेश गर्नुहोस्",
+      "cancel": "रद्द गर्नुहोस्"
+    },
+    "messages": {
+      "submitting": "दावी पेश गर्दै...",
+      "success": "दावी सफलतापूर्वक पेश गरियो!",
+      "error": "दावी पेश गर्न असफल भयो। कृपया फेरि प्रयास गर्नुहोस्।"
+    },
+    "validation": {
+      "typeRequired": "कृपया दावी प्रकार छान्नुहोस्",
+      "descriptionRequired": "कृपया विवरण प्रदान गर्नुहोस्",
+      "dateRequired": "कृपया घटना मिति छान्नुहोस्",
+      "locationRequired": "कृपया स्थान प्रदान गर्नुहोस्",
+      "amountRequired": "कृपया दावी रकम प्रविष्ट गर्नुहोस्",
+      "imageRequired": "कृपया घटना छवि अपलोड गर्नुहोस्"
+    }
+  },
+  "trackClaim": {
+    "title": "दावीहरू ट्र्याक गर्नुहोस्",
+    "claimNumber": "दावी #{{number}}",
+    "status": {
+      "submitted": "पेश गरिएको",
+      "underReview": "समीक्षाधीन",
+      "pendingVerification": "प्रमाणीकरण विचाराधीन",
+      "approved": "स्वीकृत",
+      "rejected": "अस्वीकृत",
+      "paid": "भुक्तानी गरिएको"
+    },
+    "details": {
+      "type": "प्रकार",
+      "amount": "रकम",
+      "date": "मिति",
+      "livestock": "पशुधन",
+      "description": "विवरण"
+    },
+    "timeline": {
+      "submitted": "दावी पेश गरियो",
+      "reviewing": "प्रशासकद्वारा समीक्षाधीन",
+      "verification": "प्रमाणीकरणको लागि पशु चिकित्सकलाई पठाइयो",
+      "decision": "निर्णय गरियो",
+      "payment": "भुक्तानी प्रशोधन गरियो"
+    },
+    "buttons": {
+      "viewDetails": "विवरण हेर्नुहोस्",
+      "back": "दावीहरूमा फर्कनुहोस्"
+    },
+    "noClaims": "कुनै दावी फेला परेन"
+  },
+  "verify": {
+    "title": "दावी प्रमाणित गर्नुहोस्",
+    "livestockProfile": {
+      "title": "पशुधन प्रोफाइल",
+      "tagId": "ट्याग आईडी",
+      "species": "प्रजाति",
+      "breed": "नस्ल",
+      "age": "उमेर",
+      "gender": "लिङ्ग",
+      "weight": "तौल",
+      "health": "स्वास्थ्य स्थिति"
+    },
+    "vaccinationHistory": {
+      "title": "खोप इतिहास",
+      "vaccine": "खोप",
+      "date": "मिति",
+      "vet": "पशु चिकित्सक",
+      "nextDue": "अर्को मिति",
+      "noRecords": "कुनै खोप रेकर्ड छैन"
+    },
+    "medicalHistory": {
+      "title": "चिकित्सा इतिहास",
+      "diagnosis": "निदान",
+      "treatment": "उपचार",
+      "date": "मिति",
+      "vet": "पशु चिकित्सक",
+      "noRecords": "कुनै चिकित्सा रेकर्ड छैन"
+    },
+    "claimDetails": {
+      "title": "दावी विवरण",
+      "amount": "दावी रकम",
+      "type": "दावी प्रकार",
+      "description": "विवरण",
+      "incidentDate": "घटना मिति",
+      "location": "स्थान",
+      "submittedBy": "द्वारा पेश गरिएको",
+      "submittedDate": "पेश गरिएको मिति"
+    },
+    "decision": {
+      "title": "प्रमाणीकरण निर्णय",
+      "notes": "प्रमाणीकरण टिप्पणीहरू",
+      "notesPlaceholder": "यहाँ आफ्नो प्रमाणीकरण टिप्पणीहरू थप्नुहोस्",
+      "approve": "दावी स्वीकृत गर्नुहोस्",
+      "reject": "दावी अस्वीकार गर्नुहोस्",
+      "approveConfirm": "के तपाईं यो दावी स्वीकृत गर्न निश्चित हुनुहुन्छ?",
+      "rejectConfirm": "के तपाईं यो दावी अस्वीकार गर्न निश्चित हुनुहुन्छ?",
+      "success": "प्रमाणीकरण सफलतापूर्वक पेश गरियो",
+      "error": "प्रमाणीकरण पेश गर्न असफल भयो"
+    }
+  },
+  "reviewDashboard": {
+    "title": "दावी समीक्षा ड्यासबोर्ड",
+    "stats": {
+      "pendingReview": "समीक्षा विचाराधीन",
+      "verifiedClaims": "प्रमाणित दावीहरू",
+      "rejectedClaims": "अस्वीकृत दावीहरू"
+    },
+    "claimCard": {
+      "claimNumber": "CLM-{{number}}",
+      "farmer": "किसान",
+      "livestock": "पशुधन",
+      "created": "सिर्जना गरिएको",
+      "reviewClaim": "दावी समीक्षा गर्नुहोस्"
+    },
+    "noClaims": "समीक्षा गर्न कुनै दावी छैन"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "बीमा व्यवस्थापन",
+      "tabs": {
+        "enrollments": "दर्ता बीमाहरू",
+        "claims": "दावी बीमाहरू"
+      }
+    },
+    "enrollment": {
+      "title": "दर्ता बीमाहरू",
+      "loading": "दर्ताहरू लोड गर्दै...",
+      "noEnrollments": "कुनै दर्ता फेला परेन",
+      "filters": {
+        "all": "सबै स्थिति",
+        "active": "सक्रिय",
+        "pending": "विचाराधीन",
+        "expired": "म्याद सकिएको",
+        "cancelled": "रद्द गरिएको"
+      },
+      "table": {
+        "farmer": "किसान",
+        "livestock": "पशुधन",
+        "plan": "योजना",
+        "coverage": "कभरेज",
+        "period": "अवधि",
+        "status": "स्थिति",
+        "actions": "कार्यहरू",
+        "view": "हेर्नुहोस्"
+      },
+      "modal": {
+        "title": "दर्ता विवरण",
+        "enrollmentId": "दर्ता आईडी",
+        "status": "स्थिति",
+        "farmerInfo": "किसान जानकारी",
+        "name": "नाम",
+        "email": "इमेल",
+        "phone": "फोन",
+        "livestockInfo": "पशुधन जानकारी",
+        "tagId": "ट्याग आईडी",
+        "species": "प्रजाति",
+        "breed": "नस्ल",
+        "age": "उमेर",
+        "years": "वर्ष",
+        "insurancePlan": "बीमा योजना",
+        "planName": "योजना नाम",
+        "planType": "योजना प्रकार",
+        "coverageAmount": "कभरेज रकम",
+        "premiumPaid": "प्रिमियम भुक्तानी",
+        "coveragePeriod": "कभरेज अवधि",
+        "startDate": "सुरु मिति",
+        "endDate": "अन्त्य मिति",
+        "enrollmentDate": "दर्ता मिति",
+        "paymentDate": "भुक्तानी मिति",
+        "notes": "टिप्पणीहरू",
+        "approve": "स्वीकृत गर्नुहोस्",
+        "reject": "अस्वीकार गर्नुहोस्",
+        "approving": "स्वीकृत गर्दै...",
+        "rejecting": "अस्वीकार गर्दै..."
+      }
+    },
+    "enrollments": {
+      "title": "दर्ता व्यवस्थापन",
+      "headers": {
+        "id": "आईडी",
+        "farmer": "किसान",
+        "livestock": "पशुधन",
+        "plan": "योजना",
+        "date": "मिति",
+        "status": "स्थिति",
+        "actions": "कार्यहरू"
+      }
+    },
+    "claims": {
+      "title": "दावी व्यवस्थापन",
+      "loading": "दावीहरू लोड गर्दै...",
+      "noClaims": "कुनै दावी फेला परेन",
+      "filters": {
+        "all": "सबै स्थिति",
+        "submitted": "पेश गरिएको",
+        "underReview": "समीक्षाधीन",
+        "approved": "स्वीकृत",
+        "rejected": "अस्वीकृत",
+        "paid": "भुक्तानी गरिएको"
+      },
+      "table": {
+        "claimId": "दावी आईडी",
+        "farmer": "किसान",
+        "type": "प्रकार",
+        "amount": "रकम",
+        "date": "मिति",
+        "status": "स्थिति",
+        "actions": "कार्यहरू",
+        "view": "हेर्नुहोस्"
+      },
+      "modal": {
+        "title": "दावी विवरण",
+        "claimId": "दावी आईडी",
+        "status": "स्थिति",
+        "farmer": "किसान",
+        "claimType": "दावी प्रकार",
+        "claimAmount": "दावी रकम",
+        "incidentDate": "घटना मिति",
+        "incidentLocation": "घटना स्थान",
+        "description": "विवरण",
+        "incidentImage": "घटना छवि",
+        "vaccinationHistory": "खोप इतिहास",
+        "medicalHistory": "चिकित्सा इतिहास",
+        "adminNotes": "प्रशासक टिप्पणीहरू",
+        "adminActions": "प्रशासक कार्यहरू",
+        "approveClaim": "दावी स्वीकृत गर्नुहोस्",
+        "rejectClaim": "दावी अस्वीकार गर्नुहोस्",
+        "viewDownloadImage": "छवि हेर्नुहोस्/डाउनलोड गर्नुहोस्",
+        "viewDownloadVaccination": "खोप इतिहास हेर्नुहोस्/डाउनलोड गर्नुहोस्",
+        "viewDownloadMedical": "चिकित्सा इतिहास हेर्नुहोस्/डाउनलोड गर्नुहोस्"
+      },
+      "headers": {
+        "id": "आईडी",
+        "farmer": "किसान",
+        "livestock": "पशुधन",
+        "type": "प्रकार",
+        "amount": "रकम",
+        "status": "स्थिति",
+        "verification": "प्रमाणीकरण",
+        "actions": "कार्यहरू"
+      }
+    }
+  },
+  "common": {
+    "loading": "लोड गर्दै...",
+    "error": "त्रुटि भयो",
+    "success": "सफलता",
+    "cancel": "रद्द गर्नुहोस्",
+    "save": "सुरक्षित गर्नुहोस्",
+    "delete": "मेटाउनुहोस्",
+    "edit": "सम्पादन गर्नुहोस्",
+    "view": "हेर्नुहोस्",
+    "back": "पछाडि",
+    "next": "अर्को",
+    "previous": "अघिल्लो",
+    "submit": "पेश गर्नुहोस्",
+    "confirm": "पुष्टि गर्नुहोस्",
+    "close": "बन्द गर्नुहोस्",
+    "search": "खोज्नुहोस्",
+    "filter": "फिल्टर गर्नुहोस्",
+    "noData": "कुनै डेटा उपलब्ध छैन",
+    "selectOption": "एक विकल्प छान्नुहोस्"
+  }
+}

@@ -1,5 +1,9 @@
 // components/profile-transfer/receiver-side/received-requests/components/DeclineButton.jsx
+import { useTranslation } from 'react-i18next';
+
 export default function DeclineButton({ onClick, loading }) {
+  const { t } = useTranslation('profileTransfer');
+
   return (
     <button 
       onClick={onClick}
@@ -9,12 +13,12 @@ export default function DeclineButton({ onClick, loading }) {
       {loading ? (
         <>
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-          <span>Processing...</span>
+          <span>{t('common.loading')}</span>
         </>
       ) : (
         <>
           <span>✕</span>
-          <span>Reject</span>
+          <span>{t('requestCard.decline')}</span>
         </>
       )}
     </button>

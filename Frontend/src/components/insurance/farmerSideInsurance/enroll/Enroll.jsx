@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import StepIndicator from './StepIndicator';
 import SelectLivestockStep from './SelectLivestockStep';
 import SelectPlanStep from './SelectPlanStep';
@@ -9,6 +10,7 @@ import Toast from '../../../common/Toast';
 import { createEnrollment } from '../../../../services/insuranceApi';
 
 const Enroll = () => {
+  const { t } = useTranslation('insurance');
   const location = useLocation();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
@@ -27,12 +29,12 @@ const Enroll = () => {
         // User returned from eSewa, move to step 3 (upload proof)
         setCurrentStep(3);
         setToast({
-          message: 'Payment completed! Please upload your payment screenshot.',
+          message: t('enroll.messages.paymentCompleted'),
           type: 'success'
         });
       }
     }
-  }, []);
+  }, [t]);
 
   // Check if a plan was pre-selected from the plan cards page
   useEffect(() => {
@@ -56,7 +58,7 @@ const Enroll = () => {
   const handleSubmit = async () => {
     if (!selectedLivestock || !selectedPlan || !paymentProof) {
       setToast({
-        message: 'Please complete all steps including payment proof upload',
+        message: t('enroll.messages.completeAllSteps'),
         type: 'error'
       });
       return;
@@ -95,7 +97,7 @@ const Enroll = () => {
       sessionStorage.removeItem('pending_insurance_enrollment');
 
       setToast({
-        message: 'Enrollment submitted successfully! Awaiting admin verification.',
+        message: t('enroll.messages.enrollmentSuccess'),
         type: 'success'
       });
 
@@ -109,7 +111,7 @@ const Enroll = () => {
       console.error('Error response:', error.response?.data);
       
       // Extract error message from various possible locations
-      let errorMessage = 'Failed to submit enrollment. Please try again.';
+      let errorMessage = t('enroll.messages.enrollmentFailed');
       
       if (error.response?.data) {
         const data = error.response.data;

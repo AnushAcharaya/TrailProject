@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaSyringe, FaCalendar, FaClock, FaCheck, FaChevronRight } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import FarmerLayout from "../../components/farmerDashboard/FarmerLayout";
 import VaccinationTabs from "../../components/vaccination/VaccinationTabs";
@@ -11,6 +12,7 @@ import { getAllVaccinations, getVaccinationCounts, getUpcomingVaccinations, getO
 import "./../../styles/vaccination.css";
 
 const VaccinationPage = () => {
+  const { t } = useTranslation('vaccination');
   const [activeTab, setActiveTab] = useState("upcoming");
   const [vaccinations, setVaccinations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -109,10 +111,10 @@ const VaccinationPage = () => {
         onClick={() => navigate('/farmerpage')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Dashboard
+        {t('breadcrumbs.dashboard')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
-      <span className="text-gray-600">Vaccinations</span>
+      <span className="text-gray-600">{t('breadcrumbs.vaccinations')}</span>
     </div>
   ) : (
     <div className="flex items-center gap-2 text-sm mb-6">
@@ -120,17 +122,17 @@ const VaccinationPage = () => {
         onClick={() => navigate('/vet/farmer-profiles')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Farmer Profiles
+        {t('breadcrumbs.farmerProfiles')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
       <button 
         onClick={() => navigate('/vet/farmer-details')}
         className="text-emerald-600 hover:text-emerald-700"
       >
-        Animals
+        {t('breadcrumbs.animals')}
       </button>
       <FaChevronRight className="text-gray-400 text-xs" />
-      <span className="text-gray-600">Vaccinations</span>
+      <span className="text-gray-600">{t('breadcrumbs.vaccinations')}</span>
     </div>
   );
 
@@ -147,30 +149,21 @@ const VaccinationPage = () => {
           allVaccinations={vaccinations}
         />
 
-        <div className="page-header">
-          <div className="flex items-center gap-2">
-            <div className="bg-green-100 p-2 rounded">
-              <FaSyringe className="text-green-700" size={24} />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-body">Vaccination Schedule</h1>
-              <p className="text-sm text-muted">Manage and track livestock vaccinations</p>
-            </div>
-          </div>
+        <div className="flex justify-end items-center mb-4">
           <Link to="/vaccination/add" state={{ from: isFarmer ? 'farmer' : 'vet' }} className="add-btn">
             <FaSyringe className="mr-1" size={18} />
-            Add Vaccination
+            {t('buttons.addVaccination')}
           </Link>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="summary-card upcoming">
             <div className="icon">
               <FaCalendar className="text-white" size={24} />
             </div>
             <div className="count">{counts.upcoming}</div>
-            <div className="label">Upcoming</div>
+            <div className="label">{t('summary.upcoming')}</div>
           </div>
 
           <div className="summary-card completed">
@@ -178,7 +171,7 @@ const VaccinationPage = () => {
               <FaCheck className="text-white" size={24} />
             </div>
             <div className="count">{counts.completed}</div>
-            <div className="label">Completed</div>
+            <div className="label">{t('summary.completed')}</div>
           </div>
 
           <div className="summary-card overdue">
@@ -186,7 +179,7 @@ const VaccinationPage = () => {
               <FaClock className="text-white" size={24} />
             </div>
             <div className="count">{counts.overdue}</div>
-            <div className="label">Overdue</div>
+            <div className="label">{t('summary.overdue')}</div>
           </div>
         </div>
 
@@ -194,10 +187,10 @@ const VaccinationPage = () => {
         <VaccinationTabs activeTab={activeTab} onTabChange={setActiveTab} counts={counts} />
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           {loading ? (
             <div className="col-span-full text-center py-10">
-              <p className="text-gray-600">Loading vaccinations...</p>
+              <p className="text-gray-600">{t('page.loading')}</p>
             </div>
           ) : filteredVaccinations.length > 0 ? (
             filteredVaccinations.map((v) => (
@@ -206,7 +199,7 @@ const VaccinationPage = () => {
           ) : (
             <div className="col-span-full empty-state">  
               <FaClock className="text-gray-400 mx-auto" size={40} />
-              <p>No {activeTab} vaccinations found.</p>
+              <p>{t('page.noResults', { status: t(`tabs.${activeTab}`) })}</p>
             </div>
           )}
         </div>

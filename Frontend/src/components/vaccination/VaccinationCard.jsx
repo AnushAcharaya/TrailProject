@@ -2,10 +2,12 @@
 import { useState } from "react";
 import { FaCalendar, FaClock, FaEdit, FaPaw, FaCheck } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { updateVaccination } from "../../services/vaccinationApi";
 import "./../../styles/vaccination.css";
 
 const VaccinationCard = ({ vaccination, onRefresh }) => {
+  const { t } = useTranslation('vaccination');
   const navigate = useNavigate();
   const [isCompleting, setIsCompleting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -84,12 +86,12 @@ const VaccinationCard = ({ vaccination, onRefresh }) => {
             <button
               onClick={handleEdit}
               className="text-blue-600 hover:text-blue-800 p-2 rounded hover:bg-blue-50 transition-colors"
-              title="Edit vaccination"
+              title={t('card.edit')}
             >
               <FaEdit size={18} />
             </button>
             <span className={`badge badge-${status}`}>
-              {status.charAt(0).toUpperCase() + status.slice(1)}
+              {t(`card.status.${status}`)}
             </span>
           </div>
         </div>
@@ -97,17 +99,17 @@ const VaccinationCard = ({ vaccination, onRefresh }) => {
         <div className="details">
           <div className="date">
             <FaCalendar className="text-muted mr-1" size={16} />
-            Given: {givenDate.toLocaleDateString()}
+            {t('card.given')}: {givenDate.toLocaleDateString()}
           </div>
           <div className="date">
             <FaClock className="text-muted mr-1" size={16} />
-            Due: {dueDate.toLocaleDateString()}
+            {t('card.due')}: {dueDate.toLocaleDateString()}
           </div>
         </div>
 
         {vaccination.notes && (
           <div className="text-sm text-gray-600 mt-2 p-2 bg-gray-50 rounded">
-            <strong>Notes:</strong> {vaccination.notes}
+            <strong>{t('card.notes')}:</strong> {vaccination.notes}
           </div>
         )}
 
@@ -126,7 +128,7 @@ const VaccinationCard = ({ vaccination, onRefresh }) => {
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <FaCheck size={14} />
-              {isCompleting ? 'Marking...' : 'Mark Completed'}
+              {isCompleting ? t('card.marking') : t('card.markCompleted')}
             </button>
           )}
           <button
@@ -137,9 +139,9 @@ const VaccinationCard = ({ vaccination, onRefresh }) => {
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                 : 'bg-green-600 hover:bg-green-700 text-white'
             }`}
-            title={isCompleted ? 'Cannot add vaccine - vaccination is completed' : 'Add vaccine for this animal'}
+            title={isCompleted ? t('card.cannotAdd') : t('card.addTooltip')}
           >
-            Add Vaccine
+            {t('card.addVaccine')}
           </button>
         </div>
       </div>
@@ -160,23 +162,23 @@ const VaccinationCard = ({ vaccination, onRefresh }) => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              Confirm Mark as Completed
+              {t('card.confirmModal.title')}
             </h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to mark this vaccination as completed?
+              {t('card.confirmModal.message')}
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowConfirmModal(false)}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition-colors"
               >
-                No
+                {t('card.confirmModal.no')}
               </button>
               <button
                 onClick={handleMarkCompleted}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
               >
-                Yes
+                {t('card.confirmModal.yes')}
               </button>
             </div>
           </div>

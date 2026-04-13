@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import LivestockDetails from './LivestockDetails';
 import { getAllLivestock } from '../../../../services/livestockCrudApi';
 
-const SelectLivestockStep = ({ livestock, onLivestockSelect, onNext, onBack }) => {
+const SelectLivestockStep = ({ livestock, onLivestockSelect, onNext }) => {
+  const { t } = useTranslation('insurance');
   const [livestockOptions, setLivestockOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -71,12 +73,12 @@ const SelectLivestockStep = ({ livestock, onLivestockSelect, onNext, onBack }) =
 
   return (
     <div className="form-card">
-      <h2 className="form-title">Select Livestock</h2>
-      <p className="form-subtitle">Choose the livestock you want to insure from your registered animals.</p>
+      <h2 className="form-title">{t('enroll.selectLivestock.title')}</h2>
+      <p className="form-subtitle">{t('enroll.selectLivestock.subtitle')}</p>
 
       {loading ? (
         <div className="text-center py-4">
-          <p className="text-gray-600">Loading livestock...</p>
+          <p className="text-gray-600">{t('enroll.selectLivestock.loading')}</p>
         </div>
       ) : error ? (
         <div className="text-center py-4">
@@ -85,12 +87,12 @@ const SelectLivestockStep = ({ livestock, onLivestockSelect, onNext, onBack }) =
             onClick={fetchLivestock}
             className="mt-2 text-emerald-600 hover:text-emerald-700"
           >
-            Try Again
+            {t('enroll.selectLivestock.tryAgain')}
           </button>
         </div>
       ) : livestockOptions.length === 0 ? (
         <div className="text-center py-4">
-          <p className="text-gray-600">No livestock found. Please add livestock first.</p>
+          <p className="text-gray-600">{t('enroll.selectLivestock.noLivestock')}</p>
         </div>
       ) : (
         <>
@@ -105,7 +107,7 @@ const SelectLivestockStep = ({ livestock, onLivestockSelect, onNext, onBack }) =
                 onLivestockSelect(selected);
               }}
             >
-              <option value="">Select livestock...</option>
+              <option value="">{t('enroll.selectLivestock.selectPlaceholder')}</option>
               {livestockOptions.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name} ({item.breed}) - {item.tag}
@@ -125,7 +127,7 @@ const SelectLivestockStep = ({ livestock, onLivestockSelect, onNext, onBack }) =
           onClick={onNext}
           disabled={!livestock || loading}
         >
-          Next →
+          {t('enroll.selectLivestock.next')}
         </button>
       </div>
     </div>

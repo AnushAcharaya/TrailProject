@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { FaTimes } from 'react-icons/fa';
 import ProgressStepper from './ProgressStepper';
 import AnimalDetail from './AnimalDetail';
+import { tStatus } from '../../../../utils/translateEnum';
 
 export default function TransferDetailsModal({ transfer, onClose }) {
   const { t } = useTranslation('profileTransfer');
+  const { t: tCommon } = useTranslation('common');
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -43,7 +45,7 @@ export default function TransferDetailsModal({ transfer, onClose }) {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">{t('transferItem.status')}:</span>
-                <span className="font-semibold text-yellow-600">{transfer.status}</span>
+                <span className="font-semibold text-yellow-600">{tStatus(tCommon, transfer.status)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">{t('transferItem.date')}:</span>

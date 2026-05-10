@@ -3,9 +3,11 @@ import { FaChevronDown } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import LivestockDetails from './LivestockDetails';
 import { getAllLivestock } from '../../../../services/livestockCrudApi';
+import { tAnimal } from '../../../../utils/translateEnum';
 
 const SelectLivestockStep = ({ livestock, onLivestockSelect, onNext }) => {
   const { t } = useTranslation('insurance');
+  const { t: tCommon } = useTranslation('common');
   const [livestockOptions, setLivestockOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -110,7 +112,7 @@ const SelectLivestockStep = ({ livestock, onLivestockSelect, onNext }) => {
               <option value="">{t('enroll.selectLivestock.selectPlaceholder')}</option>
               {livestockOptions.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.name} ({item.breed}) - {item.tag}
+                  {tAnimal(tCommon, item.name)} ({item.breed}) - {item.tag}
                 </option>
               ))}
             </select>

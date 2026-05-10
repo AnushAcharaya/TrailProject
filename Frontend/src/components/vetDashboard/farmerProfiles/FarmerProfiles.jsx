@@ -60,14 +60,6 @@ export default function FarmerProfiles() {
       {/* Main Content */}
       <div className="p-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          {/* Welcome Section */}
-          <div className="mb-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white shadow-lg">
-            <h1 className="text-3xl font-bold mb-3">{t('farmerProfiles.welcome')}</h1>
-            <p className="text-emerald-50 text-lg leading-relaxed">
-              {t('farmerProfiles.welcomeMessage')}
-            </p>
-          </div>
-
           {/* Search Bar */}
           <div className="mb-8">
             <SearchBar value={searchQuery} onChange={setSearchQuery} />

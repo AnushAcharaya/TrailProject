@@ -1,19 +1,25 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { tAnimal } from '../../utils/translateEnum';
+import { useLocalizedNumber } from '../../utils/formatNumber';
 
 const AnimalReportCard = ({ animal, onViewTreatment, onViewVaccination }) => {
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
+
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 'N/A';
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
-    const ageInMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + 
+    const ageInMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 +
                         (today.getMonth() - birthDate.getMonth());
-    
+
     if (ageInMonths < 12) {
-      return `${ageInMonths} months`;
+      return `${fmt(ageInMonths)} months`;
     } else {
       const years = Math.floor(ageInMonths / 12);
       const months = ageInMonths % 12;
-      return months > 0 ? `${years}y ${months}m` : `${years} years`;
+      return months > 0 ? `${fmt(years)}y ${fmt(months)}m` : `${fmt(years)} years`;
     }
   };
 
@@ -35,7 +41,7 @@ const AnimalReportCard = ({ animal, onViewTreatment, onViewVaccination }) => {
       <div className="card-body">
         <div className="info-row">
           <span className="info-label">Species:</span>
-          <span className="info-value">{animal.species_name || 'N/A'}</span>
+          <span className="info-value">{animal.species_name ? tAnimal(tCommon, animal.species_name) : 'N/A'}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Age:</span>
@@ -47,7 +53,7 @@ const AnimalReportCard = ({ animal, onViewTreatment, onViewVaccination }) => {
         </div>
         <div className="info-row">
           <span className="info-label">Weight:</span>
-          <span className="info-value">{animal.weight ? `${animal.weight} kg` : 'N/A'}</span>
+          <span className="info-value">{animal.weight ? `${fmt(animal.weight)} kg` : 'N/A'}</span>
         </div>
       </div>
 

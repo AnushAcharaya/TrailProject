@@ -3,7 +3,7 @@
     "title": "Vaccination Schedule",
     "subtitle": "Manage and track livestock vaccinations",
     "loading": "Loading vaccinations...",
-    "noResults": "No {status} vaccinations found."
+    "noResults": "No {{status}} vaccinations found."
   },
   "breadcrumbs": {
     "dashboard": "Dashboard",
@@ -76,6 +76,8 @@
       "dateGiven": "Date Given",
       "nextDueDate": "Next Due Date",
       "nextDueDateHint": "Must be on or after {date}",
+      "vetName": "Veterinarian Name",
+      "vetNamePlaceholder": "Enter veterinarian name",
       "notes": "Notes (Optional)",
       "notesPlaceholder": "Add any additional notes about this vaccination..."
     },

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css'
+import { NotificationProvider } from './context/NotificationContext';
 import AccountCreate from "./pages/CreateAccount";
 import LoginPage from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -45,65 +46,69 @@ import MainDashboardPage from "./pages/vetDashboard/MainDashboard";
 import FarmerProfilesPage from "./pages/vetDashboard/FarmerProfile";
 import FarmerDetailPage from "./pages/vetDashboard/FarmerDetail";
 import ReportsPage from "./pages/reports/ReportsPage";
+import BroadcastNotification from "./pages/admin/BroadcastNotification";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        
-        <Route path="/register" element={<AccountCreate />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/" element={<Page />} />
-        <Route path="/adminpage" element={<AdminPage />} />
-        <Route path="/admin/account-verifications" element={<AccountVerifications />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/livestock" element={<LivestockPage />} />
-        <Route path="/livestock/add" element={<AddLivestockPage />} />
-        <Route path="/livestock/edit/:id" element={<EditLivestockPage />} />
-        <Route path="/medical/add" element={<AddTreatmentRecord />} />
-        <Route path="/medical/edit" element={<EditTreatmentRecord />} />
-        <Route path="/medical/history" element={<ViewTreatmentHistory />} />
-        <Route path="/medical/deadlines" element={<MonitorDeadlines />} />
-        <Route path="/medical/alerts" element={<AlertsNotifications />} />
-        <Route path="/vaccination" element={<VaccinationPage />} />
-        <Route path="/vaccination/add" element={<AddVaccinationPage />} />
-        <Route path="/vaccination/edit/:id" element={<EditVaccinationPage />} />
-        <Route path="/farmerpage" element={<FarmerDashboardPage />} />
-        <Route path="/farmerappointment" element={<FarmerAppointments />} />
-        <Route path="/appointments" element={<FarmerAppointments />} />
-        <Route path="/vetappointment" element={<VetAppointments />} />
-        <Route path="/vet/appointments" element={<VetAppointments />} />
-        <Route path="/appointments/request" element={<RequestAppointmentPage />} />
-        <Route path="/payment/success" element={<PaymentSuccess />} />
-        <Route path="/payment/failure" element={<PaymentFailure />} />
-        <Route path="/farmer/friends/requests" element={<FriendRequestsPage />} />
-        <Route path="/farmer/friends/list" element={<FriendsListPage />} />
-        <Route path="/messages" element={<MessagesPage />} />
-        <Route path="/messages/:friendId" element={<MessagesPage />} />
-        <Route path="/vet/friends/requests" element={<VetFriendRequestsPage />} />
-        <Route path="/vet/friends/list" element={<VetFriendsListPage />} />
-        <Route path="/vet/messages" element={<VetMessagesPage />} />
-        <Route path="/vet/messages/:friendId" element={<VetMessagesPage />} />
-        <Route path="/farmerinsurancedashboard" element={<Dashboard />} />
-        <Route path="/farmerinsuranceplan" element={<InsurancePlans />} />
-        <Route path="/farmerinsuranceenroll" element={<EnrollPage />} />
-        <Route path="/farmerinsurancesubmitclaim" element={<SubmitClaimPage />} />
-        <Route path="/farmerinsurancetrackclaim" element={<TrackClaimPage />} />
-        <Route path="/farmerinsurancetrackclaim/:claimId" element={<TrackClaimPage />} />
-        <Route path="/admin/insurance" element={<AdminInsurancePage />} />
-        <Route path="/profile-transfer/farmer/animals" element={<AnimalListPage />} />
-        <Route path="/profile-transfer/farmer/sent" element={<SendTransfersPage />} />
-        <Route path="/profile-transfer/receiver/requests" element={<ReceivedRequestsPage />} />
-        <Route path="/profile-transfer/admin/dashboard" element={<AdminDashboardPage />} />
-        <Route path="/profile-transfer/admin/review/:transferId" element={<ReviewTransferPage />} />
-        <Route path="/vet/dashboard" element={<MainDashboardPage />} />
-        <Route path="/vet/farmer-profiles" element={<FarmerProfilesPage />} />
-        <Route path="/vet/farmer-details" element={<FarmerDetailPage />} />
-        <Route path="/reports" element={<ReportsPage />} />
+    <NotificationProvider>
+      <Router>
+        <Routes>
+          
+          <Route path="/register" element={<AccountCreate />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/" element={<Page />} />
+          <Route path="/adminpage" element={<AdminPage />} />
+          <Route path="/admin/account-verifications" element={<AccountVerifications />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/livestock" element={<LivestockPage />} />
+          <Route path="/livestock/add" element={<AddLivestockPage />} />
+          <Route path="/livestock/edit/:id" element={<EditLivestockPage />} />
+          <Route path="/medical/add" element={<AddTreatmentRecord />} />
+          <Route path="/medical/edit" element={<EditTreatmentRecord />} />
+          <Route path="/medical/history" element={<ViewTreatmentHistory />} />
+          <Route path="/medical/deadlines" element={<MonitorDeadlines />} />
+          <Route path="/medical/alerts" element={<AlertsNotifications />} />
+          <Route path="/vaccination" element={<VaccinationPage />} />
+          <Route path="/vaccination/add" element={<AddVaccinationPage />} />
+          <Route path="/vaccination/edit/:id" element={<EditVaccinationPage />} />
+          <Route path="/farmerpage" element={<FarmerDashboardPage />} />
+          <Route path="/farmerappointment" element={<FarmerAppointments />} />
+          <Route path="/appointments" element={<FarmerAppointments />} />
+          <Route path="/vetappointment" element={<VetAppointments />} />
+          <Route path="/vet/appointments" element={<VetAppointments />} />
+          <Route path="/appointments/request" element={<RequestAppointmentPage />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/payment/failure" element={<PaymentFailure />} />
+          <Route path="/farmer/friends/requests" element={<FriendRequestsPage />} />
+          <Route path="/farmer/friends/list" element={<FriendsListPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/messages/:friendId" element={<MessagesPage />} />
+          <Route path="/vet/friends/requests" element={<VetFriendRequestsPage />} />
+          <Route path="/vet/friends/list" element={<VetFriendsListPage />} />
+          <Route path="/vet/messages" element={<VetMessagesPage />} />
+          <Route path="/vet/messages/:friendId" element={<VetMessagesPage />} />
+          <Route path="/farmerinsurancedashboard" element={<Dashboard />} />
+          <Route path="/farmerinsuranceplan" element={<InsurancePlans />} />
+          <Route path="/farmerinsuranceenroll" element={<EnrollPage />} />
+          <Route path="/farmerinsurancesubmitclaim" element={<SubmitClaimPage />} />
+          <Route path="/farmerinsurancetrackclaim" element={<TrackClaimPage />} />
+          <Route path="/farmerinsurancetrackclaim/:claimId" element={<TrackClaimPage />} />
+          <Route path="/admin/insurance" element={<AdminInsurancePage />} />
+          <Route path="/profile-transfer/farmer/animals" element={<AnimalListPage />} />
+          <Route path="/profile-transfer/farmer/sent" element={<SendTransfersPage />} />
+          <Route path="/profile-transfer/receiver/requests" element={<ReceivedRequestsPage />} />
+          <Route path="/profile-transfer/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/profile-transfer/admin/review/:transferId" element={<ReviewTransferPage />} />
+          <Route path="/vet/dashboard" element={<MainDashboardPage />} />
+          <Route path="/vet/farmer-profiles" element={<FarmerProfilesPage />} />
+          <Route path="/vet/farmer-details" element={<FarmerDetailPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/admin/broadcast" element={<BroadcastNotification />} />
 
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </NotificationProvider>
   )
 }
 

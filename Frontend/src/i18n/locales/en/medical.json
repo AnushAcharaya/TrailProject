@@ -16,6 +16,9 @@
     "savingTreatment": "Saving treatment...",
     "notFound": "Treatment not found"
   },
+  "search": {
+    "placeholder": "Search by treatment name, diagnosis, tag ID, species, or vet name..."
+  },
   "breadcrumbs": {
     "dashboard": "Dashboard",
     "farmerProfiles": "Farmer Profiles",

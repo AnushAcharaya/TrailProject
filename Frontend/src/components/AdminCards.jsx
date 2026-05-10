@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { Users, Clock, CheckCircle, Activity } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { fetchAdminDashboardStats } from "../services/api";
+import { useLocalizedNumber } from "../utils/formatNumber";
 
 const AdminCards = () => {
   const { t } = useTranslation('admin');
+  const fmt = useLocalizedNumber();
   const [stats, setStats] = useState({
     total_registrations: 0,
     pending_reviews: 0,
@@ -33,28 +35,28 @@ const AdminCards = () => {
     {
       id: 1,
       title: t('dashboard.cards.totalRegistrations'),
-      value: loading ? "..." : stats.total_registrations.toLocaleString(),
+      value: loading ? "..." : fmt(stats.total_registrations),
       icon: <Users className="w-12 h-12 text-white" />,
       bgGradient: "bg-gradient-to-r from-blue-500 to-blue-600",
     },
     {
       id: 2,
       title: t('dashboard.cards.pendingReviews'),
-      value: loading ? "..." : stats.pending_reviews.toLocaleString(),
+      value: loading ? "..." : fmt(stats.pending_reviews),
       icon: <Clock className="w-12 h-12 text-white" />,
       bgGradient: "bg-gradient-to-r from-yellow-400 to-yellow-500",
     },
     {
       id: 3,
       title: t('dashboard.cards.approvedAccounts'),
-      value: loading ? "..." : stats.approved_accounts.toLocaleString(),
+      value: loading ? "..." : fmt(stats.approved_accounts),
       icon: <CheckCircle className="w-12 h-12 text-white" />,
       bgGradient: "bg-gradient-to-r from-green-500 to-green-600",
     },
     {
       id: 4,
       title: t('dashboard.cards.activeThisWeek'),
-      value: loading ? "..." : stats.active_this_week.toLocaleString(),
+      value: loading ? "..." : fmt(stats.active_this_week),
       icon: <Activity className="w-12 h-12 text-white" />,
       bgGradient: "bg-gradient-to-r from-purple-500 to-purple-600",
     },

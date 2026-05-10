@@ -3,8 +3,8 @@ import "./../../styles/medicalHistory.css";
 
 const PageHeader = ({ title, subtitle }) => {
   return (
-    <div className="page-header">
-      <h1>{title}</h1>
+    <div className="page-header text-center">
+      <h1 className="text-center">{title}</h1>
     </div>
   );
 };

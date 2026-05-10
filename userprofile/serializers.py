@@ -46,6 +46,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'gender',
             'profile_image',
             'profile_image_url',
+            'consultation_fee',
             'theme',
             'language',
             'email_notifications',
@@ -79,7 +80,13 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'location',
             'gender',
             'profile_image',
+            'consultation_fee',
         ]
+
+    def validate_consultation_fee(self, value):
+        if value is not None and value < 0:
+            raise serializers.ValidationError("Consultation fee cannot be negative.")
+        return value
     
     def validate_bio(self, value):
         """Validate bio length"""

@@ -1,5 +1,8 @@
 // components/profile-transfer/admin-side/dashboard/components/StatsCard.jsx
+import { useLocalizedNumber } from '../../../utils/formatNumber';
+
 export default function StatsCard({ value, label, color }) {
+  const fmt = useLocalizedNumber();
   const colorConfig = {
     yellow: {
       bg: 'bg-yellow-50',
@@ -30,10 +33,10 @@ export default function StatsCard({ value, label, color }) {
       <div className="flex items-center justify-between">
         <div>
           <p className={`text-sm font-medium ${config.text} mb-1`}>{label}</p>
-          <p className="text-4xl font-bold text-gray-900">{value}</p>
+          <p className="text-4xl font-bold text-gray-900">{fmt(value)}</p>
         </div>
         <div className={`${config.icon} w-16 h-16 rounded-full flex items-center justify-center`}>
-          <span className="text-2xl font-bold text-white">{value}</span>
+          <span className="text-2xl font-bold text-white">{fmt(value)}</span>
         </div>
       </div>
     </div>

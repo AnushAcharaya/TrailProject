@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import FarmerLayout from "../../components/farmerDashboard/FarmerLayout";
 import { getReceivedRequests, acceptFriendRequest, rejectFriendRequest } from "../../services/friendsApi";
 import { FaUserPlus, FaCheck, FaTimes } from "react-icons/fa";
+import { tRole } from "../../utils/translateEnum";
 
 const FriendRequests = () => {
+  const { t: tCommon } = useTranslation('common');
   const [requests, setRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
@@ -101,7 +104,7 @@ const FriendRequests = () => {
                     <h3 className="text-xl font-semibold text-gray-800">
                       {request.sender.full_name || request.sender.username}
                     </h3>
-                    <p className="text-gray-600">{request.sender.role}</p>
+                    <p className="text-gray-600">{tRole(tCommon, request.sender.role)}</p>
                     {request.sender.phone && (
                       <p className="text-sm text-gray-500">{request.sender.phone}</p>
                     )}

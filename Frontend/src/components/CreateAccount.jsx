@@ -1,416 +1,435 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, Upload, LogIn, Mail, CheckCircle } from "lucide-react";
+import { Upload, CheckCircle, Hourglass } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { registerUser, verifyEmailOTP, resendEmailOTP } from "../services/api";
+import { registerUser, loginWithGoogle } from "../services/api";
+import BrandLogo from "./common/BrandLogo";
+import GoogleSignInButton from "./common/GoogleSignInButton";
+
+// Map backend / state field names → human labels for the generic banner
+const FIELD_LABELS = {
+  username: "Username",
+  full_name: "Full name",
+  fullName: "Full name",
+  address: "Address",
+  phone: "Phone",
+  email: "Email",
+  password: "Password",
+  role: "Role",
+  farm_name: "Farm name",
+  farmName: "Farm name",
+  nid_photo: "NID photo",
+  nidPhoto: "NID photo",
+  specialization: "Specialization",
+  certificate_photo: "Certificate photo",
+  certificatePhoto: "Certificate photo",
+};
+
+// Convert DRF error payload into per-field strings.
+const parseFieldErrors = (err) => {
+  if (!err) return { _general: "Something went wrong. Please try again." };
+  if (typeof err === "string") return { _general: err };
+  if (err.error && !err.errors) return { _general: err.error };
+  if (err.message && !err.errors) return { _general: err.message };
+
+  const source = err.errors && typeof err.errors === "object" ? err.errors : err;
+  const out = {};
+  for (const [k, v] of Object.entries(source || {})) {
+    if (k === "success" || k === "errors") continue;
+    if (Array.isArray(v)) out[k] = v.join(" ");
+    else if (typeof v === "string") out[k] = v;
+  }
+  if (Object.keys(out).length === 0) {
+    out._general = "Registration failed. Please check your details.";
+  }
+  return out;
+};
+
+const InlineError = ({ msg }) =>
+  msg ? (
+    <p className="text-red-600 text-xs mt-1 leading-snug" role="alert">
+      {msg}
+    </p>
+  ) : null;
+
+const inputClass = (hasError) =>
+  `w-full bg-white border rounded-lg px-4 py-3 text-sm placeholder-gray-400 focus:outline-none transition-colors ${
+    hasError
+      ? "border-red-400 focus:border-red-500"
+      : "border-gray-200 focus:border-emerald-600"
+  }`;
 
 const CreateAccount = () => {
-  const { t } = useTranslation('auth');
-  const [step, setStep] = useState(1); // 1: Registration, 2: Success Message, 3: OTP Verification
-  const [registeredUser, setRegisteredUser] = useState(null);
-  const [emailVerified, setEmailVerified] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [emailOtpError, setEmailOtpError] = useState("");
-  
-  const [otpData, setOtpData] = useState({
-    emailOtp: "",
-  });
-  
+  const { t } = useTranslation("auth");
+  const navigate = useNavigate();
+
+  const [step, setStep] = useState(1); // 1 = form, 2 = pending admin approval
+  const [submitting, setSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [registeredEmail, setRegisteredEmail] = useState("");
+
   const [formData, setFormData] = useState({
     username: "",
     fullName: "",
     address: "",
+    phone: "",
     email: "",
     password: "",
     role: "",
     farmName: "",
     nidPhoto: null,
-    certificatePhoto: null,
     specialization: "",
-    phone: "",
+    certificatePhoto: null,
   });
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    setFormData({ ...formData, [name]: files ? files[0] : value });
+    setFormData((p) => ({ ...p, [name]: files ? files[0] : value }));
+
+    // Clear that field's error as user fixes it
+    setFieldErrors((p) => {
+      if (!p[name] && !p[name.replace(/[A-Z]/g, m => "_" + m.toLowerCase())] && !p._general) return p;
+      const n = { ...p };
+      delete n[name];
+      delete n[name.replace(/[A-Z]/g, m => "_" + m.toLowerCase())];
+      delete n._general;
+      return n;
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage(""); // Clear previous errors
-    
-    // Call the registration API
+    setSubmitting(true);
+    setFieldErrors({});
+
     const result = await registerUser(formData);
-    
+
     if (result.success) {
-      // Store user data and show success message
-      setRegisteredUser({
-        email: formData.email,
-        phone: formData.phone,
+      setRegisteredEmail(formData.email);
+      setStep(2);
+    } else {
+      setFieldErrors(parseFieldErrors(result.error));
+    }
+    setSubmitting(false);
+  };
+
+  // ---- Google one-click signup (the button at the bottom) ----
+  const handleGoogleSuccess = async (idToken) => {
+    setFieldErrors({});
+    const result = await loginWithGoogle(idToken, formData.role || "farmer");
+    if (!result.success) {
+      setFieldErrors({
+        _general:
+          result.error?.error ||
+          result.error?.message ||
+          "Couldn't complete Google sign-up.",
       });
-      setStep(2); // Show success message
-      
-      // Auto-move to OTP verification after 5 seconds
-      setTimeout(() => {
-        setStep(3);
-      }, 5000);
-    } else {
-      // Handle registration error - show as red text
-      const errorMsg = result.error.message || result.error.error || JSON.stringify(result.error);
-      setErrorMessage(errorMsg);
+      return;
     }
+    const data = result.data;
+    sessionStorage.setItem("token", data.access);
+    sessionStorage.setItem("refresh_token", data.refresh);
+    sessionStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("token", data.access);
+    localStorage.setItem("refresh_token", data.refresh);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    sessionStorage.setItem("tabId", Date.now() + "_" + Math.random());
+    window.dispatchEvent(new Event("userLoggedIn"));
+
+    const r = data.user.role;
+    if (r === "admin") navigate("/adminpage");
+    else if (r === "vet") navigate("/vet/dashboard");
+    else navigate("/farmerpage");
   };
 
-  const handleOtpChange = (e) => {
-    const { name, value } = e.target;
-    // Only allow numbers and limit to 6 digits
-    if (/^\d{0,6}$/.test(value)) {
-      setOtpData({ ...otpData, [name]: value });
-    }
+  const handleGoogleError = (err) => {
+    setFieldErrors({ _general: err?.message || "Google sign-in failed." });
   };
 
-  const handleVerifyEmail = async (e) => {
-    e.preventDefault();
-    setEmailOtpError(""); // Clear previous errors
-    
-    const result = await verifyEmailOTP(registeredUser.email, otpData.emailOtp);
-    
-    if (result.success) {
-      setEmailVerified(true);
-    } else {
-      const errorMsg = result.error.message || result.error.error || JSON.stringify(result.error);
-      setEmailOtpError(errorMsg);
-    }
-  };
-
-  const handleResendOtp = async () => {
-    const result = await resendEmailOTP(registeredUser.email);
-    
-    if (result.success) {
-      alert('Email OTP has been resent!');
-    } else {
-      const errorMessage = result.error.message || JSON.stringify(result.error);
-      alert(`Failed to resend Email OTP: ${errorMessage}`);
-    }
-  };
-
-  const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:8000/auth/login/google-oauth2/';
-  };
-
-  const formVariant = {
-    hidden: { opacity: 0, y: -10 },
-    visible: { opacity: 1, y: 0 },
+  // Helper to look up an error whether the backend keyed it snake_case or camelCase
+  const errFor = (camel) => {
+    const snake = camel.replace(/[A-Z]/g, m => "_" + m.toLowerCase());
+    return fieldErrors[camel] || fieldErrors[snake];
   };
 
   return (
-    <section className="section-bg w-full flex justify-center px-4 sm:px-6 lg:px-12">
+    <section className="section-bg w-full">
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="card w-full max-w-3xl bg-white rounded-xl shadow-lg p-6 sm:p-10"
+        transition={{ duration: 0.5 }}
+        className="card w-full max-w-xl bg-white rounded-2xl shadow-lg p-6 sm:p-10"
       >
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-6 justify-center">
-          {step === 1 ? (
-            <>
-              <UserPlus className="text-primary-dark w-10 h-10 sm:w-8 sm:h-8" />
-              <h1 className="text-2xl sm:text-3xl font-bold text-primary-dark text-center">
-                {t('register.title')}
-              </h1>
-            </>
-          ) : (
-            <>
-              <CheckCircle className="text-green-600 w-10 h-10 sm:w-8 sm:h-8" />
-              <h1 className="text-2xl sm:text-3xl font-bold text-primary-dark text-center">
-                {t('register.verifyYourAccount')}
-              </h1>
-            </>
-          )}
+        {/* Brand */}
+        <div className="flex justify-center mb-4">
+          <BrandLogo size="md" />
         </div>
 
-        {/* Step 1: Registration Form */}
-        {step === 1 && (
-          <form className="space-y-4" onSubmit={handleSubmit}>
-          {/* Helper to create horizontal label + input */}
-          {[
-            { label: t('register.username'), name: "username", type: "text", placeholder: t('register.username') },
-            { label: t('register.fullName'), name: "fullName", type: "text", placeholder: t('register.fullName') },
-            { label: t('register.address'), name: "address", type: "text", placeholder: t('register.address') },
-            { label: t('register.phone'), name: "phone", type: "text", placeholder: t('register.phone') },
-            { label: t('register.email'), name: "email", type: "email", placeholder: t('register.email') },
-            { label: t('register.password'), name: "password", type: "password", placeholder: t('register.password') },
-          ].map((field) => (
-            <div key={field.name} className="flex items-center justify-between gap-4 w-full">
-              <label className="w-1/4 text-right font-medium">{field.label}:</label>
-              <input
-                type={field.type}
-                name={field.name}
-                value={formData[field.name]}
-                onChange={handleChange}
-                required
-                placeholder={field.placeholder}
-                className="w-1/2 input-field py-1 px-2 border rounded"
-              />
-            </div>
-          ))}
-
-          {/* Role Selector */}
-          <div className="flex items-center justify-between gap-4 w-full">
-            <label className="w-1/4 text-right font-medium">{t('register.role')}:</label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              className="w-1/2 input-field py-1 px-2 border rounded bg-white"
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
-              <option value="">{t('register.selectRole')}</option>
-              <option value="farmer">{t('roles.farmer')}</option>
-              <option value="vet">{t('roles.vet')}</option>
-              <option value="admin">{t('roles.admin')}</option>
-            </select>
-          </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-emerald-700 text-center mb-6">
+                Create Account
+              </h1>
 
-          {/* Conditional Fields */}
-          <AnimatePresence mode="wait">
-            {formData.role === "farmer" && (
-              <motion.div
-                key="farmerFields"
-                variants={formVariant}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                transition={{ duration: 0.4 }}
-                className="space-y-4 bg-green-50 p-4 rounded-xl"
-              >
-                <div className="flex items-center justify-between gap-4 w-full">
-                  <label className="w-1/4 text-right font-medium">{t('register.farmName')}:</label>
+              {fieldErrors._general && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-5">
+                  {fieldErrors._general}
+                </div>
+              )}
+
+              <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
+                <div>
                   <input
-                    type="text"
-                    name="farmName"
-                    value={formData.farmName}
+                    name="username"
+                    value={formData.username}
                     onChange={handleChange}
-                    required
-                    placeholder={t('register.farmName')}
-                    className="w-1/2 input-field py-1 px-2 border rounded"
+                    placeholder="Username"
+                    className={inputClass(!!errFor("username"))}
                   />
+                  <InlineError msg={errFor("username")} />
                 </div>
 
-                <div className="flex items-center justify-between gap-4 w-full">
-                  <label className="w-1/4 text-right font-medium">{t('register.nidPhoto')}:</label>
-                  <div className="w-1/2">
-                    <label className="upload-box flex items-center gap-2 p-2 border rounded-lg cursor-pointer">
-                      <Upload className="text-green-700" />
-                      <span>{formData.nidPhoto ? formData.nidPhoto.name : t('register.chooseFile')}</span>
-                      <input
-                        type="file"
-                        name="nidPhoto"
-                        onChange={handleChange}
-                        accept="image/*"
-                        className="hidden"
-                        required
-                      />
-                    </label>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {formData.role === "vet" && (
-              <motion.div
-                key="vetFields"
-                variants={formVariant}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                transition={{ duration: 0.4 }}
-                className="space-y-4 bg-green-50 p-4 rounded-xl"
-              >
-                <div className="flex items-center justify-between gap-4 w-full">
-                  <label className="w-1/4 text-right font-medium">{t('register.specialization')}:</label>
+                <div>
                   <input
-                    type="text"
-                    name="specialization"
-                    value={formData.specialization}
+                    name="fullName"
+                    value={formData.fullName}
                     onChange={handleChange}
-                    required
-                    placeholder={t('register.specialization')}
-                    className="w-1/2 input-field py-1 px-2 border rounded"
+                    placeholder="Full Name"
+                    className={inputClass(!!errFor("fullName"))}
                   />
+                  <InlineError msg={errFor("fullName")} />
                 </div>
 
-                <div className="flex items-center justify-between gap-4 w-full">
-                  <label className="w-1/4 text-right font-medium">{t('register.certificatePhoto')}:</label>
-                  <div className="w-1/2">
-                    <label className="upload-box flex items-center gap-2 p-2 border rounded-lg cursor-pointer">
-                      <Upload className="text-green-700" />
-                      <span>{formData.certificatePhoto ? formData.certificatePhoto.name : t('register.chooseFile')}</span>
+                <div>
+                  <input
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Address"
+                    className={inputClass(!!errFor("address"))}
+                  />
+                  <InlineError msg={errFor("address")} />
+                </div>
+
+                <div>
+                  <input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Phone"
+                    className={inputClass(!!errFor("phone"))}
+                  />
+                  <InlineError msg={errFor("phone")} />
+                </div>
+
+                <div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email"
+                    className={inputClass(!!errFor("email"))}
+                  />
+                  <InlineError msg={errFor("email")} />
+                </div>
+
+                <div>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    className={inputClass(!!errFor("password"))}
+                  />
+                  <InlineError msg={errFor("password")} />
+                </div>
+
+                <div>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className={inputClass(!!errFor("role")) + " text-gray-700"}
+                  >
+                    <option value="">Select your role</option>
+                    <option value="farmer">Farmer</option>
+                    <option value="vet">Veterinarian</option>
+                  </select>
+                  <InlineError msg={errFor("role")} />
+                </div>
+
+                {/* Farmer-only block */}
+                {formData.role === "farmer" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 space-y-3"
+                  >
+                    <div>
                       <input
-                        type="file"
-                        name="certificatePhoto"
+                        name="farmName"
+                        value={formData.farmName}
                         onChange={handleChange}
-                        accept="image/*"
-                        className="hidden"
-                        required
+                        placeholder="Farm name"
+                        className={inputClass(!!errFor("farmName"))}
                       />
-                    </label>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                      <InlineError msg={errFor("farmName")} />
+                    </div>
+                    <div>
+                      <label className="flex items-center justify-center gap-2 cursor-pointer bg-white border-2 border-dashed border-emerald-300 rounded-xl px-4 py-3 hover:border-emerald-500 transition-colors">
+                        <Upload size={18} className="text-emerald-600" />
+                        <span className="text-sm text-gray-700 truncate">
+                          {formData.nidPhoto ? formData.nidPhoto.name : "Upload NID photo"}
+                        </span>
+                        <input
+                          type="file"
+                          name="nidPhoto"
+                          onChange={handleChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                      </label>
+                      <InlineError msg={errFor("nidPhoto")} />
+                    </div>
+                  </motion.div>
+                )}
 
-            {formData.role === "admin" && (
-              <motion.div
-                key="adminFields"
-                variants={formVariant}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                transition={{ duration: 0.4 }}
-                className="bg-green-50 p-4 rounded-xl text-center"
-              >
-                <p className="text-sm sm:text-base text-gray-700 italic">
-                  {t('register.adminNote')}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {/* Vet-only block */}
+                {formData.role === "vet" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 space-y-3"
+                  >
+                    <div>
+                      <input
+                        name="specialization"
+                        value={formData.specialization}
+                        onChange={handleChange}
+                        placeholder="Specialization"
+                        className={inputClass(!!errFor("specialization"))}
+                      />
+                      <InlineError msg={errFor("specialization")} />
+                    </div>
+                    <div>
+                      <label className="flex items-center justify-center gap-2 cursor-pointer bg-white border-2 border-dashed border-emerald-300 rounded-xl px-4 py-3 hover:border-emerald-500 transition-colors">
+                        <Upload size={18} className="text-emerald-600" />
+                        <span className="text-sm text-gray-700 truncate">
+                          {formData.certificatePhoto ? formData.certificatePhoto.name : "Upload certificate photo"}
+                        </span>
+                        <input
+                          type="file"
+                          name="certificatePhoto"
+                          onChange={handleChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                      </label>
+                      <InlineError msg={errFor("certificatePhoto")} />
+                    </div>
+                  </motion.div>
+                )}
 
-          {/* Google Login Button */}
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.95 }}
-            type="button"
-            onClick={handleGoogleLogin}
-            className="btn-google mx-auto block py-2 px-4 mt-4 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600 transition"
-          >
-            <LogIn className="inline w-4 h-4 mr-2" />
-            {t('register.loginWithGoogle')}
-          </motion.button>
+                <motion.button
+                  whileHover={{ scale: submitting ? 1 : 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                >
+                  {submitting ? "Creating account…" : "Create Account"}
+                </motion.button>
+              </form>
 
-          {/* Error Message */}
-          {errorMessage && (
-            <div className="text-red-600 text-sm mt-3 text-center">
-              {errorMessage}
-            </div>
+              {/* Divider */}
+              <div className="flex items-center gap-4 my-6">
+                <div className="flex-1 border-t border-gray-300"></div>
+                <span className="text-gray-500 text-sm">or</span>
+                <div className="flex-1 border-t border-gray-300"></div>
+              </div>
+
+              {/* Google sign-up button (real Google icon) — width matches inputs */}
+              <GoogleSignInButton
+                text="signup_with"
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                width={400}
+              />
+
+              {/* Sign-in link */}
+              <p className="text-center text-gray-600 text-sm mt-6">
+                I'm already a member!{" "}
+                <Link
+                  to="/login"
+                  className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline"
+                >
+                  Sign In
+                </Link>
+              </p>
+            </motion.div>
           )}
 
-          {/* Submit Button */}
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.95 }}
-            type="submit"
-            className="btn-primary mx-auto block py-2 px-6 mt-4 text-sm sm:text-base"
-          >
-            {t('register.createAccount')}
-          </motion.button>
-        </form>
-        )}
-
-        {/* Step 2: Success Message */}
-        {step === 2 && registeredUser && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6 py-8"
-          >
-            <CheckCircle className="w-20 h-20 text-green-600 mx-auto" />
-            <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg">
-              <p className="font-bold text-xl">{t('register.registrationComplete')}</p>
-              <p className="text-base mt-2">{t('register.verifyEmail')}</p>
-            </div>
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
-              <span>{t('register.redirectingToVerification')}</span>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Step 3: OTP Verification */}
-        {step === 3 && registeredUser && (
-          <div className="space-y-6">
-            {/* Email OTP Verification */}
+          {step === 2 && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`p-6 rounded-xl space-y-4 ${emailVerified ? 'bg-green-100 border-2 border-green-500' : 'bg-blue-50'}`}
+              key="pending"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              className="text-center py-6 space-y-6"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Mail className={`w-6 h-6 ${emailVerified ? 'text-green-600' : 'text-blue-600'}`} />
-                  <h3 className={`text-lg font-semibold ${emailVerified ? 'text-green-900' : 'text-blue-900'}`}>
-                    {t('register.emailVerification')}
-                  </h3>
+              <div className="relative inline-flex">
+                <div className="absolute inset-0 bg-emerald-200 rounded-full blur-xl opacity-60"></div>
+                <div className="relative bg-emerald-100 rounded-full p-5">
+                  <CheckCircle className="w-16 h-16 text-emerald-600" strokeWidth={2.2} />
                 </div>
-                {emailVerified && <CheckCircle className="w-6 h-6 text-green-600" />}
               </div>
-              
-              {!emailVerified ? (
-                <>
-                  <input
-                    type="text"
-                    name="emailOtp"
-                    value={otpData.emailOtp}
-                    onChange={handleOtpChange}
-                    placeholder={t('register.enterEmailOTP')}
-                    maxLength="6"
-                    className="w-full input-field py-2 px-4 border rounded-lg text-center text-2xl tracking-widest"
-                  />
-                  {emailOtpError && (
-                    <div className="text-red-600 text-sm text-center">
-                      {emailOtpError}
-                    </div>
-                  )}
-                  <div className="flex gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleVerifyEmail}
-                      disabled={otpData.emailOtp.length !== 6}
-                      className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {t('register.verifyEmailButton')}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleResendOtp}
-                      className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
-                    >
-                      {t('register.resend')}
-                    </motion.button>
-                  </div>
-                </>
-              ) : (
-                <p className="text-green-700 font-semibold text-center">✓ {t('register.emailVerifiedSuccess')}</p>
-              )}
-            </motion.div>
 
-            {/* Success and Login Link */}
-            {emailVerified && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg text-center space-y-4"
-              >
-                <CheckCircle className="w-16 h-16 text-green-600 mx-auto" />
-                <p className="font-bold text-xl">{t('register.accountVerifiedSuccess')}</p>
-                <Link to="/login">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-green-600 text-white py-3 px-8 rounded-lg hover:bg-green-700 transition font-semibold"
-                  >
-                    {t('register.goToLogin')}
-                  </motion.button>
-                </Link>
-              </motion.div>
-            )}
-          </div>
-        )}
+              <div className="space-y-2">
+                <h2 className="text-2xl md:text-3xl font-bold text-emerald-700">
+                  Registration successful!
+                </h2>
+                <p className="text-gray-700 text-base">
+                  Please wait for admin approval before signing in.
+                </p>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mx-auto max-w-md text-left flex items-start gap-3">
+                <Hourglass size={18} className="text-amber-700 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-amber-700 font-semibold">
+                    Pending admin approval
+                  </p>
+                  <p className="text-sm text-gray-800 font-semibold mt-0.5 break-all">
+                    {registeredEmail}
+                  </p>
+                  <p className="text-xs text-amber-800 leading-relaxed mt-2">
+                    An administrator will review your account shortly. You'll
+                    be able to sign in once your account is approved.
+                  </p>
+                </div>
+              </div>
+
+              <Link to="/login">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors"
+                >
+                  Go to Sign In
+                </motion.button>
+              </Link>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </section>
   );

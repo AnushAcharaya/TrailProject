@@ -30,11 +30,11 @@ def send_email_sync(email, subject, message):
         )
         msg.attach_alternative(html_message, "text/html")
         msg.send(fail_silently=False)
-        print(f"✓ Email sent to {email}")
+        print(f"[OK] Email sent to {email}")
         return True
     except Exception as e:
-        print(f"✗ Email failed: {str(e)}")
-        print(f"📧 Email OTP for {email}:")
+        print(f"[FAIL] Email failed: {str(e)}")
+        print(f"[EMAIL] Email OTP for {email}:")
         print(f"Subject: {subject}")
         print(f"Message: {message}")
         print("=" * 60)
@@ -49,7 +49,7 @@ def send_sms_sync(phone, message):
     # Development mode - print to console
     if os.getenv('SMS_DEV_MODE', 'False') == 'True' or not os.getenv('TWILIO_ACCOUNT_SID'):
         print("=" * 60)
-        print("📱 SMS DEVELOPMENT MODE")
+        print("[SMS] SMS DEVELOPMENT MODE")
         print("=" * 60)
         print(f"To: {phone}")
         print(f"Message: {message}")
@@ -71,9 +71,9 @@ def send_sms_sync(phone, message):
             from_=twilio_phone,
             to=phone
         )
-        print(f"✓ SMS sent to {phone} (SID: {sms_message.sid})")
+        print(f"[OK] SMS sent to {phone} (SID: {sms_message.sid})")
         return sms_message.sid
     except Exception as e:
-        print(f"✗ SMS failed: {str(e)}")
-        print(f"📱 OTP for {phone}: {message}")
+        print(f"[FAIL] SMS failed: {str(e)}")
+        print(f"[SMS] OTP for {phone}: {message}")
         return None

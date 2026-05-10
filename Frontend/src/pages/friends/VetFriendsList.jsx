@@ -4,9 +4,11 @@ import { useTranslation } from "react-i18next";
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import { getFriends, removeFriend } from "../../services/friendsApi";
 import { FaUsers, FaEnvelope, FaUserTimes } from "react-icons/fa";
+import { tRole } from "../../utils/translateEnum";
 
 const VetFriendsList = () => {
   const { t } = useTranslation('vetDashboard');
+  const { t: tCommon } = useTranslation('common');
   const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,7 +107,7 @@ const VetFriendsList = () => {
                       <h3 className="text-lg font-semibold text-gray-800">
                         {friend.full_name || friend.username}
                       </h3>
-                      <p className="text-gray-600 text-sm">{friend.role}</p>
+                      <p className="text-gray-600 text-sm">{tRole(tCommon, friend.role)}</p>
                       {friend.phone && (
                         <p className="text-xs text-gray-500">{friend.phone}</p>
                       )}

@@ -8,6 +8,7 @@
     "accountVerifications": "Account Verifications",
     "insurance": "Insurance",
     "profileTransfer": "Profile Transfer",
+    "broadcast": "Send Announcement",
     "analytics": "Analytics",
     "settings": "Settings",
     "helpSupport": "Help & Support",
@@ -82,5 +83,51 @@
   },
   "common": {
     "loading": "Loading..."
+  },
+  "broadcast": {
+    "title": "Send Announcement",
+    "subtitle": "Compose an urgent or important message and broadcast it to all farmers and/or veterinarians as a real-time notification.",
+    "send": "Send Broadcast",
+    "sending": "Sending…",
+    "willSendTo": "Recipients",
+    "fields": {
+      "audience": "Recipients",
+      "urgency": "Urgency",
+      "title": "Title",
+      "titlePlaceholder": "Short, clear headline (e.g. Vaccination drive next week)",
+      "message": "Message",
+      "messagePlaceholder": "Write the full message here. Be specific and actionable.",
+      "link": "Link (optional)",
+      "linkPlaceholder": "/appointments  or  https://example.com/info",
+      "linkHelp": "When users click the notification, they will be navigated here. Leave empty to skip."
+    },
+    "audience": {
+      "all": "Farmers + Vets",
+      "farmers": "Farmers only",
+      "vets": "Vets only"
+    },
+    "urgency": {
+      "normal": "Normal",
+      "important": "Important",
+      "urgent": "Urgent"
+    },
+    "preview": {
+      "title": "Live preview",
+      "titlePlaceholder": "(Title appears here)",
+      "messagePlaceholder": "(Message appears here)",
+      "system": "System Announcement",
+      "justNow": "Just now",
+      "help": "This is exactly how the notification will appear in each recipient’s notification bell. Urgent and Important messages are tagged automatically."
+    },
+    "confirm": {
+      "title": "Send this broadcast?",
+      "body": "This will deliver the message instantly to all approved {{audience}}.",
+      "cancel": "Cancel",
+      "send": "Yes, send now"
+    },
+    "result": {
+      "success": "Broadcast delivered to {{count}} user(s).",
+      "failed": "Could not send broadcast. Please try again."
+    }
   }
 }

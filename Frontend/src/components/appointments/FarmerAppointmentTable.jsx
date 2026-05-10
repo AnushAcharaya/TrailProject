@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getAppointments, cancelAppointment, formatAppointmentDate, formatAppointmentTime } from "../../services/appointmentApi";
+import { tAnimal } from "../../utils/translateEnum";
 import "../../styles/appointments.css";
 
 const FarmerAppointmentTable = () => {
   const { t } = useTranslation('appointments');
+  // The enum translations live in the `common` namespace, so we need a separate t for that.
+  const { t: tCommon } = useTranslation('common');
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -156,7 +159,7 @@ const FarmerAppointmentTable = () => {
                     </div>
                   </div>
                 </td>
-                <td className="capitalize">{appointment.animal_type}</td>
+                <td>{tAnimal(tCommon, appointment.animal_type)}</td>
                 <td>
                   <div>
                     <div className="font-medium text-gray-900">
@@ -229,7 +232,7 @@ const FarmerAppointmentTable = () => {
               <div className="mobile-card-body">
                 <div className="mobile-card-row">
                   <span className="mobile-card-label">{t('card.animal')}</span>
-                  <span className="mobile-card-value capitalize">{appointment.animal_type}</span>
+                  <span className="mobile-card-value">{tAnimal(tCommon, appointment.animal_type)}</span>
                 </div>
 
                 <div className="mobile-card-row">
@@ -313,7 +316,7 @@ const FarmerAppointmentTable = () => {
 
                 <div>
                   <label className="text-sm font-medium text-gray-500">{t('form.animalType')}</label>
-                  <p className="text-gray-900 capitalize">{selectedAppointment.animal_type}</p>
+                  <p className="text-gray-900">{tAnimal(tCommon, selectedAppointment.animal_type)}</p>
                 </div>
 
                 <div>

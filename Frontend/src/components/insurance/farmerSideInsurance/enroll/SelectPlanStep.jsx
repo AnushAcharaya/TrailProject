@@ -78,15 +78,20 @@ const SelectPlanStep = ({ plan, onPlanSelect, onBack, preSelected, livestock }) 
       const paymentResponse = await initiatePayment(paymentData);
       
       if (paymentResponse.success) {
-        // Store enrollment data in sessionStorage for after payment
+        // Persist FULL livestock and plan objects (not just IDs) so the
+        // Review & Submit step can re-hydrate them after the user returns
+        // from eSewa — at which point Enroll.jsx is freshly mounted and
+        // its React state is empty.
         sessionStorage.setItem('pending_insurance_enrollment', JSON.stringify({
+          livestock,
+          plan,
           livestock_id: livestock.id,
           plan_id: plan.id,
           plan_name: plan.name,
           premium_amount: premiumAmount,
-          payment_initiated: true
+          payment_initiated: true,
         }));
-        
+
         // Redirect to eSewa
         redirectToEsewa(paymentResponse.payment_data, paymentResponse.esewa_url);
       } else {

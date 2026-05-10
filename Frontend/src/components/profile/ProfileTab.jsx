@@ -21,6 +21,7 @@ const ProfileTab = ({ user, onUpdate }) => {
     location: "",
     bio: "",
     gender: "",
+    consultation_fee: "",
   });
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -34,6 +35,7 @@ const ProfileTab = ({ user, onUpdate }) => {
         location: user.location || "",
         bio: user.bio || "",
         gender: user.gender || "",
+        consultation_fee: user.consultation_fee != null ? String(user.consultation_fee) : "",
       });
       // Use profile_image_url if available (full URL from backend), otherwise construct it
       const imageUrl = user.profile_image_url || (user.profile_image ? `http://localhost:8000${user.profile_image}` : null);
@@ -65,6 +67,15 @@ const ProfileTab = ({ user, onUpdate }) => {
       location: form.location,
       gender: form.gender,
     };
+
+    // Vets can set their consultation fee. Send only when provided
+    // (so farmer/admin profiles ignore this field).
+    if (user?.role === 'vet' && form.consultation_fee !== "") {
+      const num = Number(form.consultation_fee);
+      if (!Number.isNaN(num) && num >= 0) {
+        profileData.consultation_fee = num;
+      }
+    }
     
     // Add image file if selected
     if (profileImage) {
@@ -348,6 +359,43 @@ const ProfileTab = ({ user, onUpdate }) => {
           onMouseLeave={hoverOff}
         />
       </div>
+
+      {/* Vet-only: consultation fee */}
+      {user?.role === 'vet' && (
+        <div className="mb-4">
+          <label
+            className="block text-xs font-medium mb-1"
+            style={{ color: BRAND.textMedium }}
+          >
+            Consultation Fee (NPR)
+          </label>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500 font-semibold">NPR</span>
+            <input
+              type="number"
+              min="0"
+              step="50"
+              value={form.consultation_fee}
+              onChange={(e) =>
+                setForm({ ...form, consultation_fee: e.target.value })
+              }
+              className="w-full rounded-md px-3 py-2 text-sm outline-none transition-all duration-200"
+              style={{
+                border: `1px solid ${BRAND.border}`,
+                backgroundColor: "#FFFFFF",
+              }}
+              placeholder="e.g. 1000"
+              onFocus={attachInteractiveStyles}
+              onBlur={resetInteractiveStyles}
+              onMouseEnter={hoverOn}
+              onMouseLeave={hoverOff}
+            />
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Farmers will see this on your card and at appointment booking time.
+          </p>
+        </div>
+      )}
 
       {/* Error message */}
       {error && (

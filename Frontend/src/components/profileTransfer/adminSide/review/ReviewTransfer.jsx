@@ -8,9 +8,13 @@ import SenderPanel from './SenderPanel';
 import ReceiverPanel from './ReceiverPanel';
 import ActionSection from './ActionSection';
 import { getTransferById } from '../../../../services/profileTransferApi';
+import { tStatus } from '../../../../utils/translateEnum';
+import { useLocalizedNumber } from '../../../../utils/formatNumber';
 
 function ReviewTransfer() {
   const { t } = useTranslation('profileTransfer');
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
   const navigate = useNavigate();
   const { transferId } = useParams();
   const [transfer, setTransfer] = useState(null);
@@ -97,7 +101,7 @@ function ReviewTransfer() {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{t('reviewTransfer.title')}</h1>
-            <p className="text-sm text-gray-600">{t('reviewTransfer.id')}: TR-{transfer.id}</p>
+            <p className="text-sm text-gray-600">{t('reviewTransfer.id')}: TR-{fmt(transfer.id)}</p>
           </div>
           <div className="ml-auto">
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
@@ -108,7 +112,7 @@ function ReviewTransfer() {
               transfer.status === 'Completed' ? 'bg-green-100 text-green-800' :
               'bg-gray-100 text-gray-800'
             }`}>
-              {transfer.status}
+              {tStatus(tCommon, transfer.status)}
             </span>
           </div>
         </div>

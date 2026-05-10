@@ -10,11 +10,39 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
   console.log('[TreatmentForm] initialData:', initialData);
   console.log('[TreatmentForm] initialData.medicines:', initialData?.medicines);
   
+  // Get logged-in user's info from localStorage
+  const getLoggedInUser = () => {
+    const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        return {
+          name: user.full_name || user.username || "",
+          role: user.role || ""
+        };
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+        return { name: "", role: "" };
+      }
+    }
+    return { name: "", role: "" };
+  };
+
+  const loggedInUser = getLoggedInUser();
+  const isVet = loggedInUser.role === 'vet';
+
+  console.log('[TreatmentForm] ========== INITIALIZATION ==========');
+  console.log('[TreatmentForm] Logged in user:', loggedInUser);
+  console.log('[TreatmentForm] User role:', loggedInUser.role);
+  console.log('[TreatmentForm] Is vet?:', isVet);
+  console.log('[TreatmentForm] Is farmer?:', loggedInUser.role === 'farmer');
+  console.log('[TreatmentForm] ==========================================');
+
   const [formData, setFormData] = useState({
     livestockTag: initialData?.livestockTag || "",
     treatmentName: initialData?.treatmentName || "",
     diagnosis: initialData?.diagnosis || "",
-    vetName: initialData?.vetName || "",
+    vetName: initialData?.vetName || (isVet ? loggedInUser.name : ""),
     treatmentDate: initialData?.treatmentDate || "",
     nextTreatmentDate: initialData?.nextTreatmentDate || "",
     status: initialData?.status || "In Progress",
@@ -41,6 +69,10 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
   const [searchTerm, setSearchTerm] = useState(initialData?.livestockTag || "");
   const [isLoadingLivestock, setIsLoadingLivestock] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Vet autocomplete states
+  const [vetSuggestions, setVetSuggestions] = useState([]);
+  const [showVetDropdown, setShowVetDropdown] = useState(false);
 
   // Update form data when initialData changes - BUT ONLY ONCE!
   useEffect(() => {
@@ -51,7 +83,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
         livestockTag: initialData.livestockTag || "",
         treatmentName: initialData.treatmentName || "",
         diagnosis: initialData.diagnosis || "",
-        vetName: initialData.vetName || "",
+        vetName: initialData.vetName || (isVet ? loggedInUser.name : ""),
         treatmentDate: initialData.treatmentDate || "",
         nextTreatmentDate: initialData.nextTreatmentDate || "",
         status: initialData.status || "In Progress",
@@ -72,7 +104,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
       setSearchTerm(initialData.livestockTag || "");
       setIsInitialized(true); // Mark as initialized so this doesn't run again
     }
-  }, [initialData, isInitialized]);
+  }, [initialData, isInitialized, isVet, loggedInUser.name]);
 
   useEffect(() => {
     // Fetch livestock from API
@@ -141,6 +173,78 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
     setShowDropdown(false);
   };
 
+  // Fetch vet suggestions from API
+  const fetchVetSuggestions = async (search) => {
+    console.log('[TreatmentForm][fetchVetSuggestions] ========== CALLED ==========');
+    console.log('[TreatmentForm][fetchVetSuggestions] Search term:', search);
+    console.log('[TreatmentForm][fetchVetSuggestions] Search length:', search ? search.length : 0);
+    
+    if (!search || search.trim().length < 2) {
+      console.log('[TreatmentForm][fetchVetSuggestions] Search term too short, clearing suggestions');
+      setVetSuggestions([]);
+      return;
+    }
+
+    try {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      const url = `http://localhost:8000/api/v1/auth/vets/?search=${encodeURIComponent(search)}`;
+      console.log('[TreatmentForm][fetchVetSuggestions] Calling API:', url);
+      console.log('[TreatmentForm][fetchVetSuggestions] Token:', token ? `${token.substring(0, 20)}...` : 'Missing');
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('[TreatmentForm][fetchVetSuggestions] Response status:', response.status);
+      console.log('[TreatmentForm][fetchVetSuggestions] Response OK:', response.ok);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('[TreatmentForm][fetchVetSuggestions] Response data:', data);
+        console.log('[TreatmentForm][fetchVetSuggestions] data.success:', data.success);
+        console.log('[TreatmentForm][fetchVetSuggestions] data.vets:', data.vets);
+        if (data.success) {
+          console.log('[TreatmentForm][fetchVetSuggestions] Setting vet suggestions:', data.vets);
+          setVetSuggestions(data.vets || []);
+        } else {
+          console.log('[TreatmentForm][fetchVetSuggestions] API returned success=false');
+        }
+      } else {
+        const errorData = await response.json();
+        console.error('[TreatmentForm][fetchVetSuggestions] Response not OK:', response.status, errorData);
+      }
+    } catch (error) {
+      console.error('[TreatmentForm][fetchVetSuggestions] Error:', error);
+      console.error('[TreatmentForm][fetchVetSuggestions] Error stack:', error.stack);
+    }
+  };
+
+  // Handle vet name input change
+  const handleVetNameChange = (e) => {
+    const value = e.target.value;
+    console.log('[TreatmentForm][handleVetNameChange] ========== CALLED ==========');
+    console.log('[TreatmentForm][handleVetNameChange] Value:', value);
+    console.log('[TreatmentForm][handleVetNameChange] Value length:', value.length);
+    console.log('[TreatmentForm][handleVetNameChange] isVet:', isVet);
+    console.log('[TreatmentForm][handleVetNameChange] loggedInUser:', loggedInUser);
+    setFormData({ ...formData, vetName: value });
+    setShowVetDropdown(true);
+    
+    // Fetch suggestions after user types
+    console.log('[TreatmentForm][handleVetNameChange] About to call fetchVetSuggestions');
+    fetchVetSuggestions(value);
+  };
+
+  // Handle vet selection from dropdown
+  const handleVetSelect = (vetName) => {
+    setFormData({ ...formData, vetName: vetName });
+    setShowVetDropdown(false);
+    setVetSuggestions([]);
+  };
+
   const addMedicine = () => {
     setFormData({
       ...formData,
@@ -171,6 +275,27 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
   const handleMedicineChange = (index, field, value) => {
     const updated = [...formData.medicines];
     updated[index][field] = value;
+    
+    // When frequency changes, adjust exactTimes array to match
+    if (field === 'frequency') {
+      const newFrequency = Number(value);
+      const currentTimes = updated[index].exactTimes || [];
+      
+      // Resize exactTimes array to match frequency
+      if (currentTimes.length < newFrequency) {
+        // Add more times if needed
+        const defaultTimes = ["08:00", "13:00", "18:00"];
+        while (currentTimes.length < newFrequency) {
+          currentTimes.push(defaultTimes[currentTimes.length] || "08:00");
+        }
+      } else if (currentTimes.length > newFrequency) {
+        // Remove extra times
+        currentTimes.splice(newFrequency);
+      }
+      
+      updated[index].exactTimes = currentTimes;
+    }
+    
     setFormData({ ...formData, medicines: updated });
   };
 
@@ -189,6 +314,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
     console.log('[TreatmentForm] ========== FORM SUBMIT ==========');
     console.log('[TreatmentForm] formData.medicines BEFORE validation:', formData.medicines);
     console.log('[TreatmentForm] medicines count:', formData.medicines.length);
+    console.log('[TreatmentForm] medicines array:', JSON.stringify(formData.medicines, null, 2));
     
     // Validate that at least one medicine has all required fields filled
     const hasValidMedicine = formData.medicines.some(med => 
@@ -198,7 +324,8 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
     console.log('[TreatmentForm] hasValidMedicine:', hasValidMedicine);
     
     if (!hasValidMedicine) {
-      alert(t('form.validation.required'));
+      alert(t('form.validation.required') || 'Please fill in at least one medicine with name and dosage');
+      console.error('[TreatmentForm] ⚠️ VALIDATION FAILED - No valid medicines!');
       return;
     }
     
@@ -209,14 +336,24 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
     
     console.log('[TreatmentForm] Valid medicines AFTER filtering:', validMedicines);
     console.log('[TreatmentForm] Valid medicines count:', validMedicines.length);
+    console.log('[TreatmentForm] Valid medicines JSON:', JSON.stringify(validMedicines, null, 2));
+    
+    if (validMedicines.length === 0) {
+      alert('Please add at least one medicine with name and dosage');
+      console.error('[TreatmentForm] ⚠️ NO VALID MEDICINES AFTER FILTERING!');
+      return;
+    }
     
     const dataToSubmit = {
       ...formData,
       medicines: validMedicines
     };
     
-    console.log('[TreatmentForm] Final dataToSubmit:', dataToSubmit);
+    console.log('[TreatmentForm] ========== FINAL DATA TO SUBMIT ==========');
+    console.log('[TreatmentForm] dataToSubmit:', dataToSubmit);
     console.log('[TreatmentForm] dataToSubmit.medicines:', dataToSubmit.medicines);
+    console.log('[TreatmentForm] dataToSubmit.medicines length:', dataToSubmit.medicines.length);
+    console.log('[TreatmentForm] dataToSubmit.medicines[0]:', dataToSubmit.medicines[0]);
     console.log('[TreatmentForm] =====================================');
     
     onSubmit(dataToSubmit);
@@ -458,16 +595,62 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
         </div>
 
         {/* Vet Name */}
-        <div>
+        <div className="relative">
           <label className="block text-sm font-medium text-body mb-1">{t('form.vetName')}</label>
           <input
             type="text"
             name="vetName"
             value={formData.vetName}
-            onChange={handleChange}
+            onChange={(e) => {
+              console.log('[TreatmentForm] Vet name input onChange triggered');
+              console.log('[TreatmentForm] Event value:', e.target.value);
+              console.log('[TreatmentForm] isVet:', isVet);
+              console.log('[TreatmentForm] Will call:', isVet ? 'handleChange' : 'handleVetNameChange');
+              if (isVet) {
+                handleChange(e);
+              } else {
+                handleVetNameChange(e);
+              }
+            }}
+            onFocus={() => {
+              console.log('[TreatmentForm] Vet name input onFocus triggered');
+              console.log('[TreatmentForm] isVet:', isVet);
+              console.log('[TreatmentForm] Will show dropdown:', !isVet);
+              if (!isVet) {
+                setShowVetDropdown(true);
+              }
+            }}
+            onBlur={() => setTimeout(() => setShowVetDropdown(false), 300)}
             placeholder={t('form.vetNamePlaceholder')}
-            className="w-full p-2 border border-light rounded"
+            readOnly={isVet}
+            autoComplete="off"
+            className={`w-full p-2 border border-light rounded ${isVet ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           />
+          
+          {/* Vet Suggestions Dropdown */}
+          {!isVet && showVetDropdown && vetSuggestions.length > 0 && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              {vetSuggestions.map((vet, index) => (
+                <div
+                  key={vet.id || index}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    handleVetSelect(vet.name);
+                  }}
+                  className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                >
+                  <div className="font-medium text-gray-900">{vet.name}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* No Results Message */}
+          {!isVet && showVetDropdown && formData.vetName && formData.vetName.length >= 2 && vetSuggestions.length === 0 && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
+              <p className="text-gray-500 text-sm">No veterinarians found matching "{formData.vetName}"</p>
+            </div>
+          )}
         </div>
 
         {/* Treatment Date */}

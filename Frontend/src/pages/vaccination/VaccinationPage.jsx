@@ -10,9 +10,11 @@ import VaccinationCard from "../../components/vaccination/VaccinationCard";
 import VaccinationSearchBar from "../../components/vaccination/VaccinationSearchBar";
 import { getAllVaccinations, getVaccinationCounts, getUpcomingVaccinations, getOverdueVaccinations, getCompletedVaccinations } from "../../services/vaccinationApi";
 import "./../../styles/vaccination.css";
+import { useLocalizedNumber } from "../../utils/formatNumber";
 
 const VaccinationPage = () => {
   const { t } = useTranslation('vaccination');
+  const fmt = useLocalizedNumber();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [vaccinations, setVaccinations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -156,31 +158,46 @@ const VaccinationPage = () => {
           </Link>
         </div>
 
-        {/* Summary Cards */}
+        {/* Summary Cards — click to filter the list below */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="summary-card upcoming">
+          <button
+            type="button"
+            onClick={() => setActiveTab("upcoming")}
+            className={`summary-card upcoming text-left transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg ${activeTab === "upcoming" ? "ring-2 ring-blue-400 ring-offset-2" : ""}`}
+            aria-pressed={activeTab === "upcoming"}
+          >
             <div className="icon">
               <FaCalendar className="text-white" size={24} />
             </div>
-            <div className="count">{counts.upcoming}</div>
+            <div className="count">{fmt(counts.upcoming)}</div>
             <div className="label">{t('summary.upcoming')}</div>
-          </div>
+          </button>
 
-          <div className="summary-card completed">
+          <button
+            type="button"
+            onClick={() => setActiveTab("completed")}
+            className={`summary-card completed text-left transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg ${activeTab === "completed" ? "ring-2 ring-emerald-400 ring-offset-2" : ""}`}
+            aria-pressed={activeTab === "completed"}
+          >
             <div className="icon">
               <FaCheck className="text-white" size={24} />
             </div>
-            <div className="count">{counts.completed}</div>
+            <div className="count">{fmt(counts.completed)}</div>
             <div className="label">{t('summary.completed')}</div>
-          </div>
+          </button>
 
-          <div className="summary-card overdue">
+          <button
+            type="button"
+            onClick={() => setActiveTab("overdue")}
+            className={`summary-card overdue text-left transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg ${activeTab === "overdue" ? "ring-2 ring-red-400 ring-offset-2" : ""}`}
+            aria-pressed={activeTab === "overdue"}
+          >
             <div className="icon">
               <FaClock className="text-white" size={24} />
             </div>
-            <div className="count">{counts.overdue}</div>
+            <div className="count">{fmt(counts.overdue)}</div>
             <div className="label">{t('summary.overdue')}</div>
-          </div>
+          </button>
         </div>
 
         {/* Tabs */}

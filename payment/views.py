@@ -101,21 +101,26 @@ class PaymentViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-        # Prepare eSewa payment data
+        # eSewa v2: product_code in the FORM submission must be the MERCHANT CODE
+        # assigned by eSewa (e.g. "EPAYTEST" for sandbox, your real code in prod).
+        # The internal "product_code" we receive from the frontend (INSURANCE_PREMIUM,
+        # APPOINTMENT_FEE, etc.) is just for our own bookkeeping — eSewa never sees it.
+        merchant_code = settings.ESEWA_MERCHANT_ID
+
         payment_data = {
             'amount': str(amount),
             'tax_amount': str(tax_amount),
             'total_amount': str(total_amount),
             'transaction_uuid': transaction_uuid,
-            'product_code': product_code,
+            'product_code': merchant_code,
             'product_service_charge': '0',
             'product_delivery_charge': '0',
             'success_url': settings.ESEWA_SUCCESS_URL,
             'failure_url': settings.ESEWA_FAILURE_URL,
             'signed_field_names': 'total_amount,transaction_uuid,product_code',
-            'signature': self._generate_signature(total_amount, transaction_uuid, product_code)
+            'signature': self._generate_signature(total_amount, transaction_uuid, merchant_code)
         }
-        
+
         return Response({
             'success': True,
             'payment_id': payment.id,
@@ -254,34 +259,60 @@ class PaymentViewSet(viewsets.ModelViewSet):
         return base64.b64encode(signature).decode()
     
     def _verify_with_esewa(self, amount, ref_id, transaction_uuid):
-        """Verify payment with eSewa server"""
-        try:
-            verification_url = 'https://uat.esewa.com.np/epay/transrec'
-            # For production: https://esewa.com.np/epay/transrec
-            
-            verify_data = {
-                'amt': str(amount),
-                'rid': ref_id,
-                'pid': transaction_uuid,
-                'scd': settings.ESEWA_MERCHANT_ID
+        """
+        Verify payment with eSewa using the v2 Status Check API.
+
+        Endpoint: GET /api/epay/transaction/status/
+        Query params: product_code, total_amount, transaction_uuid
+
+        Successful response (200, JSON):
+            {
+                "product_code": "EPAYTEST",
+                "transaction_uuid": "...",
+                "total_amount": 100.0,
+                "status": "COMPLETE",
+                "ref_id": "0KPG7K8"
             }
-            
-            response = requests.get(verification_url, params=verify_data, timeout=10)
-            
-            if response.status_code == 200:
-                response_text = response.text.strip().lower()
-                if 'success' in response_text:
-                    return {'success': True}
-                else:
-                    return {'success': False, 'error': 'eSewa verification failed'}
-            else:
+        Possible status values: COMPLETE, PENDING, FULL_REFUND, PARTIAL_REFUND,
+                                AMBIGUOUS, NOT_FOUND, CANCELED.
+        """
+        try:
+            verification_url = settings.ESEWA_STATUS_URL
+            verify_params = {
+                'product_code': settings.ESEWA_MERCHANT_ID,
+                'total_amount': str(amount),
+                'transaction_uuid': transaction_uuid,
+            }
+
+            response = requests.get(verification_url, params=verify_params, timeout=10)
+
+            if response.status_code != 200:
+                logger.warning(
+                    "eSewa status check returned HTTP %s: %s",
+                    response.status_code, response.text[:300],
+                )
                 return {'success': False, 'error': f'HTTP {response.status_code}'}
-                
+
+            try:
+                data = response.json()
+            except ValueError:
+                logger.error("eSewa status check returned non-JSON: %s", response.text[:300])
+                return {'success': False, 'error': 'Invalid response from eSewa'}
+
+            esewa_status = (data.get('status') or '').upper()
+            if esewa_status == 'COMPLETE':
+                return {'success': True, 'esewa_ref_id': data.get('ref_id')}
+
+            return {
+                'success': False,
+                'error': f"eSewa status: {esewa_status or 'UNKNOWN'}",
+            }
+
         except requests.RequestException as e:
-            logger.error(f"eSewa verification request failed: {str(e)}")
+            logger.error("eSewa verification request failed: %s", e)
             return {'success': False, 'error': 'Network error during verification'}
         except Exception as e:
-            logger.error(f"Unexpected error during eSewa verification: {str(e)}")
+            logger.error("Unexpected error during eSewa verification: %s", e)
             return {'success': False, 'error': 'Verification error'}
     
     def _handle_successful_payment(self, payment):

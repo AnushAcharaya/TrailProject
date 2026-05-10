@@ -31,3 +31,14 @@ redis
 
 # Django Filters (required by medical app)
 django-filter
+
+# WebSocket Support (Django Channels)
+channels>=4.0.0
+channels-redis>=4.1.0
+daphne>=4.0.0
+
+# Google OAuth (ID token verification)
+google-auth>=2.30.0
+
+# DNS MX lookup (used to validate that an email's domain is hosted by Google)
+dnspython>=2.6.0

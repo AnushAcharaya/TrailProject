@@ -2,9 +2,13 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getClaims, updateClaimStatus } from '../../../services/insuranceApi';
 import { FaEye, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { tStatus } from '../../../utils/translateEnum';
+import { useLocalizedNumber } from '../../../utils/formatNumber';
 
 const ClaimInsurances = () => {
   const { t } = useTranslation('insurance');
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -122,7 +126,7 @@ const ClaimInsurances = () => {
               {filteredClaims.map((claim) => (
                 <tr key={claim.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    #{claim.id}
+                    #{fmt(claim.id)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
@@ -136,14 +140,14 @@ const ClaimInsurances = () => {
                     {claim.claim_type}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    NPR {claim.claim_amount?.toLocaleString()}
+                    NPR {fmt(claim.claim_amount?.toLocaleString())}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(claim.incident_date).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(claim.status)}`}>
-                      {claim.status}
+                      {tStatus(tCommon, claim.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -180,13 +184,13 @@ const ClaimInsurances = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.claimId')}</label>
-                    <p className="text-gray-900">#{selectedClaim.id}</p>
+                    <p className="text-gray-900">#{fmt(selectedClaim.id)}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.status')}</label>
                     <p>
                       <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedClaim.status)}`}>
-                        {selectedClaim.status}
+                        {tStatus(tCommon, selectedClaim.status)}
                       </span>
                     </p>
                   </div>
@@ -200,7 +204,7 @@ const ClaimInsurances = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.claimAmount')}</label>
-                    <p className="text-gray-900">NPR {selectedClaim.claim_amount?.toLocaleString()}</p>
+                    <p className="text-gray-900">NPR {fmt(selectedClaim.claim_amount?.toLocaleString())}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">{t('admin.claims.modal.incidentDate')}</label>

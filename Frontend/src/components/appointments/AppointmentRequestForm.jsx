@@ -289,6 +289,17 @@ const AppointmentRequestForm = () => {
               {t('form.vetSelected', { name: selectedVet.full_name || selectedVet.username })}
               {selectedVet.specialization && ` - ${selectedVet.specialization}`}
             </p>
+            {selectedVet.consultation_fee !== null && selectedVet.consultation_fee !== undefined && (
+              <p className="text-sm text-emerald-800 mt-1.5 font-semibold">
+                💰 Consultation fee:{" "}
+                <span className="text-emerald-700">
+                  NPR {Number(selectedVet.consultation_fee).toFixed(0)}
+                </span>{" "}
+                <span className="font-normal text-emerald-700/80">
+                  (this will be charged at booking)
+                </span>
+              </p>
+            )}
           </div>
         )}
       </div>

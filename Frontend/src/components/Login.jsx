@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LogIn } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { sendLoginOTP, verifyLoginOTP } from "../services/api";
+import { sendLoginOTP, verifyLoginOTP, loginWithGoogle } from "../services/api";
+import BrandLogo from "./common/BrandLogo";
+import GoogleSignInButton from "./common/GoogleSignInButton";
 
 const Login = () => {
     const { t } = useTranslation('auth');
@@ -21,6 +22,8 @@ const Login = () => {
     const [emailVerified, setEmailVerified] = useState(false);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [apiError, setApiError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -33,6 +36,11 @@ const Login = () => {
                 delete newErrors[name];
                 return newErrors;
             });
+        }
+        
+        // Clear API error when user types
+        if (apiError) {
+            setApiError("");
         }
     };
 
@@ -76,6 +84,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setApiError("");
 
         if (validate()) {
             const response = await sendLoginOTP(formData);
@@ -83,8 +92,8 @@ const Login = () => {
             if (response.success) {
                 setStep(2); // Move to OTP verification
             } else {
-                const errorMessage = response.error.error || response.error.message || JSON.stringify(response.error);
-                alert(`Login failed: ${errorMessage}`);
+                const errorMessage = response.error.error || response.error.message || "Login failed. Please check your credentials.";
+                setApiError(errorMessage);
             }
         }
         setIsSubmitting(false);
@@ -96,11 +105,17 @@ const Login = () => {
         if (/^\d{0,6}$/.test(value)) {
             setOtpData({ ...otpData, [name]: value });
         }
+        
+        // Clear API error when user types
+        if (apiError) {
+            setApiError("");
+        }
     };
 
     const handleVerifyEmailOtp = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setApiError("");
 
         // Only verify email OTP - phone OTP is commented out in backend
         const response = await verifyLoginOTP(formData.email, otpData.emailOtp, '', formData.role);
@@ -151,24 +166,56 @@ const Login = () => {
                 }, 1500);
             } catch (error) {
                 console.error('Error storing authentication data:', error);
-                alert('Failed to store authentication data. Please try again.');
+                setApiError('Failed to store authentication data. Please try again.');
             }
         } else {
-            const errorMessage = response.error.error || response.error.message || JSON.stringify(response.error);
-            alert(`Verification failed: ${errorMessage}`);
+            const errorMessage = response.error.error || response.error.message || "Verification failed. Please check your OTP.";
+            setApiError(errorMessage);
         }
         
         setIsSubmitting(false);
     };
 
+    const handleGoogleSuccess = async (idToken) => {
+        setApiError("");
+        const result = await loginWithGoogle(idToken, formData.role || 'farmer');
+        if (!result.success) {
+            setApiError(result.error?.error || result.error?.message || "Google sign-in failed.");
+            return;
+        }
+        const data = result.data;
+        sessionStorage.setItem('token', data.access);
+        sessionStorage.setItem('refresh_token', data.refresh);
+        sessionStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        sessionStorage.setItem('tabId', Date.now() + '_' + Math.random());
+        window.dispatchEvent(new Event('userLoggedIn'));
+
+        const role = data.user.role;
+        if (role === 'admin') navigate('/adminpage');
+        else if (role === 'vet') navigate('/vet/dashboard');
+        else navigate('/farmerpage');
+    };
+
+    const handleGoogleError = (err) => {
+        console.error('[Google sign-in]', err);
+        setApiError(err?.message || "Couldn't complete Google sign-in.");
+    };
+
     const handleResendOtp = async () => {
+        setApiError("");
+        setSuccessMessage("");
+        
         const response = await sendLoginOTP(formData);
         
         if (response.success) {
-            alert('Email OTP has been resent!');
+            setSuccessMessage('Email OTP has been resent successfully!');
+            setTimeout(() => setSuccessMessage(""), 5000);
         } else {
-            const errorMessage = response.error.error || response.error.message || JSON.stringify(response.error);
-            alert(`Failed to resend OTP: ${errorMessage}`);
+            const errorMessage = response.error.error || response.error.message || "Failed to resend OTP. Please try again.";
+            setApiError(errorMessage);
         }
     };
 
@@ -180,9 +227,13 @@ const Login = () => {
                 transition={{ duration: 0.6 }}
                 className="card w-full max-w-md"
             >
+                {/* Brand Logo */}
+                <div className="flex justify-center mb-4">
+                    <BrandLogo size="md" />
+                </div>
+
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-6 justify-center">
-                    <LogIn className="text-primary-dark w-10 h-10 sm:w-8 sm:h-8" />
                     <h1 className="text-2xl sm:text-3xl font-bold text-primary-dark text-center">
                         {step === 1 ? t('login.title') : t('login.verifyOTP')}
                     </h1>
@@ -190,85 +241,84 @@ const Login = () => {
 
                 {/* Step 1: Login Form */}
                 {step === 1 && (
-                <form className="space-y-5" onSubmit={handleSubmit}>
-                    {/* Role Selector - First */}
-                    <div className="form-row">
-                        <label className="label">{t('login.role')}</label>
-                        <div className="w-full">
-                            <select
-                                name="role"
-                                value={formData.role}
-                                onChange={handleChange}
-                                className={`input-field bg-white ${errors.role ? "border-red-400 focus:outline-red-400" : ""}`}
-                            >
-                                <option value="">{t('login.selectRole')}</option>
-                                <option value="farmer">{t('roles.farmer')}</option>
-                                <option value="vet">{t('roles.vet')}</option>
-                                <option value="admin">{t('roles.admin')}</option>
-                            </select>
-                            {errors.role && (
-                                <p className="text-red-500 text-xs mt-1">{errors.role}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Email - Always visible after role selection */}
-                    {formData.role && (
-                        <div className="form-row">
-                            <label className="label">{t('login.email')}</label>
-                            <div className="w-full">
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    className={`input-field ${errors.email ? "border-red-400 focus:outline-red-400" : ""}`}
-                                    placeholder={t('login.enterEmail')}
-                                />
-                                {errors.email && (
-                                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                                )}
-                            </div>
+                <form className="space-y-5" onSubmit={handleSubmit} autoComplete="off">
+                    {/* API Error Message */}
+                    {apiError && (
+                        <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">
+                            <p className="font-semibold">{apiError}</p>
                         </div>
                     )}
+                    
+                    {/* Role Selector */}
+                    <div>
+                        <select
+                            name="role"
+                            value={formData.role}
+                            onChange={handleChange}
+                            autoComplete="off"
+                            className={`input-field bg-white w-full ${errors.role ? "border-red-400 focus:outline-red-400" : ""}`}
+                        >
+                            <option value="">{t('login.selectRole')}</option>
+                            <option value="farmer">{t('roles.farmer')}</option>
+                            <option value="vet">{t('roles.vet')}</option>
+                            <option value="admin">{t('roles.admin')}</option>
+                        </select>
+                        {errors.role && (
+                            <p className="text-red-500 text-xs mt-1">{errors.role}</p>
+                        )}
+                    </div>
 
                     {/* Phone - Only for Farmer/Vet */}
                     {formData.role && formData.role !== "admin" && (
-                        <div className="form-row">
-                            <label className="label">{t('login.phone')}</label>
-                            <div className="w-full">
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    className={`input-field ${errors.phone ? "border-red-400 focus:outline-red-400" : ""}`}
-                                    placeholder={t('login.enterPhone')}
-                                />
-                                {errors.phone && (
-                                    <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-                                )}
-                            </div>
+                        <div>
+                            <input
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                autoComplete="off"
+                                className={`input-field w-full ${errors.phone ? "border-red-400 focus:outline-red-400" : ""}`}
+                                placeholder={t('login.enterPhone')}
+                            />
+                            {errors.phone && (
+                                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Email */}
+                    {formData.role && (
+                        <div>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                autoComplete="off"
+                                className={`input-field w-full ${errors.email ? "border-red-400 focus:outline-red-400" : ""}`}
+                                placeholder={t('login.enterEmail')}
+                            />
+                            {errors.email && (
+                                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                            )}
                         </div>
                     )}
 
                     {/* Password */}
                     {formData.role && (
-                        <div className="form-row">
-                            <label className="label">{t('login.password')}</label>
-                            <div className="w-full">
-                                <input
-                                    type="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    className={`input-field ${errors.password ? "border-red-400 focus:outline-red-400" : ""}`}
-                                    placeholder={t('login.enterPassword')}
-                                />
-                                {errors.password && (
-                                    <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-                                )}
-                            </div>
+                        <div>
+                            <input
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                autoComplete="off"
+                                className={`input-field w-full ${errors.password ? "border-red-400 focus:outline-red-400" : ""}`}
+                                placeholder={t('login.enterPassword')}
+                            />
+                            {errors.password && (
+                                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                            )}
                         </div>
                     )}
 
@@ -293,12 +343,40 @@ const Login = () => {
                     >
                         {isSubmitting ? t('login.sendingOTP') : t('login.sendOTP')}
                     </motion.button>
+
+                    {/* Divider */}
+                    <div className="flex items-center gap-4 my-2">
+                        <div className="flex-1 border-t border-gray-300"></div>
+                        <span className="text-gray-500 text-xs">or</span>
+                        <div className="flex-1 border-t border-gray-300"></div>
+                    </div>
+
+                    {/* Google Sign-In */}
+                    <GoogleSignInButton
+                        text="signin_with"
+                        onSuccess={handleGoogleSuccess}
+                        onError={handleGoogleError}
+                    />
                 </form>
                 )}
 
                 {/* Step 2: OTP Verification */}
                 {step === 2 && (
                     <div className="space-y-6">
+                        {/* API Error Message */}
+                        {apiError && (
+                            <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">
+                                <p className="font-semibold">{apiError}</p>
+                            </div>
+                        )}
+                        
+                        {/* Success Message */}
+                        {successMessage && (
+                            <div className="bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-sm">
+                                <p className="font-semibold">{successMessage}</p>
+                            </div>
+                        )}
+                        
                         {/* Email OTP Verification */}
                         <div className={`p-6 rounded-xl space-y-4 ${emailVerified ? 'bg-green-100 border-2 border-green-500' : 'bg-blue-50'}`}>
                             <div className="flex items-center justify-between">

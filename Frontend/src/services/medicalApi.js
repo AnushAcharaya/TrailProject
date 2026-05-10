@@ -103,7 +103,18 @@ export const createTreatment = async (treatmentData) => {
     console.log('[MedicalAPI] ========== CREATE TREATMENT ==========');
     console.log('[MedicalAPI] Input treatmentData:', treatmentData);
     console.log('[MedicalAPI] treatmentData.medicines:', treatmentData.medicines);
+    console.log('[MedicalAPI] medicines is array?', Array.isArray(treatmentData.medicines));
     console.log('[MedicalAPI] medicines length:', treatmentData.medicines?.length);
+    
+    // CRITICAL CHECK: Ensure medicines exist
+    if (!treatmentData.medicines || treatmentData.medicines.length === 0) {
+      console.error('[MedicalAPI] ⚠️⚠️⚠️ CRITICAL ERROR: NO MEDICINES IN treatmentData! ⚠️⚠️⚠️');
+      console.error('[MedicalAPI] treatmentData object:', JSON.stringify(treatmentData, null, 2));
+      alert('ERROR: No medicines data found! Please check the form.');
+      return { success: false, error: 'No medicines data' };
+    }
+    
+    console.log('[MedicalAPI] ✓ Medicines data exists, proceeding...');
     
     const formData = new FormData();
     
@@ -124,28 +135,31 @@ export const createTreatment = async (treatmentData) => {
     }
     
     // Convert medicines from camelCase to snake_case
-    if (treatmentData.medicines && treatmentData.medicines.length > 0) {
-      const medicinesSnakeCase = treatmentData.medicines.map(med => ({
-        name: med.name,
-        dosage: med.dosage,
-        frequency: med.frequency,
-        duration: med.duration,
-        schedule_type: med.scheduleType,
-        start_time: med.startTime,
-        interval_hours: med.intervalHours,
-        exact_times: med.exactTimes
-      }));
-      console.log('[MedicalAPI] Medicines (snake_case):', medicinesSnakeCase);
-      console.log('[MedicalAPI] Medicines JSON string:', JSON.stringify(medicinesSnakeCase));
-      formData.append('medicines', JSON.stringify(medicinesSnakeCase));
-    } else {
-      console.warn('[MedicalAPI] ⚠️ NO MEDICINES TO SEND!');
-    }
+    const medicinesSnakeCase = treatmentData.medicines.map(med => ({
+      name: med.name,
+      dosage: med.dosage,
+      frequency: med.frequency,
+      duration: med.duration,
+      schedule_type: med.scheduleType,
+      start_time: med.startTime,
+      interval_hours: med.intervalHours,
+      exact_times: med.exactTimes
+    }));
+    
+    console.log('[MedicalAPI] Medicines (snake_case):', medicinesSnakeCase);
+    console.log('[MedicalAPI] Medicines JSON string:', JSON.stringify(medicinesSnakeCase));
+    
+    formData.append('medicines', JSON.stringify(medicinesSnakeCase));
+    console.log('[MedicalAPI] ✓ Medicines appended to FormData');
     
     // Log FormData contents
     console.log('[MedicalAPI] FormData contents:');
     for (let pair of formData.entries()) {
-      console.log(`  ${pair[0]}: ${pair[1]}`);
+      if (pair[0] === 'medicines') {
+        console.log(`  ${pair[0]}: ${pair[1].substring(0, 100)}... (truncated)`);
+      } else {
+        console.log(`  ${pair[0]}: ${pair[1]}`);
+      }
     }
     console.log('[MedicalAPI] =====================================');
     
@@ -154,6 +168,7 @@ export const createTreatment = async (treatmentData) => {
     });
     console.log('[MedicalAPI] Treatment created successfully:', response.data);
     console.log('[MedicalAPI] Response medicines:', response.data.medicines);
+    console.log('[MedicalAPI] Response medicines length:', response.data.medicines?.length);
     return { success: true, data: response.data };
   } catch (error) {
     console.error('[MedicalAPI] Create treatment error:', error);

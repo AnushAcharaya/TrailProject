@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { FaEye } from 'react-icons/fa';
 import AvatarImage from './AvatarImage';
 import StatusBadge from './StatusBadge';
+import { tAnimal } from '../../../../utils/translateEnum';
 
 export default function TransferItem({ transfer, onClick }) {
   const { t } = useTranslation('profileTransfer');
-  
+  const { t: tCommon } = useTranslation('common');
+
   return (
-    <div 
+    <div
       className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200"
     >
       <div className="flex items-center justify-between">
@@ -16,7 +18,7 @@ export default function TransferItem({ transfer, onClick }) {
           <AvatarImage src={transfer.avatar} name={transfer.farmer} />
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900">
-              {transfer.farmer} <span className="text-gray-500 font-normal text-sm">({transfer.tag})</span>
+              {tAnimal(tCommon, transfer.farmer)} <span className="text-gray-500 font-normal text-sm">({transfer.tag})</span>
             </h3>
             <p className="text-sm text-gray-600">{t('transferItem.to')}: {transfer.recipient}</p>
             <p className="text-xs text-gray-500 mt-1">{transfer.time}</p>

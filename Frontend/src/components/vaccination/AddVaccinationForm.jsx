@@ -21,6 +21,38 @@ const AddVaccinationForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
   
+  // Vet autocomplete states
+  const [vetSuggestions, setVetSuggestions] = useState([]);
+  const [showVetDropdown, setShowVetDropdown] = useState(false);
+  
+  // Get logged-in user's info from localStorage
+  const getLoggedInUser = () => {
+    const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        return {
+          name: user.full_name || user.username || "",
+          role: user.role || ""
+        };
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+        return { name: "", role: "" };
+      }
+    }
+    return { name: "", role: "" };
+  };
+
+  const loggedInUser = getLoggedInUser();
+  const isVet = loggedInUser.role === 'vet';
+  
+  console.log('[AddVaccinationForm] ========== INITIALIZATION ==========');
+  console.log('[AddVaccinationForm] Logged in user:', loggedInUser);
+  console.log('[AddVaccinationForm] User role:', loggedInUser.role);
+  console.log('[AddVaccinationForm] Is vet?:', isVet);
+  console.log('[AddVaccinationForm] Is farmer?:', loggedInUser.role === 'farmer');
+  console.log('[AddVaccinationForm] ==========================================');
+
   const [formData, setFormData] = useState({
     livestock: preSelectedLivestock || "",
     vaccineName: "",
@@ -28,6 +60,7 @@ const AddVaccinationForm = () => {
     dateGiven: "",
     nextDueDate: "",
     notes: "",
+    vetName: isVet ? loggedInUser.name : "", // Only auto-fill for vets
   });
 
   // Fetch livestock on component mount
@@ -38,7 +71,6 @@ const AddVaccinationForm = () => {
   // Auto-fill livestock if coming from vet dashboard
   useEffect(() => {
     const selectedTag = localStorage.getItem('selectedAnimalTag');
-    const selectedId = localStorage.getItem('selectedAnimalId');
     
     if (selectedTag && livestockList.length > 0) {
       // Find the animal in the list
@@ -99,6 +131,78 @@ const AddVaccinationForm = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Fetch vet suggestions from API
+  const fetchVetSuggestions = async (search) => {
+    console.log('[fetchVetSuggestions] ========== CALLED ==========');
+    console.log('[fetchVetSuggestions] Search term:', search);
+    console.log('[fetchVetSuggestions] Search length:', search ? search.length : 0);
+    
+    if (!search || search.trim().length < 2) {
+      console.log('[fetchVetSuggestions] Search term too short, clearing suggestions');
+      setVetSuggestions([]);
+      return;
+    }
+
+    try {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      const url = `http://localhost:8000/api/v1/auth/vets/?search=${encodeURIComponent(search)}`;
+      console.log('[fetchVetSuggestions] Calling API:', url);
+      console.log('[fetchVetSuggestions] Token:', token ? `${token.substring(0, 20)}...` : 'Missing');
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('[fetchVetSuggestions] Response status:', response.status);
+      console.log('[fetchVetSuggestions] Response OK:', response.ok);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('[fetchVetSuggestions] Response data:', data);
+        console.log('[fetchVetSuggestions] data.success:', data.success);
+        console.log('[fetchVetSuggestions] data.vets:', data.vets);
+        if (data.success) {
+          console.log('[fetchVetSuggestions] Setting vet suggestions:', data.vets);
+          setVetSuggestions(data.vets || []);
+        } else {
+          console.log('[fetchVetSuggestions] API returned success=false');
+        }
+      } else {
+        const errorData = await response.json();
+        console.error('[fetchVetSuggestions] Response not OK:', response.status, errorData);
+      }
+    } catch (error) {
+      console.error('[fetchVetSuggestions] Error:', error);
+      console.error('[fetchVetSuggestions] Error stack:', error.stack);
+    }
+  };
+
+  // Handle vet name input change
+  const handleVetNameChange = (e) => {
+    const value = e.target.value;
+    console.log('[handleVetNameChange] ========== CALLED ==========');
+    console.log('[handleVetNameChange] Value:', value);
+    console.log('[handleVetNameChange] Value length:', value.length);
+    console.log('[handleVetNameChange] isVet:', isVet);
+    console.log('[handleVetNameChange] loggedInUser:', loggedInUser);
+    setFormData({ ...formData, vetName: value });
+    setShowVetDropdown(true);
+    
+    // Fetch suggestions after user types
+    console.log('[handleVetNameChange] About to call fetchVetSuggestions');
+    fetchVetSuggestions(value);
+  };
+
+  // Handle vet selection from dropdown
+  const handleVetSelect = (vetName) => {
+    setFormData({ ...formData, vetName: vetName });
+    setShowVetDropdown(false);
+    setVetSuggestions([]);
   };
 
   const handleSubmit = async (e) => {
@@ -264,6 +368,64 @@ const AddVaccinationForm = () => {
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="relative">
+            <label className="block text-sm font-medium text-body mb-1">{t('addForm.fields.vetName')}</label>
+            <input
+              type="text"
+              name="vetName"
+              value={formData.vetName}
+              onChange={(e) => {
+                console.log('[AddVaccinationForm] Vet name input onChange triggered');
+                console.log('[AddVaccinationForm] Event value:', e.target.value);
+                console.log('[AddVaccinationForm] isVet:', isVet);
+                console.log('[AddVaccinationForm] Will call:', isVet ? 'handleChange' : 'handleVetNameChange');
+                if (isVet) {
+                  handleChange(e);
+                } else {
+                  handleVetNameChange(e);
+                }
+              }}
+              onFocus={() => {
+                console.log('[AddVaccinationForm] Vet name input onFocus triggered');
+                console.log('[AddVaccinationForm] isVet:', isVet);
+                console.log('[AddVaccinationForm] Will show dropdown:', !isVet);
+                if (!isVet) {
+                  setShowVetDropdown(true);
+                }
+              }}
+              onBlur={() => setTimeout(() => setShowVetDropdown(false), 300)}
+              placeholder={t('addForm.fields.vetNamePlaceholder')}
+              readOnly={isVet}
+              autoComplete="off"
+              className={`w-full p-2 border border-light rounded ${isVet ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+            />
+            
+            {/* Vet Suggestions Dropdown */}
+            {!isVet && showVetDropdown && vetSuggestions.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {vetSuggestions.map((vet, index) => (
+                  <div
+                    key={vet.id || index}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleVetSelect(vet.name);
+                    }}
+                    className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                  >
+                    <div className="font-medium text-gray-900">{vet.name}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* No Results Message */}
+            {!isVet && showVetDropdown && formData.vetName && formData.vetName.length >= 2 && vetSuggestions.length === 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
+                <p className="text-gray-500 text-sm">No veterinarians found matching "{formData.vetName}"</p>
+              </div>
+            )}
           </div>
 
           <div>

@@ -1,8 +1,13 @@
 import { FaUser, FaPaw, FaCalendar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { tStatus } from '../../../../utils/translateEnum';
+import { useLocalizedNumber } from '../../../../utils/formatNumber';
 
 const ClaimCard = ({ claim }) => {
   const navigate = useNavigate();
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
 
   const handleReviewClaim = () => {
     navigate('/vetinsuranceverifyclaim');
@@ -12,9 +17,9 @@ const ClaimCard = ({ claim }) => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-900">CLM-{claim.number}</h3>
+        <h3 className="text-xl font-bold text-gray-900">CLM-{fmt(claim.number)}</h3>
         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${claim.statusBadge}`}>
-          {claim.status}
+          {tStatus(tCommon, claim.status)}
         </span>
       </div>
 

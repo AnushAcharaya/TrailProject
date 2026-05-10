@@ -1,15 +1,17 @@
 import { FiActivity, FiClock, FiAlertTriangle, FiGrid } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { useLocalizedNumber } from "../../utils/formatNumber";
 import "../../styles/farmerdashboard.css";
 
 const SummaryCards = () => {
   const { t } = useTranslation('dashboard');
-  
+  const fmt = useLocalizedNumber();
+
   const cards = [
-    { title: t('stats.totalLivestock'), value: "324", icon: <FiGrid />, color: "bg-blue-50", iconColor: "text-blue-600" },
-    { title: t('stats.upcomingVaccinations'), value: "18", icon: <FiClock />, color: "bg-green-50", iconColor: "text-green-600" },
-    { title: t('stats.underTreatment'), value: "6", icon: <FiActivity />, color: "bg-yellow-50", iconColor: "text-yellow-600" },
-    { title: t('stats.overdueTasks'), value: "3", icon: <FiAlertTriangle />, color: "bg-red-50", iconColor: "text-red-600" },
+    { title: t('stats.totalLivestock'), value: fmt(324), icon: <FiGrid />, color: "bg-blue-50", iconColor: "text-blue-600" },
+    { title: t('stats.upcomingVaccinations'), value: fmt(18), icon: <FiClock />, color: "bg-green-50", iconColor: "text-green-600" },
+    { title: t('stats.underTreatment'), value: fmt(6), icon: <FiActivity />, color: "bg-yellow-50", iconColor: "text-yellow-600" },
+    { title: t('stats.overdueTasks'), value: fmt(3), icon: <FiAlertTriangle />, color: "bg-red-50", iconColor: "text-red-600" },
   ];
 
   return (

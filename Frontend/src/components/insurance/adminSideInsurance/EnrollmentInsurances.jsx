@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getEnrollments, updateEnrollment } from '../../../services/insuranceApi';
-import { FaCheckCircle, FaClock, FaTimesCircle, FaHourglassHalf, FaEye } from 'react-icons/fa';
+import { FaCheckCircle, FaClock, FaTimesCircle, FaHourglassHalf, FaEye, FaImage } from 'react-icons/fa';
+import { tAnimal, tStatus } from '../../../utils/translateEnum';
+import { useLocalizedNumber } from '../../../utils/formatNumber';
 
 const EnrollmentInsurances = () => {
   const { t } = useTranslation('insurance');
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -166,14 +170,14 @@ const EnrollmentInsurances = () => {
                       {enrollment.livestock_details?.tag_id || 'N/A'}
                     </div>
                     <div className="text-sm text-gray-500">
-                      {enrollment.livestock_details?.species_name}
+                      {enrollment.livestock_details?.species_name ? tAnimal(tCommon, enrollment.livestock_details.species_name) : ''}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {enrollment.plan_details?.name || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    NPR {enrollment.plan_details?.coverage_amount?.toLocaleString()}
+                    NPR {fmt(enrollment.plan_details?.coverage_amount?.toLocaleString())}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(enrollment.start_date).toLocaleDateString()} - {new Date(enrollment.end_date).toLocaleDateString()}
@@ -181,7 +185,7 @@ const EnrollmentInsurances = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(enrollment.status)}`}>
                       {getStatusIcon(enrollment.status)}
-                      {enrollment.status}
+                      {tStatus(tCommon, enrollment.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -218,14 +222,14 @@ const EnrollmentInsurances = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-500">{t('admin.enrollment.modal.enrollmentId')}</label>
-                    <p className="text-gray-900">#{selectedEnrollment.id}</p>
+                    <p className="text-gray-900">#{fmt(selectedEnrollment.id)}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">{t('admin.enrollment.modal.status')}</label>
                     <p>
                       <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedEnrollment.status)}`}>
                         {getStatusIcon(selectedEnrollment.status)}
-                        {selectedEnrollment.status}
+                        {tStatus(tCommon, selectedEnrollment.status)}
                       </span>
                     </p>
                   </div>
@@ -258,7 +262,7 @@ const EnrollmentInsurances = () => {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">{t('admin.enrollment.modal.species')}</label>
-                      <p className="text-gray-900">{selectedEnrollment.livestock_details?.species_name}</p>
+                      <p className="text-gray-900">{selectedEnrollment.livestock_details?.species_name ? tAnimal(tCommon, selectedEnrollment.livestock_details.species_name) : ''}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">{t('admin.enrollment.modal.breed')}</label>
@@ -266,7 +270,7 @@ const EnrollmentInsurances = () => {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">{t('admin.enrollment.modal.age')}</label>
-                      <p className="text-gray-900">{selectedEnrollment.livestock_details?.age || 'N/A'} {t('admin.enrollment.modal.years')}</p>
+                      <p className="text-gray-900">{selectedEnrollment.livestock_details?.age ? fmt(selectedEnrollment.livestock_details.age) : 'N/A'} {t('admin.enrollment.modal.years')}</p>
                     </div>
                   </div>
                 </div>
@@ -284,11 +288,11 @@ const EnrollmentInsurances = () => {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">{t('admin.enrollment.modal.coverageAmount')}</label>
-                      <p className="text-gray-900">NPR {selectedEnrollment.plan_details?.coverage_amount?.toLocaleString()}</p>
+                      <p className="text-gray-900">NPR {fmt(selectedEnrollment.plan_details?.coverage_amount?.toLocaleString())}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">{t('admin.enrollment.modal.premiumPaid')}</label>
-                      <p className="text-gray-900">NPR {selectedEnrollment.premium_paid?.toLocaleString()}</p>
+                      <p className="text-gray-900">NPR {fmt(selectedEnrollment.premium_paid?.toLocaleString())}</p>
                     </div>
                   </div>
                 </div>
@@ -316,6 +320,44 @@ const EnrollmentInsurances = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Payment Screenshot — admin reviews this before approving */}
+                {(selectedEnrollment.payment_screenshot_url || selectedEnrollment.payment_screenshot) && (
+                  <div className="border-t pt-4">
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      <FaImage className="text-emerald-600" />
+                      Payment Screenshot
+                    </h4>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Review the screenshot to verify the eSewa payment before approving this enrollment.
+                    </p>
+                    <div className="border-2 border-dashed border-emerald-300 rounded-lg p-3 bg-emerald-50/40">
+                      <a
+                        href={selectedEnrollment.payment_screenshot_url || selectedEnrollment.payment_screenshot}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Click to open full-size"
+                      >
+                        <img
+                          src={selectedEnrollment.payment_screenshot_url || selectedEnrollment.payment_screenshot}
+                          alt="Payment screenshot uploaded by the farmer"
+                          className="w-full max-h-[480px] object-contain rounded-md shadow-sm cursor-zoom-in hover:shadow-lg transition-shadow"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.nextElementSibling;
+                            if (fallback) fallback.style.display = 'block';
+                          }}
+                        />
+                      </a>
+                      <p className="text-sm text-red-600 text-center mt-2" style={{ display: 'none' }}>
+                        The screenshot couldn't be loaded. The file may have been moved or removed.
+                      </p>
+                      <p className="text-xs text-gray-500 text-center mt-2">
+                        Click the image to open it full-size in a new tab.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {selectedEnrollment.notes && (
                   <div className="border-t pt-4">

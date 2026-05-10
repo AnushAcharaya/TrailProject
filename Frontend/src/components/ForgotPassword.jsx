@@ -4,6 +4,7 @@ import { Mail, Key, Lock, ArrowLeft, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { forgotPassword, verifyResetToken, resetPassword } from "../services/api";
+import BrandLogo from "./common/BrandLogo";
 
 const ForgotPassword = () => {
   const { t } = useTranslation('auth');
@@ -396,6 +397,11 @@ const ForgotPassword = () => {
         transition={{ duration: 0.6 }}
         className="card w-full max-w-md"
       >
+        {/* Brand Logo */}
+        <div className="flex justify-center mb-4">
+          <BrandLogo size="md" />
+        </div>
+
         <AnimatePresence mode="wait">
           {renderStep()}
         </AnimatePresence>

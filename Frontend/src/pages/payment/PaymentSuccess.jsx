@@ -3,9 +3,13 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { verifyPayment } from '../../services/paymentApi';
 import { FiCheckCircle, FiLoader } from 'react-icons/fi';
+import { tStatus } from '../../utils/translateEnum';
+import { useLocalizedNumber } from '../../utils/formatNumber';
 
 const PaymentSuccess = () => {
   const { t } = useTranslation('payment');
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [verifying, setVerifying] = useState(true);
@@ -16,70 +20,82 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const verifyPaymentCallback = async () => {
       try {
-        // Get parameters from eSewa callback
-        const refId = searchParams.get('refId');
-        const transactionUuid = searchParams.get('oid');
+        // eSewa v2 returns ALL fields in a single base64-encoded `data` query
+        // parameter. The decoded JSON looks like:
+        //   {
+        //     "transaction_code": "000AWEO",
+        //     "status": "COMPLETE",
+        //     "total_amount": "100.0",
+        //     "transaction_uuid": "ab14a8f2",
+        //     "product_code": "EPAYTEST",
+        //     "signed_field_names": "...",
+        //     "signature": "..."
+        //   }
+        const dataParam = searchParams.get('data');
 
-        if (!refId || !transactionUuid) {
+        // Backwards-compat: in case anything still passes the old v1 query shape
+        const legacyRefId = searchParams.get('refId');
+        const legacyTxnUuid = searchParams.get('oid');
+
+        let transactionUuid = null;
+        let refId = null;
+
+        if (dataParam) {
+          try {
+            const decoded = JSON.parse(atob(dataParam));
+            transactionUuid = decoded.transaction_uuid;
+            refId = decoded.transaction_code;
+
+            // If eSewa explicitly says it failed, surface the message immediately.
+            if (decoded.status && decoded.status !== 'COMPLETE') {
+              setError(`Payment status from eSewa: ${decoded.status}`);
+              setVerifying(false);
+              return;
+            }
+          } catch (decodeErr) {
+            console.error('Failed to decode eSewa data param:', decodeErr);
+            setError(t('verification.invalidParameters'));
+            setVerifying(false);
+            return;
+          }
+        } else if (legacyRefId && legacyTxnUuid) {
+          transactionUuid = legacyTxnUuid;
+          refId = legacyRefId;
+        }
+
+        if (!transactionUuid) {
           setError(t('verification.invalidParameters'));
           setVerifying(false);
           return;
         }
 
-        // Verify payment with backend
+        // Verify payment with backend (backend will hit eSewa v2 status API
+        // and fetch the authoritative ref_id from there)
         const result = await verifyPayment({
           transaction_uuid: transactionUuid,
-          ref_id: refId
+          ref_id: refId || '',
         });
 
         if (result.success) {
           setVerificationResult(result);
-          
-          // Check if this is an insurance enrollment payment (new flow)
+
+          // Decide where the user should go next, but DON'T auto-navigate.
+          // Show a clear "Continue" button instead so the user can actually
+          // see the success state before moving on. Auto-redirect was jarring
+          // and made it easy to miss the verification details.
           const pendingEnrollment = sessionStorage.getItem('pending_insurance_enrollment');
-          
-          if (pendingEnrollment) {
+          const legacyEnrollment = sessionStorage.getItem('pending_enrollment_id');
+
+          if (pendingEnrollment || legacyEnrollment) {
             setIsInsurancePayment(true);
-            // Don't clear session storage yet - user needs to upload screenshot
-            
-            // Redirect back to enrollment page to continue with upload step
-            setTimeout(() => {
-              navigate('/farmer/insurance/enroll', { 
-                state: { 
-                  paymentSuccess: true,
-                  message: 'Payment successful! Please upload your payment screenshot.'
-                } 
-              });
-            }, 2000);
-          } else {
-            // Check for old insurance flow (backward compatibility)
-            const pendingEnrollmentId = sessionStorage.getItem('pending_enrollment_id');
-            
-            if (pendingEnrollmentId) {
-              setIsInsurancePayment(true);
+            // Clear legacy keys; the new flow needs `pending_insurance_enrollment`
+            // to stay until the user finishes the upload step.
+            if (legacyEnrollment) {
               sessionStorage.removeItem('pending_enrollment_id');
               sessionStorage.removeItem('enrollment_payment_amount');
-              
-              setTimeout(() => {
-                navigate('/farmerinsurancedashboard', { 
-                  state: { 
-                    paymentSuccess: true,
-                    message: 'Payment successful! Your insurance enrollment is confirmed.'
-                  } 
-                });
-              }, 3000);
-            } else {
-              setIsInsurancePayment(false);
-              // Regular appointment payment
-              setTimeout(() => {
-                navigate('/appointments', { 
-                  state: { 
-                    paymentSuccess: true,
-                    message: 'Payment successful! Your appointment is confirmed.'
-                  } 
-                });
-              }, 3000);
             }
+          } else {
+            setIsInsurancePayment(false);
           }
         } else {
           setError(result.message || 'Payment verification failed');
@@ -160,34 +176,85 @@ const PaymentSuccess = () => {
             <div className="text-sm space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">{t('success.details.paymentId')}:</span>
-                <span className="font-medium text-gray-900">{verificationResult.payment_id}</span>
+                <span className="font-medium text-gray-900">{fmt(verificationResult.payment_id)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">{t('success.details.status')}:</span>
-                <span className="font-medium text-green-600">{verificationResult.status}</span>
+                <span className="font-medium text-green-600">{tStatus(tCommon, verificationResult.status)}</span>
               </div>
               {verificationResult.esewa_ref_id && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">{t('success.details.referenceId')}:</span>
-                  <span className="font-medium text-gray-900">{verificationResult.esewa_ref_id}</span>
+                  <span className="font-medium text-gray-900">{fmt(verificationResult.esewa_ref_id)}</span>
                 </div>
               )}
             </div>
           </div>
         )}
 
-        <p className="text-sm text-gray-500 mb-6">
-          {isInsurancePayment 
-            ? t('success.redirecting.insurance')
-            : t('success.redirecting.appointment')}
-        </p>
+        {/* Next-step hint — different text for insurance vs appointment */}
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-left">
+          {isInsurancePayment ? (
+            <p className="text-sm text-amber-800 leading-relaxed">
+              <span className="font-semibold">Next step:</span> upload a screenshot
+              of your eSewa receipt so we can finalise your enrollment.
+            </p>
+          ) : (
+            <div className="text-sm text-amber-800 leading-relaxed space-y-2">
+              <p>
+                <span className="font-semibold">What happens next:</span>
+              </p>
+              <ul className="list-disc list-inside space-y-1 ml-1">
+                <li>Your veterinarian has been notified of your booking.</li>
+                <li>They will <span className="font-semibold">review and confirm</span> the date and time shortly.</li>
+                <li>You'll receive a notification when they accept or suggest a different time.</li>
+              </ul>
+            </div>
+          )}
+        </div>
 
+        {/* Primary action — view the booking */}
         <button
-          onClick={() => navigate(isInsurancePayment ? '/farmer/insurance/enroll' : '/appointments')}
-          className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+          onClick={() =>
+            navigate(
+              isInsurancePayment ? '/farmerinsuranceenroll' : '/farmerappointment',
+              {
+                state: {
+                  paymentSuccess: true,
+                  appointmentCreated: !isInsurancePayment,
+                  refreshKey: Date.now(),
+                },
+              }
+            )
+          }
+          className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium inline-flex items-center justify-center gap-2 mb-3"
         >
-          {isInsurancePayment ? t('success.buttons.continueEnrollment') : t('success.buttons.goToAppointments')}
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          {isInsurancePayment
+            ? 'Back to Upload Payment Screenshot'
+            : 'View My Appointments'}
         </button>
+
+        {/* Secondary — different by flow */}
+        {isInsurancePayment ? (
+          <button
+            onClick={() => navigate('/farmerinsurancedashboard')}
+            className="w-full px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-sm"
+          >
+            Go to Insurance Dashboard
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate('/appointments/request')}
+            className="w-full px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-sm"
+          >
+            Book Another Appointment
+          </button>
+        )}
+
       </div>
     </div>
   );

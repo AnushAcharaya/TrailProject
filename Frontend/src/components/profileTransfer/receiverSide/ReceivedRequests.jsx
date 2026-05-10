@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import RequestCard from './RequestCard';
 import { getReceivedTransfers } from '../../../services/profileTransferApi';
+import { tAnimal } from '../../../utils/translateEnum';
 
 export default function ReceivedRequests() {
   const { t } = useTranslation('profileTransfer');
+  const { t: tCommon } = useTranslation('common');
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,9 +39,9 @@ export default function ReceivedRequests() {
           id: transfer.id,
           senderAvatar: '/api/placeholder/48/48', // User profile pictures not implemented yet
           senderName: transfer.sender_details?.full_name || 'Unknown',
-          animalName: transfer.livestock_details?.species_name || 'Unknown',
+          animalName: transfer.livestock_details?.species_name ? tAnimal(tCommon, transfer.livestock_details.species_name) : 'Unknown',
           animalTag: transfer.livestock_details?.tag_id || 'N/A',
-          animalBreed: `${transfer.livestock_details?.species_name || 'Unknown'} - ${transfer.livestock_details?.breed_name || 'Unknown'}`,
+          animalBreed: `${transfer.livestock_details?.species_name ? tAnimal(tCommon, transfer.livestock_details.species_name) : 'Unknown'} - ${transfer.livestock_details?.breed_name || 'Unknown'}`,
           animalImage: getImageUrl(transfer.livestock_details?.image),
           time: new Date(transfer.created_at).toLocaleDateString(),
           reason: transfer.reason || 'No reason provided',

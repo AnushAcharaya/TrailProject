@@ -64,15 +64,6 @@ const AddVaccinationPage = () => {
         {/* Breadcrumbs */}
         {breadcrumbs}
 
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800">
-            {t('addForm.title')}
-          </h1>
-          <p className="text-sm text-gray-500">
-            {t('addForm.subtitle')}
-          </p>
-        </div>
-
         <AddVaccinationForm />
       </div>
     </Layout>

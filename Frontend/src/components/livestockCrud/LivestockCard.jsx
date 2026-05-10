@@ -5,9 +5,13 @@ import { useTranslation } from "react-i18next";
 import { GiCow } from "react-icons/gi";
 import { FaSyringe } from "react-icons/fa";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { tAnimal, tStatus } from "../../utils/translateEnum";
+import { useLocalizedNumber } from "../../utils/formatNumber";
 
 const LivestockCard = ({ livestock, onDelete }) => {
   const { t } = useTranslation('livestock');
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
   const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
@@ -49,7 +53,7 @@ const LivestockCard = ({ livestock, onDelete }) => {
       </div>
 
       {/* Title */}
-      <h3 className="card-title">{livestock.species_name}</h3>
+      <h3 className="card-title">{tAnimal(tCommon, livestock.species_name)}</h3>
 
       {/* Two-column layout for info */}
       <div className="card-info-grid">
@@ -63,7 +67,7 @@ const LivestockCard = ({ livestock, onDelete }) => {
         </div>
         <div className="info-item">
           <span className="info-label">{t('card.labels.age')}</span>
-          <span className="info-value">{livestock.age || t('card.values.na')} {t('card.values.years')}</span>
+          <span className="info-value">{livestock.age ? fmt(livestock.age) : t('card.values.na')} {t('card.values.years')}</span>
         </div>
         <div className="info-item">
           <span className="info-label">{t('card.labels.gender')}</span>
@@ -71,11 +75,11 @@ const LivestockCard = ({ livestock, onDelete }) => {
         </div>
         <div className="info-item">
           <span className="info-label">{t('card.labels.weight')}</span>
-          <span className="info-value">{livestock.weight || t('card.values.na')} {t('card.values.kg')}</span>
+          <span className="info-value">{livestock.weight ? fmt(livestock.weight) : t('card.values.na')} {t('card.values.kg')}</span>
         </div>
         <div className="info-item">
           <span className="info-label">{t('card.labels.health')}</span>
-          <span className="info-value">{livestock.health_status || t('card.values.na')}</span>
+          <span className="info-value">{livestock.health_status ? tStatus(tCommon, livestock.health_status) : t('card.values.na')}</span>
         </div>
       </div>
 

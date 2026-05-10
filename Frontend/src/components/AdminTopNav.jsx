@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { Bell, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./common/LanguageSwitcher";
+import NotificationBell from "./notifications/NotificationBell";
 import { getUserProfile } from "../services/profileApi";
 import "../styles/languageSwitcher.css";
+import "../styles/notifications.css";
 
 export default function TopNav({ toggleSidebar }) {
   const navigate = useNavigate();
@@ -81,7 +83,8 @@ export default function TopNav({ toggleSidebar }) {
           {/* Language Switcher */}
           <LanguageSwitcher context="admin" theme="dark" />
           
-          <Bell size={22} className="text-white cursor-pointer hover:opacity-80 transition-opacity" />
+          {/* Notification Bell */}
+          <NotificationBell />
           
           {/* Profile Section */}
           <div 

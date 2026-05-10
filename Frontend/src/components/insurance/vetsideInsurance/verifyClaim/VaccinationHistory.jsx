@@ -1,6 +1,9 @@
 import { FaSyringe } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+import { tStatus } from '../../../../utils/translateEnum';
 
 const VaccinationHistory = () => {
+  const { t: tCommon } = useTranslation('common');
   const vaccinations = [
     { date: 'Jul 10, 2025', type: 'FMD Vaccine', status: 'vaccinated' },
     { date: 'Jun 15, 2025', type: 'PPR Vaccine', status: 'vaccinated' },
@@ -23,7 +26,7 @@ const VaccinationHistory = () => {
               <div className="text-sm text-gray-700 font-medium">{vaccine.type}</div>
             </div>
             <span className={`px-2 py-1 rounded-full text-xs font-bold ${vaccine.status === 'vaccinated' ? 'bg-emerald-100 text-emerald-800' : 'bg-orange-100 text-orange-800'}`}>
-              {vaccine.status === 'vaccinated' ? 'Done' : 'Pending'}
+              {vaccine.status === 'vaccinated' ? tStatus(tCommon, 'Completed') : tStatus(tCommon, 'Pending')}
             </span>
           </div>
         ))}

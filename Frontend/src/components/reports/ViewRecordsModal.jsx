@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getTreatmentsByLivestock } from '../../services/medicalApi';
 import { getVaccinationsByLivestock } from '../../services/vaccinationApi';
+import { tAnimal, tStatus } from '../../utils/translateEnum';
 
 const ViewRecordsModal = ({ animal, type, onClose }) => {
+  const { t: tCommon } = useTranslation('common');
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -157,7 +160,7 @@ const ViewRecordsModal = ({ animal, type, onClose }) => {
                         <div className="record-row">
                           <span className="record-label">Status:</span>
                           <span className={`record-status status-${record.status?.toLowerCase()}`}>
-                            {record.status || 'N/A'}
+                            {record.status ? tStatus(tCommon, record.status) : 'N/A'}
                           </span>
                         </div>
                         {record.notes && (

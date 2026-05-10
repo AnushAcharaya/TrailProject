@@ -1,14 +1,16 @@
 import React from 'react';
+import { useLocalizedNumber } from '../../utils/formatNumber';
 
-const ReportsSidebar = ({ 
-  searchTerm, 
-  setSearchTerm, 
-  filterSpecies, 
-  setFilterSpecies, 
+const ReportsSidebar = ({
+  searchTerm,
+  setSearchTerm,
+  filterSpecies,
+  setFilterSpecies,
   uniqueSpecies,
   totalAnimals,
   filteredCount
 }) => {
+  const fmt = useLocalizedNumber();
   return (
     <div className="reports-sidebar">
       <div className="sidebar-header">
@@ -46,11 +48,11 @@ const ReportsSidebar = ({
         <div className="sidebar-stats">
           <div className="stat-item">
             <span className="stat-label">Total Animals</span>
-            <span className="stat-value">{totalAnimals}</span>
+            <span className="stat-value">{fmt(totalAnimals)}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">Filtered Results</span>
-            <span className="stat-value">{filteredCount}</span>
+            <span className="stat-value">{fmt(filteredCount)}</span>
           </div>
         </div>
       </div>

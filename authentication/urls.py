@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import (RegisterView, VerifyEmailView, ResendVerificationView, SendPhoneOTPView, 
-                    VerifyPhoneOTPView, LoginView, ForgotPasswordEmailView, VerifyTokenView, 
+from .views import (RegisterView, VerifyEmailView, ResendVerificationView, SendPhoneOTPView,
+                    VerifyPhoneOTPView, LoginView, ForgotPasswordEmailView, VerifyTokenView,
                     ResetPasswordView, AdminUserListView, AdminDashboardStatsView, ApproveUserView, DeclineUserView,
-                    SendLoginOTPView, VerifyLoginOTPView)
+                    SendLoginOTPView, VerifyLoginOTPView, VetListView, GoogleLoginView,
+                    VerifyEmailViaGoogleView)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -31,4 +32,11 @@ urlpatterns = [
     # Login OTP endpoints
     path('login/send-otp/', SendLoginOTPView.as_view(), name='send-login-otp'),
     path('login/verify-otp/', VerifyLoginOTPView.as_view(), name='verify-login-otp'),
+    
+    # Vet list endpoint
+    path('vets/', VetListView.as_view(), name='vet-list'),
+
+    # Google OAuth (ID token verification)
+    path('google/', GoogleLoginView.as_view(), name='google-login'),
+    path('verify-email-google/', VerifyEmailViaGoogleView.as_view(), name='verify-email-google'),
 ]

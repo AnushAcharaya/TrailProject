@@ -2,9 +2,13 @@
 import { useTranslation } from 'react-i18next';
 import "./../../styles/medicalHistory.css";
 import StatusBadge from "./StatusBadge";
+import { tAnimal } from "../../utils/translateEnum";
+import { useLocalizedNumber } from "../../utils/formatNumber";
 
 const ViewTreatmentModal = ({ treatment, onClose }) => {
   const { t } = useTranslation('medical');
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
   
   if (!treatment) return null;
 
@@ -35,11 +39,7 @@ const ViewTreatmentModal = ({ treatment, onClose }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-gray-600">{t('viewModal.treatmentName')}</label>
-                <p className="text-gray-900 mt-1">{treatment.treatment_name || "N/A"}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-600">{t('viewModal.livestock')}</label>
-                <p className="text-gray-900 mt-1">{treatment.livestock?.tag_id || "N/A"}</p>
+                <p className="text-gray-900 mt-1 font-medium">{treatment.treatment_name || "N/A"}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600">{t('viewModal.status')}</label>
@@ -51,6 +51,48 @@ const ViewTreatmentModal = ({ treatment, onClose }) => {
                 <label className="text-sm font-medium text-gray-600">{t('viewModal.vet')}</label>
                 <p className="text-gray-900 mt-1">{treatment.vet_name || "N/A"}</p>
               </div>
+            </div>
+          </div>
+
+          {/* Livestock Info Section */}
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 border border-blue-200">
+            <h3 className="font-semibold text-lg mb-3 text-gray-900 flex items-center gap-2">
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+              {t('viewModal.livestock')}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-xs font-medium text-gray-600">Tag ID</label>
+                <p className="text-gray-900 mt-1 font-semibold text-lg">{treatment.livestock?.tag_id || "N/A"}</p>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600">Species</label>
+                <p className="text-gray-900 mt-1">{treatment.livestock?.species_name ? tAnimal(tCommon, treatment.livestock.species_name) : "N/A"}</p>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600">Breed</label>
+                <p className="text-gray-900 mt-1">{treatment.livestock?.breed_name || "N/A"}</p>
+              </div>
+              {treatment.livestock?.age && (
+                <div>
+                  <label className="text-xs font-medium text-gray-600">Age</label>
+                  <p className="text-gray-900 mt-1">{fmt(treatment.livestock.age)} years</p>
+                </div>
+              )}
+              {treatment.livestock?.gender && (
+                <div>
+                  <label className="text-xs font-medium text-gray-600">Gender</label>
+                  <p className="text-gray-900 mt-1 capitalize">{treatment.livestock.gender}</p>
+                </div>
+              )}
+              {treatment.livestock?.weight && (
+                <div>
+                  <label className="text-xs font-medium text-gray-600">Weight</label>
+                  <p className="text-gray-900 mt-1">{fmt(treatment.livestock.weight)} kg</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -108,18 +150,18 @@ const ViewTreatmentModal = ({ treatment, onClose }) => {
 
                     <div className="border-t border-gray-200 pt-3">
                       <label className="text-xs font-medium text-gray-600">{t('viewModal.medicineDetails.schedule')}</label>
-                      <p className="text-sm text-gray-900 mt-1 capitalize">{med.scheduleType || med.schedule_type}</p>
+                      <p className="text-sm text-gray-900 mt-1 capitalize">{med.schedule_type || med.scheduleType}</p>
                       
-                      {(med.scheduleType === "interval" || med.schedule_type === "interval") ? (
+                      {((med.schedule_type === "interval" || med.scheduleType === "interval")) ? (
                         <div className="mt-2 bg-blue-50 rounded p-2">
                           <p className="text-sm text-blue-900">
-                            <span className="font-medium">{t('viewModal.medicineDetails.schedule')}:</span> {t('form.schedulePreview.interval', { hours: med.intervalHours || med.interval_hours, time: med.startTime || med.start_time })}
+                            <span className="font-medium">{t('viewModal.medicineDetails.schedule')}:</span> {t('form.schedulePreview.interval', { hours: med.interval_hours || med.intervalHours, time: med.start_time || med.startTime })}
                           </p>
                         </div>
                       ) : (
                         <div className="mt-2 bg-blue-50 rounded p-2">
                           <p className="text-sm text-blue-900">
-                            <span className="font-medium">{t('form.exactTime', { number: '' })}:</span> {(med.exactTimes || med.exact_times)?.slice(0, med.frequency).join(", ")}
+                            <span className="font-medium">{t('form.exactTime', { number: '' })}:</span> {(med.exact_times || med.exactTimes)?.slice(0, med.frequency).join(", ")}
                           </p>
                         </div>
                       )}

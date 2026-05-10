@@ -356,36 +356,90 @@ class AdminDashboardStatsView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+def _send_account_status_email(user, approved: bool):
+    """Send a plain-text email notifying the user about admin's decision."""
+    try:
+        full_name = user.full_name or user.username
+        role_label = (user.role or 'user').capitalize()
+        if approved:
+            subject = "Your LHMMS account has been approved"
+            body = (
+                f"Hello {full_name},\n\n"
+                f"Good news! An administrator has approved your LHMMS account.\n\n"
+                f"You can now sign in with your registered email and password as a {role_label}.\n"
+                f"Sign in here: http://localhost:5173/login\n\n"
+                f"Welcome to LHMMS — Livestock Health Management & Monitoring System.\n\n"
+                f"— LHMMS Team"
+            )
+        else:
+            subject = "Your LHMMS account verification was declined"
+            body = (
+                f"Hello {full_name},\n\n"
+                f"We're sorry — an administrator was unable to approve your LHMMS account at this time.\n\n"
+                f"This usually means the documents you submitted couldn't be verified, "
+                f"or some of the information needed clarification.\n\n"
+                f"If you believe this was a mistake, please contact LHMMS support and we'll be happy to help.\n\n"
+                f"— LHMMS Team"
+            )
+        send_email_sync(user.email, subject, body)
+    except Exception as exc:  # noqa: BLE001
+        # Never let an email transport failure break the admin's approval action.
+        import logging
+        logging.getLogger(__name__).warning(
+            "Approval/decline email failed for %s: %s", user.email, exc,
+        )
+
+
 class ApproveUserView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request, user_id):
-        # Check if user is admin
         if request.user.role != 'admin':
-            return Response({'error': 'Only admins can approve users'}, status=status.HTTP_403_FORBIDDEN)
-        
+            return Response({'error': 'Only admins can approve users'},
+                            status=status.HTTP_403_FORBIDDEN)
+
         user = get_object_or_404(CustomUser, id=user_id)
         user.status = 'approved'
         user.is_active = True
         user.save()
-        
-        return Response({'success': True, 'message': 'User approved successfully'}, status=status.HTTP_200_OK)
+
+        # 1) email the user
+        _send_account_status_email(user, approved=True)
+
+        # 2) in-app notification (real-time bell) — best-effort
+        try:
+            from notifications.utils import notify_account_approved
+            notify_account_approved(user)
+        except Exception:
+            pass
+
+        return Response({'success': True, 'message': 'User approved successfully'},
+                        status=status.HTTP_200_OK)
 
 
 class DeclineUserView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request, user_id):
-        # Check if user is admin
         if request.user.role != 'admin':
-            return Response({'error': 'Only admins can decline users'}, status=status.HTTP_403_FORBIDDEN)
-        
+            return Response({'error': 'Only admins can decline users'},
+                            status=status.HTTP_403_FORBIDDEN)
+
         user = get_object_or_404(CustomUser, id=user_id)
         user.status = 'declined'
         user.is_active = False
         user.save()
-        
-        return Response({'success': True, 'message': 'User declined successfully'}, status=status.HTTP_200_OK)
+
+        _send_account_status_email(user, approved=False)
+
+        try:
+            from notifications.utils import notify_account_declined
+            notify_account_declined(user)
+        except Exception:
+            pass
+
+        return Response({'success': True, 'message': 'User declined successfully'},
+                        status=status.HTTP_200_OK)
 
 
 # Login OTP Views
@@ -422,7 +476,25 @@ class SendLoginOTPView(APIView):
         if role in ['farmer', 'vet']:
             if not phone or user.phone != phone:
                 return Response({'success': False, 'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+        # Block accounts whose email was never verified through Google.
+        # is_email_verified is only set True after the user successfully signs in
+        # to Google with the same email (VerifyEmailViaGoogleView), or when the
+        # whole signup happens via Google OAuth (GoogleLoginView).
+        # Fake / non-Google emails can therefore never reach a logged-in state.
+        if not user.is_email_verified:
+            return Response(
+                {
+                    'success': False,
+                    'error': (
+                        'Your email is not verified. Only emails that are real '
+                        'Google accounts are accepted — please complete sign-up '
+                        'by verifying with Google.'
+                    ),
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         # Check if user is approved (except admin)
         if role != 'admin':
             if user.status == 'pending':
@@ -516,3 +588,241 @@ class VerifyLoginOTPView(APIView):
                 'role': user.role,
             }
         }, status=status.HTTP_200_OK)
+
+
+class VerifyEmailViaGoogleView(APIView):
+    """
+    Verifies a user's registered email by requiring them to sign in to Google
+    with that same email. Only emails that are real Google accounts can pass
+    this check — emails that don't exist on Google's directory cannot be verified.
+
+    Body: { id_token: <Google ID token>, email: <email user registered with> }
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from django.conf import settings
+        try:
+            from google.oauth2 import id_token as google_id_token
+            from google.auth.transport import requests as google_requests
+        except ImportError:
+            return Response(
+                {'success': False, 'error': 'google-auth package not installed on server'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        token = request.data.get('id_token') or request.data.get('credential')
+        claimed_email = (request.data.get('email') or '').strip().lower()
+
+        if not token or not claimed_email:
+            return Response(
+                {'success': False, 'error': 'id_token and email are required'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        client_id = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+        if not client_id:
+            return Response(
+                {'success': False, 'error': 'Google OAuth not configured on server'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        try:
+            idinfo = google_id_token.verify_oauth2_token(
+                token, google_requests.Request(), client_id
+            )
+        except ValueError as exc:
+            return Response(
+                {'success': False, 'error': f'Invalid Google token: {exc}'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if idinfo.get('iss') not in ('accounts.google.com', 'https://accounts.google.com'):
+            return Response(
+                {'success': False, 'error': 'Invalid token issuer'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        google_email = (idinfo.get('email') or '').strip().lower()
+        if not google_email or not idinfo.get('email_verified'):
+            return Response(
+                {'success': False, 'error': 'Google did not verify this email address'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if google_email != claimed_email:
+            return Response(
+                {
+                    'success': False,
+                    'error': (
+                        f'Email mismatch. You registered with "{claimed_email}" but '
+                        f'signed in to Google as "{google_email}". '
+                        'Please sign in with the same Google account.'
+                    ),
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user = CustomUser.objects.get(email=claimed_email)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {'success': False, 'error': 'No registration found for this email'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            user.save(update_fields=['is_email_verified'])
+
+        return Response(
+            {
+                'success': True,
+                'message': 'Email verified via Google.',
+                'email': user.email,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class GoogleLoginView(APIView):
+    """
+    Verifies a Google ID token from the frontend (Google Identity Services),
+    finds or creates the user, and issues JWT tokens in the same shape as
+    VerifyLoginOTPView so the frontend can reuse its existing storage logic.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from django.conf import settings
+        try:
+            from google.oauth2 import id_token as google_id_token
+            from google.auth.transport import requests as google_requests
+        except ImportError:
+            return Response(
+                {'success': False, 'error': 'google-auth package not installed on server'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        token = request.data.get('id_token') or request.data.get('credential')
+        if not token:
+            return Response(
+                {'success': False, 'error': 'Missing id_token'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        client_id = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+        if not client_id:
+            return Response(
+                {'success': False, 'error': 'Google OAuth not configured on server'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        try:
+            idinfo = google_id_token.verify_oauth2_token(
+                token, google_requests.Request(), client_id
+            )
+        except ValueError as exc:
+            return Response(
+                {'success': False, 'error': f'Invalid Google token: {exc}'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if idinfo.get('iss') not in ('accounts.google.com', 'https://accounts.google.com'):
+            return Response(
+                {'success': False, 'error': 'Invalid token issuer'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        email = idinfo.get('email')
+        if not email or not idinfo.get('email_verified'):
+            return Response(
+                {'success': False, 'error': 'Google account email not verified'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        full_name = idinfo.get('name') or email.split('@')[0]
+        # Frontend may pass an intended role for new signups (farmer/vet/admin)
+        requested_role = (request.data.get('role') or '').strip().lower()
+        if requested_role not in ('farmer', 'vet', 'admin'):
+            requested_role = 'farmer'
+
+        # Find existing user by email; otherwise create a new one with placeholder fields
+        try:
+            user = CustomUser.objects.get(email=email)
+            created = False
+        except CustomUser.DoesNotExist:
+            # Generate a unique username + placeholder phone (CustomUser requires both unique).
+            # The user can complete their profile after login.
+            base_username = email.split('@')[0]
+            username = base_username
+            i = 0
+            while CustomUser.objects.filter(username=username).exists():
+                i += 1
+                username = f"{base_username}{i}"
+
+            placeholder_phone = f"oauth_{random.randint(10**11, 10**12 - 1)}"
+            while CustomUser.objects.filter(phone=placeholder_phone).exists():
+                placeholder_phone = f"oauth_{random.randint(10**11, 10**12 - 1)}"
+
+            user = CustomUser.objects.create(
+                username=username,
+                email=email,
+                full_name=full_name,
+                phone=placeholder_phone,
+                address='',
+                role=requested_role,
+                status='approved' if requested_role == 'farmer' else 'pending',
+                is_email_verified=True,  # Google verified
+            )
+            user.set_unusable_password()
+            user.save()
+            created = True
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'success': True,
+            'message': 'Google login successful',
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'is_new_user': created,
+            'profile_incomplete': user.phone.startswith('oauth_') if user.phone else True,
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'full_name': user.full_name,
+                'role': user.role,
+            }
+        }, status=status.HTTP_200_OK)
+
+
+class VetListView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        # Get search query parameter
+        search = request.query_params.get('search', '')
+        
+        # Get all approved vets
+        vets = CustomUser.objects.filter(role='vet', status='approved')
+        
+        # Debug logging
+        print(f"[VetListView] Search term: '{search}'")
+        print(f"[VetListView] Total approved vets: {vets.count()}")
+        
+        # Filter by search term if provided
+        if search:
+            from django.db.models import Q
+            vets = vets.filter(Q(full_name__icontains=search) | Q(username__icontains=search))
+            print(f"[VetListView] After search filter: {vets.count()}")
+        
+        # Limit to 10 results
+        vets = vets[:10]
+        
+        # Return vet names
+        vet_list = [{'id': vet.id, 'name': vet.full_name or vet.username} for vet in vets]
+        print(f"[VetListView] Returning vets: {vet_list}")
+        
+        return Response({'success': True, 'vets': vet_list}, status=status.HTTP_200_OK)

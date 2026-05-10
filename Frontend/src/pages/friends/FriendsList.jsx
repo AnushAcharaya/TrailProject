@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import FarmerLayout from "../../components/farmerDashboard/FarmerLayout";
 import { getFriends, removeFriend } from "../../services/friendsApi";
 import { FaUsers, FaEnvelope, FaUserTimes } from "react-icons/fa";
+import { tRole } from "../../utils/translateEnum";
 
 const FriendsList = () => {
   const navigate = useNavigate();
+  const { t: tCommon } = useTranslation('common');
   const [friends, setFriends] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [removingId, setRemovingId] = useState(null);
@@ -113,7 +116,7 @@ const FriendsList = () => {
                       <h3 className="text-lg font-semibold text-gray-800">
                         {friend.full_name || friend.username}
                       </h3>
-                      <p className="text-gray-600 text-sm">{friend.role}</p>
+                      <p className="text-gray-600 text-sm">{tRole(tCommon, friend.role)}</p>
                       {friend.phone && (
                         <p className="text-xs text-gray-500">{friend.phone}</p>
                       )}

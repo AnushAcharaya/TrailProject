@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { FiClock, FiAlertCircle, FiCheckCircle, FiXCircle } from "react-icons/fi";
 import { getAppointmentStats } from "../../services/appointmentApi";
+import { useLocalizedNumber } from "../../utils/formatNumber";
 import "../../styles/appointments.css";
 
 const StatCards = () => {
   const { t } = useTranslation('appointments');
+  const fmt = useLocalizedNumber();
   const [stats, setStats] = useState({
     upcoming: 0,
     pending: 0,
@@ -87,7 +89,7 @@ const StatCards = () => {
             </div>
           </div>
           <p className={`stat-value text-${stat.color}-600`}>
-            {stat.value}
+            {fmt(stat.value)}
           </p>
         </div>
       ))}

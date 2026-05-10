@@ -16,6 +16,16 @@ insuranceApi.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // CRITICAL: When sending FormData (file uploads like the payment screenshot),
+    // we MUST let the browser set the Content-Type header itself so it includes
+    // the correct multipart boundary. Forcing application/json here would
+    // break the upload and the backend's request.FILES would be empty.
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+      delete config.headers['content-type'];
+    }
+
     return config;
   },
   (error) => {

@@ -40,21 +40,29 @@ class AppointmentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Set farmer from request user
         validated_data['farmer'] = self.context['request'].user
-        
+
         # Get veterinarian from veterinarian_id (can be ID or username)
         vet_identifier = validated_data.pop('veterinarian_id', None)
+        veterinarian = None
         if vet_identifier:
             try:
-                # Try to get by ID first (if it's numeric)
                 if str(vet_identifier).isdigit():
                     veterinarian = User.objects.get(id=int(vet_identifier), role='vet')
                 else:
-                    # Otherwise try by username
                     veterinarian = User.objects.get(username=vet_identifier, role='vet')
                 validated_data['veterinarian'] = veterinarian
             except User.DoesNotExist:
                 raise serializers.ValidationError({"veterinarian_id": "Invalid veterinarian ID or username"})
-        
+
+        # Fee resolution. Priority:
+        #   1) request explicitly provided appointment_fee
+        #   2) the chosen vet's profile.consultation_fee
+        #   3) hard fallback NPR 500
+        if validated_data.get('appointment_fee') is None and veterinarian is not None:
+            profile = getattr(veterinarian, 'profile', None)
+            if profile and profile.consultation_fee is not None:
+                validated_data['appointment_fee'] = profile.consultation_fee
+
         return super().create(validated_data)
     
     def validate(self, data):

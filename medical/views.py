@@ -32,35 +32,19 @@ class TreatmentViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         # Ensure medicines are always prefetched
-        return Treatment.objects.filter(
+        queryset = Treatment.objects.filter(
             user=self.request.user
-        ).select_related('livestock', 'livestock__species', 'livestock__breed', 'user').prefetch_related('medicines').order_by('-created_at')
+        ).select_related('livestock', 'livestock__species', 'livestock__breed', 'user').prefetch_related('medicines')
+        
+        return queryset.order_by('-created_at')
     
     def list(self, request, *args, **kwargs):
-        """Override list to add debug logging"""
+        """Override list to ensure medicines are included"""
         queryset = self.filter_queryset(self.get_queryset())
-        
-        # Debug logging
-        print(f"\n{'='*60}")
-        print(f"[TreatmentViewSet] LIST - Total treatments: {queryset.count()}")
-        if queryset.exists():
-            first = queryset.first()
-            print(f"[TreatmentViewSet] First treatment: {first.treatment_name}")
-            print(f"[TreatmentViewSet] Medicines count: {first.medicines.count()}")
-            if first.medicines.exists():
-                for med in first.medicines.all():
-                    print(f"[TreatmentViewSet]   - {med.name} ({med.dosage})")
-            else:
-                print(f"[TreatmentViewSet]   ⚠️ No medicines found!")
-        print(f"{'='*60}\n")
         
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            # Debug serialized data
-            if serializer.data:
-                first_data = serializer.data[0]
-                print(f"[TreatmentViewSet] Serialized medicines: {first_data.get('medicines', [])}")
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
@@ -68,80 +52,84 @@ class TreatmentViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         # Handle medicines JSON string from FormData
-        data = request.data.copy()
+        import json
+        from rest_framework.request import Request
+        from django.http import QueryDict
+        
         print(f"\n{'='*60}")
-        print(f"[TreatmentViewSet] CREATE - Raw request.data:")
-        print(f"  medicines field: {data.get('medicines')}")
-        print(f"  medicines type: {type(data.get('medicines'))}")
+        print(f"[TreatmentViewSet.create] ========== START ==========")
+        print(f"[TreatmentViewSet.create] request.data type: {type(request.data)}")
+        print(f"[TreatmentViewSet.create] request.data keys: {request.data.keys() if hasattr(request.data, 'keys') else 'N/A'}")
         
+        # Create a mutable copy of request data
+        if isinstance(request.data, QueryDict):
+            data = request.data.dict()
+        else:
+            data = dict(request.data)
+        
+        print(f"[TreatmentViewSet.create] data type after conversion: {type(data)}")
+        print(f"[TreatmentViewSet.create] 'medicines' in data: {'medicines' in data}")
+        
+        if 'medicines' in data:
+            print(f"[TreatmentViewSet.create] medicines type: {type(data['medicines'])}")
+            print(f"[TreatmentViewSet.create] medicines value (first 200 chars): {str(data['medicines'])[:200]}")
+        
+        # Parse medicines if it's a JSON string
         if 'medicines' in data and isinstance(data['medicines'], str):
-            import json
-            parsed_medicines = json.loads(data['medicines'])
-            print(f"  Parsed medicines: {parsed_medicines}")
-            print(f"  Parsed medicines length: {len(parsed_medicines)}")
-            data['medicines'] = parsed_medicines
+            try:
+                parsed = json.loads(data['medicines'])
+                print(f"[TreatmentViewSet.create] Parsed medicines type: {type(parsed)}")
+                print(f"[TreatmentViewSet.create] Parsed medicines length: {len(parsed) if isinstance(parsed, list) else 'N/A'}")
+                print(f"[TreatmentViewSet.create] Parsed medicines: {parsed}")
+                data['medicines'] = parsed
+            except json.JSONDecodeError as e:
+                print(f"[TreatmentViewSet.create] JSON decode error: {e}")
+                return Response(
+                    {'medicines': ['Invalid JSON format']},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         
-        print(f"  Final medicines data: {data.get('medicines')}")
+        print(f"[TreatmentViewSet.create] Final data['medicines'] type: {type(data.get('medicines'))}")
+        print(f"[TreatmentViewSet.create] Final data['medicines']: {data.get('medicines')}")
         print(f"{'='*60}\n")
         
         serializer = self.get_serializer(data=data)
+        
+        print(f"[TreatmentViewSet.create] Before is_valid()")
+        print(f"[TreatmentViewSet.create] serializer.initial_data type: {type(serializer.initial_data)}")
+        print(f"[TreatmentViewSet.create] 'medicines' in serializer.initial_data: {'medicines' in serializer.initial_data}")
+        if 'medicines' in serializer.initial_data:
+            print(f"[TreatmentViewSet.create] serializer.initial_data['medicines']: {serializer.initial_data['medicines']}")
+        
         serializer.is_valid(raise_exception=True)
+        
+        print(f"[TreatmentViewSet.create] After is_valid()")
+        print(f"[TreatmentViewSet.create] 'medicines' in validated_data: {'medicines' in serializer.validated_data}")
+        if 'medicines' in serializer.validated_data:
+            print(f"[TreatmentViewSet.create] validated_data['medicines']: {serializer.validated_data['medicines']}")
+        else:
+            print(f"[TreatmentViewSet.create] ⚠️⚠️⚠️ NO 'medicines' IN validated_data! ⚠️⚠️⚠️")
+        
         self.perform_create(serializer)
         
-        # Log what was actually created
-        created_treatment = serializer.instance
-        print(f"\n[TreatmentViewSet] Created treatment ID: {created_treatment.id}")
-        print(f"[TreatmentViewSet] Medicines count in DB: {created_treatment.medicines.count()}")
-        for med in created_treatment.medicines.all():
-            print(f"  - {med.name} ({med.dosage})")
-        
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        # Re-serialize the instance to include the medicines that were just created
+        response_serializer = self.get_serializer(serializer.instance)
+        headers = self.get_success_headers(response_serializer.data)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def retrieve(self, request, *args, **kwargs):
-        """Override retrieve to add debug logging"""
+        """Override retrieve to ensure medicines are included"""
         instance = self.get_object()
-        print(f"\n{'='*60}")
-        print(f"[TreatmentViewSet] RETRIEVE - Treatment ID: {instance.id}")
-        print(f"[TreatmentViewSet] Treatment name: {instance.treatment_name}")
-        print(f"[TreatmentViewSet] Medicines count in DB: {instance.medicines.count()}")
-        if instance.medicines.exists():
-            for med in instance.medicines.all():
-                print(f"[TreatmentViewSet]   - {med.name} ({med.dosage})")
-        else:
-            print(f"[TreatmentViewSet]   ⚠️ No medicines found in DB!")
-        print(f"{'='*60}\n")
-        
         serializer = self.get_serializer(instance)
-        print(f"[TreatmentViewSet] Serialized medicines: {serializer.data.get('medicines', [])}")
         return Response(serializer.data)
     
     def update(self, request, *args, **kwargs):
         # Handle medicines JSON string from FormData
         data = request.data.copy()
-        print(f"\n{'='*60}")
-        print(f"[TreatmentViewSet] UPDATE - Raw request.data:")
-        print(f"[TreatmentViewSet] ALL FIELDS IN REQUEST:")
-        for key in data.keys():
-            print(f"  {key}: {data.get(key)}")
-        print(f"\n[TreatmentViewSet] medicines field: {data.get('medicines')}")
-        print(f"[TreatmentViewSet] medicines type: {type(data.get('medicines'))}")
-        print(f"[TreatmentViewSet] 'medicines' in data: {'medicines' in data}")
         
-        if 'medicines' in data:
-            if isinstance(data['medicines'], str):
-                import json
-                parsed_medicines = json.loads(data['medicines'])
-                print(f"[TreatmentViewSet] Parsed medicines from JSON string: {parsed_medicines}")
-                print(f"[TreatmentViewSet] Parsed medicines length: {len(parsed_medicines)}")
-                data['medicines'] = parsed_medicines
-            else:
-                print(f"[TreatmentViewSet] Medicines is already a list/dict: {data['medicines']}")
-        else:
-            print(f"[TreatmentViewSet] ⚠️⚠️⚠️ NO 'medicines' FIELD IN REQUEST DATA! ⚠️⚠️⚠️")
-        
-        print(f"[TreatmentViewSet] Final medicines data: {data.get('medicines')}")
-        print(f"{'='*60}\n")
+        if 'medicines' in data and isinstance(data['medicines'], str):
+            import json
+            data['medicines'] = json.loads(data['medicines'])
         
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -149,14 +137,9 @@ class TreatmentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         
-        # Log what was actually updated
-        updated_treatment = serializer.instance
-        print(f"\n[TreatmentViewSet] Updated treatment ID: {updated_treatment.id}")
-        print(f"[TreatmentViewSet] Medicines count in DB after update: {updated_treatment.medicines.count()}")
-        for med in updated_treatment.medicines.all():
-            print(f"  - {med.name} ({med.dosage})")
-        
-        return Response(serializer.data)
+        # Re-serialize the instance to include the updated medicines
+        response_serializer = self.get_serializer(serializer.instance)
+        return Response(response_serializer.data)
     
     @action(detail=False, methods=['get'])
     def counts(self, request):

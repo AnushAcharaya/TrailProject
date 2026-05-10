@@ -2,17 +2,19 @@ import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { FiUser, FiCalendar, FiFileText, FiClock } from "react-icons/fi";
 import { MdPets } from "react-icons/md";
-import { 
-  approveAppointment, 
-  declineAppointment, 
+import {
+  approveAppointment,
+  declineAppointment,
   completeAppointment,
   formatAppointmentDate,
-  formatAppointmentTime 
+  formatAppointmentTime
 } from "../../services/appointmentApi";
+import { tAnimal, tStatus } from "../../utils/translateEnum";
 import "../../styles/appointments.css";
 
 const VetAppointmentCard = ({ appointment, onUpdate }) => {
   const { t } = useTranslation('appointments');
+  const { t: tCommon } = useTranslation('common');
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [showNotesModal, setShowNotesModal] = useState(false);
@@ -95,7 +97,9 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
   };
 
   const farmerName = appointment.farmer_details?.full_name || appointment.farmer_details?.username || t('vet.unknownFarmer');
-  const animalType = appointment.animal_type?.charAt(0).toUpperCase() + appointment.animal_type?.slice(1) || t('vet.unknownAnimal');
+  const animalType = appointment.animal_type
+    ? tAnimal(tCommon, appointment.animal_type)
+    : t('vet.unknownAnimal');
   const createdDate = formatAppointmentDate(appointment.created_at);
   const preferredDate = formatAppointmentDate(appointment.preferred_date);
   const preferredTime = formatAppointmentTime(appointment.preferred_time);
@@ -161,7 +165,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
                 : "badge-gray"
             }`}
           >
-            {appointment.status}
+            {tStatus(tCommon, appointment.status)}
           </span>
 
           {/* Payment Badges and Action Buttons in Same Row */}
@@ -323,7 +327,7 @@ const VetAppointmentCard = ({ appointment, onUpdate }) => {
                         ? "badge-red"
                         : "badge-gray"
                     }`}>
-                      {appointment.status}
+                      {tStatus(tCommon, appointment.status)}
                     </span>
                   </p>
                 </div>

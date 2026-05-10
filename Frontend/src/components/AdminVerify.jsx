@@ -13,9 +13,11 @@ import {
   FaImage,
   FaTimes as FaClose
 } from "react-icons/fa";
+import { tRole, tStatus, tSpecialization } from "../utils/translateEnum";
 
 const AccountCard = ({ data, onApprove, onDecline }) => {
   const { t } = useTranslation('admin');
+  const { t: tCommon } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(data.status);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -79,9 +81,9 @@ const AccountCard = ({ data, onApprove, onDecline }) => {
               <h3 className="username">{name}</h3>
 
               <div className="tag-row">
-                <span className="tag role">{role}</span>
+                <span className="tag role">{tRole(tCommon, role)}</span>
                 <span className={`tag status ${currentStatus.toLowerCase()}`}>
-                  {currentStatus}
+                  {tStatus(tCommon, currentStatus)}
                 </span>
               </div>
             </div>
@@ -127,7 +129,7 @@ const AccountCard = ({ data, onApprove, onDecline }) => {
             {role === "Veterinarian" && (
               <>
                 <div className="section-title">{t('accountCard.specialization')}</div>
-                <div className="section-text">{specialization}</div>
+                <div className="section-text">{tSpecialization(tCommon, specialization)}</div>
               </>
             )}
 

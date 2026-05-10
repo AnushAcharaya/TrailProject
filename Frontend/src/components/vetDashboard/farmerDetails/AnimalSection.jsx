@@ -1,13 +1,18 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { tAnimal, tStatus } from '../../../utils/translateEnum';
+import { useLocalizedNumber } from '../../../utils/formatNumber';
 
 function AnimalSection({ animals }) {
   const navigate = useNavigate();
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
 
   if (!animals) return null;
 
   return (
     <div>
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Animals ({animals.length})</h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-4">Animals ({fmt(animals.length)})</h3>
       
       {animals.length === 0 ? (
         <div className="bg-white rounded-lg p-8 text-center text-gray-600">
@@ -34,7 +39,7 @@ function AnimalSection({ animals }) {
                   <span className={`absolute top-3 right-3 px-2 py-1 rounded text-xs font-medium ${
                     animal.health_status === 'Healthy' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                   }`}>
-                    {animal.health_status || 'Unknown'}
+                    {animal.health_status ? tStatus(tCommon, animal.health_status) : 'Unknown'}
                   </span>
                 </div>
                 
@@ -42,12 +47,12 @@ function AnimalSection({ animals }) {
                 <div className="p-4">
                   <h4 className="text-lg font-bold text-gray-900 mb-1">Tag: {animal.tag_id}</h4>
                   <div className="flex items-center space-x-2 text-sm text-gray-600 mb-1">
-                    <span>Species: {animal.species_name || 'N/A'}</span>
+                    <span>Species: {animal.species_name ? tAnimal(tCommon, animal.species_name) : 'N/A'}</span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
                     <span>Breed: {animal.breed_name || 'N/A'}</span>
                     <span>•</span>
-                    <span>Age: {animal.age || 'N/A'}</span>
+                    <span>Age: {animal.age ? fmt(animal.age) : 'N/A'}</span>
                   </div>
                   
                   {/* Action Buttons */}

@@ -1,11 +1,13 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaTachometerAlt, FaClipboardList } from 'react-icons/fa';
-import { Bell, Users, CheckCircle, BarChart2, Settings, HelpCircle, LogOut, AlertTriangle, Shield, ArrowRightLeft, Menu, X } from 'lucide-react';
+import { Users, CheckCircle, BarChart2, Settings, HelpCircle, LogOut, AlertTriangle, Shield, ArrowRightLeft, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../common/LanguageSwitcher';
+import NotificationBell from '../../notifications/NotificationBell';
 import ProfilePage from '../../profile/ProfilePage';
 import { getUserProfile } from '../../../services/profileApi';
+import '../../../styles/notifications.css';
 
 function AdminLayout({ children }) {
   const navigate = useNavigate();
@@ -247,7 +249,8 @@ function AdminLayout({ children }) {
               {/* Language Switcher */}
               <LanguageSwitcher context="admin" />
 
-              <Bell size={22} className="text-white cursor-pointer hover:opacity-80 transition-opacity" />
+              {/* Notification Bell */}
+              <NotificationBell />
               
               {/* Profile Section */}
               <div 

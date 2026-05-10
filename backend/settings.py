@@ -38,6 +38,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',  # WebSocket support - must be first
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,6 +62,7 @@ INSTALLED_APPS = [
     'friends',
     'messaging',
     'payment',  # eSewa payment integration
+    'notifications',  # Real-time notifications
 ]
 
 MIDDLEWARE = [
@@ -254,6 +256,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+# Google OAuth credentials (read from .env)
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY', '').strip().strip("'").strip('"')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET', '').strip().strip("'").strip('"')
+
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'http://localhost:5173/'  # Frontend after login
 #SOCIAL_AUTH_LOGIN_ERROR_URL = 'http://localhost:5173/login-error/'  # optional
 
@@ -289,5 +295,31 @@ ESEWA_MERCHANT_ID = os.getenv('ESEWA_MERCHANT_ID', '')
 ESEWA_SECRET_KEY = os.getenv('ESEWA_SECRET_KEY', '')
 ESEWA_SUCCESS_URL = os.getenv('ESEWA_SUCCESS_URL', 'http://localhost:3000/payment/success')
 ESEWA_FAILURE_URL = os.getenv('ESEWA_FAILURE_URL', 'http://localhost:3000/payment/failure')
-ESEWA_PAYMENT_URL = os.getenv('ESEWA_PAYMENT_URL', 'https://uat.esewa.com.np/epay/main')  # Test URL
+ESEWA_PAYMENT_URL = os.getenv('ESEWA_PAYMENT_URL', 'https://rc-epay.esewa.com.np/api/epay/main/v2/form')  # Test URL (v2)
+ESEWA_STATUS_URL = os.getenv('ESEWA_STATUS_URL', 'https://rc.esewa.com.np/api/epay/transaction/status/')  # Test URL (v2)
 # For production: https://esewa.com.np/epay/main
+
+# Channels Configuration for WebSocket
+ASGI_APPLICATION = 'backend.asgi.application'
+
+# Channel layer backend.
+#  - In-memory (default): zero deps, works inside a single runserver process.
+#    Perfect for local dev. Lost on restart, doesn't scale to multiple workers.
+#  - Redis: set USE_REDIS_CHANNELS=True in .env when Redis is running, e.g. for
+#    production or multi-worker setups.
+if os.getenv('USE_REDIS_CHANNELS', 'False').lower() == 'true':
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                "hosts": [(os.getenv('REDIS_HOST', '127.0.0.1'),
+                           int(os.getenv('REDIS_PORT', '6379')))],
+            },
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        },
+    }

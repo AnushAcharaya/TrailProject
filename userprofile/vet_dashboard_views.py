@@ -184,84 +184,98 @@ class VetDashboardAlertsView(APIView):
                 'error': 'Only vets can access this endpoint'
             }, status=status.HTTP_403_FORBIDDEN)
         
-        today = timezone.now().date()
-        seven_days_from_now = today + timedelta(days=7)
-        
-        # Get farmers this vet has worked with (accepted/completed appointments)
-        vet_farmers = Appointment.objects.filter(
-            veterinarian=user,
-            status__in=['Approved', 'Completed']
-        ).values_list('farmer', flat=True).distinct()
-        
-        alerts = []
-        
-        # Add pending appointments for this vet
-        pending_appointments = Appointment.objects.filter(
-            veterinarian=user,
-            status='Pending'
-        ).select_related('farmer').order_by('preferred_date')
-        
-        for appointment in pending_appointments:
-            days_until = (appointment.preferred_date - today).days
-            farmer_name = f"{appointment.farmer.first_name} {appointment.farmer.last_name}" if appointment.farmer.first_name else appointment.farmer.username
-            alerts.append({
-                'id': f'pending_apt_{appointment.id}',
-                'type': 'pending_appointment',
-                'description': f'Pending appointment with {farmer_name} on {appointment.preferred_date}',
-                'animal_tag': appointment.animal_type,
-                'priority': 'high' if days_until <= 1 else 'medium',
-                'days_until_due': days_until if days_until >= 0 else None,
-                'days_overdue': abs(days_until) if days_until < 0 else None
-            })
-        
-        # Find overdue vaccinations - only for farmers this vet has worked with
-        overdue_vaccinations = Vaccination.objects.filter(
-            user__in=vet_farmers,
-            next_due_date__lt=today
-        ).select_related('livestock')
-        
-        for vaccination in overdue_vaccinations:
-            days_overdue = (today - vaccination.next_due_date).days
-            alerts.append({
-                'id': f'overdue_vac_{vaccination.id}',
-                'type': 'overdue_vaccination',
-                'description': f'{vaccination.vaccine_name} overdue for {vaccination.livestock.tag_id}',
-                'animal_tag': vaccination.livestock.tag_id,
-                'priority': 'high',
-                'days_overdue': days_overdue
-            })
-        
-        # Find treatments needing follow-up - only for farmers this vet has worked with
-        upcoming_treatments = Treatment.objects.filter(
-            user__in=vet_farmers,
-            next_treatment_date__lte=seven_days_from_now,
-            next_treatment_date__gte=today,
-            status='In Progress'
-        ).select_related('livestock')
-        
-        for treatment in upcoming_treatments:
-            days_until_due = (treatment.next_treatment_date - today).days
-            alerts.append({
-                'id': f'followup_{treatment.id}',
-                'type': 'follow_up',
-                'description': f'{treatment.treatment_name} ({treatment.livestock.tag_id}) needs follow-up check-up',
-                'animal_tag': treatment.livestock.tag_id,
-                'priority': 'medium' if days_until_due > 2 else 'high',
-                'days_until_due': days_until_due
-            })
-        
-        # Sort by priority (high first) and then by days
-        def sort_key(alert):
-            priority_order = {'high': 0, 'medium': 1, 'low': 2}
-            return (priority_order.get(alert['priority'], 3), 
-                    alert.get('days_overdue', -alert.get('days_until_due', 0)))
-        
-        alerts.sort(key=sort_key)
-        
-        # Return top 10 alerts
-        alerts = alerts[:10]
-        
-        return Response({
-            'success': True,
-            'data': alerts
-        }, status=status.HTTP_200_OK)
+        try:
+            today = timezone.now().date()
+            seven_days_from_now = today + timedelta(days=7)
+            
+            # Get farmers this vet has worked with (accepted/completed appointments)
+            vet_farmers = list(Appointment.objects.filter(
+                veterinarian=user,
+                status__in=['Approved', 'Completed']
+            ).values_list('farmer', flat=True).distinct())
+            
+            alerts = []
+            
+            # Add pending appointments for this vet
+            pending_appointments = Appointment.objects.filter(
+                veterinarian=user,
+                status='Pending'
+            ).select_related('farmer').order_by('preferred_date')
+            
+            for appointment in pending_appointments:
+                days_until = (appointment.preferred_date - today).days
+                farmer_name = f"{appointment.farmer.first_name} {appointment.farmer.last_name}" if appointment.farmer.first_name else appointment.farmer.username
+                alerts.append({
+                    'id': f'pending_apt_{appointment.id}',
+                    'type': 'pending_appointment',
+                    'description': f'Pending appointment with {farmer_name} on {appointment.preferred_date}',
+                    'animal_tag': appointment.animal_type,
+                    'priority': 'high' if days_until <= 1 else 'medium',
+                    'days_until_due': days_until if days_until >= 0 else None,
+                    'days_overdue': abs(days_until) if days_until < 0 else None
+                })
+            
+            # Only query vaccinations and treatments if there are farmers
+            if vet_farmers:
+                # Find overdue vaccinations - only for farmers this vet has worked with
+                overdue_vaccinations = Vaccination.objects.filter(
+                    user__in=vet_farmers,
+                    next_due_date__lt=today
+                ).select_related('livestock')
+                
+                for vaccination in overdue_vaccinations:
+                    days_overdue = (today - vaccination.next_due_date).days
+                    alerts.append({
+                        'id': f'overdue_vac_{vaccination.id}',
+                        'type': 'overdue_vaccination',
+                        'description': f'{vaccination.vaccine_name} overdue for {vaccination.livestock.tag_id}',
+                        'animal_tag': vaccination.livestock.tag_id,
+                        'priority': 'high',
+                        'days_overdue': days_overdue
+                    })
+                
+                # Find treatments needing follow-up - only for farmers this vet has worked with
+                upcoming_treatments = Treatment.objects.filter(
+                    user__in=vet_farmers,
+                    next_treatment_date__lte=seven_days_from_now,
+                    next_treatment_date__gte=today,
+                    status='In Progress'
+                ).select_related('livestock')
+                
+                for treatment in upcoming_treatments:
+                    days_until_due = (treatment.next_treatment_date - today).days
+                    alerts.append({
+                        'id': f'followup_{treatment.id}',
+                        'type': 'follow_up',
+                        'description': f'{treatment.treatment_name} ({treatment.livestock.tag_id}) needs follow-up check-up',
+                        'animal_tag': treatment.livestock.tag_id,
+                        'priority': 'medium' if days_until_due > 2 else 'high',
+                        'days_until_due': days_until_due
+                    })
+            
+            # Sort by priority (high first) and then by days
+            def sort_key(alert):
+                priority_order = {'high': 0, 'medium': 1, 'low': 2}
+                return (priority_order.get(alert['priority'], 3), 
+                        alert.get('days_overdue', -alert.get('days_until_due', 0)))
+            
+            alerts.sort(key=sort_key)
+            
+            # Return top 10 alerts
+            alerts = alerts[:10]
+            
+            return Response({
+                'success': True,
+                'data': alerts
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            # Log the error for debugging
+            import traceback
+            print(f"Error in VetDashboardAlertsView: {str(e)}")
+            print(traceback.format_exc())
+            
+            return Response({
+                'success': False,
+                'error': f'Internal server error: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

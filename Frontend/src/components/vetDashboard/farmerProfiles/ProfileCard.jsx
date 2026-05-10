@@ -3,10 +3,12 @@ import { FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { sendFriendRequest, checkFriendshipStatus } from '../../../services/friendsApi';
+import { useLocalizedNumber } from '../../../utils/formatNumber';
 
 function ProfileCard({ farmer }) {
   const navigate = useNavigate();
   const { t } = useTranslation('vetDashboard');
+  const fmt = useLocalizedNumber();
   const [isSendingRequest, setIsSendingRequest] = useState(false);
   const [friendshipStatus, setFriendshipStatus] = useState('none'); // 'none', 'pending', 'friends'
   const [showToast, setShowToast] = useState(false);
@@ -141,7 +143,7 @@ function ProfileCard({ farmer }) {
         </div>
         
         {/* Animals count */}
-        <p className="text-sm text-gray-500 mb-4">{t('farmerProfiles.animals', { count: farmer.animal_count || 0 })}</p>
+        <p className="text-sm text-gray-500 mb-4">{t('farmerProfiles.animals', { count: fmt(farmer.animal_count || 0) })}</p>
         
         {/* Action Buttons */}
         <div className="flex flex-col gap-2">

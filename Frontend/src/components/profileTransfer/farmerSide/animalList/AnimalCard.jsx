@@ -1,9 +1,13 @@
 // components/profile-transfer/farmer-side/animal-list/components/AnimalCard.jsx
 import { useTranslation } from 'react-i18next';
 import { FaExchangeAlt } from 'react-icons/fa';
+import { tStatus } from '../../../../utils/translateEnum';
+import { useLocalizedNumber } from '../../../../utils/formatNumber';
 
 export default function AnimalCard({ animal, onTransferClick }) {
   const { t } = useTranslation('profileTransfer');
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
   // Status badge styling
   const getStatusStyle = (status) => {
     const styles = {
@@ -29,7 +33,7 @@ export default function AnimalCard({ animal, onTransferClick }) {
         </div>
         {animal.status && (
           <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(animal.status)}`}>
-            {animal.status}
+            {tStatus(tCommon, animal.status)}
           </div>
         )}
       </div>
@@ -47,7 +51,7 @@ export default function AnimalCard({ animal, onTransferClick }) {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">{t('animalCard.age')}:</span>
-            <span className="font-semibold text-gray-800">{animal.age}</span>
+            <span className="font-semibold text-gray-800">{fmt(animal.age)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">{t('animalCard.owner')}:</span>

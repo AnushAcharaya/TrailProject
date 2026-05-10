@@ -37,10 +37,20 @@ class UserProfile(models.Model):
     location = models.CharField(max_length=255, blank=True, null=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
     profile_image = models.ImageField(
-        upload_to='profile_images/', 
-        blank=True, 
+        upload_to='profile_images/',
+        blank=True,
         null=True,
         validators=[validate_image_extension, validate_image_size]
+    )
+
+    # Vet-only: default consultation fee in NPR shown on the vet's public card
+    # and used to pre-fill the appointment-booking form for farmers.
+    consultation_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="Default consultation fee in NPR (vet only).",
     )
     
     # Preferences (editable)

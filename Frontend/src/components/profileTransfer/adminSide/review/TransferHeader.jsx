@@ -1,12 +1,16 @@
 import { useTranslation } from 'react-i18next';
+import { tAnimal, tStatus } from '../../../../utils/translateEnum';
+import { useLocalizedNumber } from '../../../../utils/formatNumber';
 
 function TransferHeader({ transfer }) {
   const { t } = useTranslation('profileTransfer');
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
 
   if (!transfer) return null;
 
   const livestock = transfer.livestock_details || {};
-  const species = livestock.species_name || t('common.noData');
+  const species = livestock.species_name ? tAnimal(tCommon, livestock.species_name) : t('common.noData');
   const breed = livestock.breed_name || t('common.noData');
   const tagId = livestock.tag_id || 'N/A';
   const livestockImage = livestock.image;
@@ -52,7 +56,7 @@ function TransferHeader({ transfer }) {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">{t('reviewTransfer.age')}:</span>
-              <span className="text-sm font-medium text-gray-900">{livestock.age ? `${livestock.age} years` : 'N/A'}</span>
+              <span className="text-sm font-medium text-gray-900">{livestock.age ? `${fmt(livestock.age)} years` : 'N/A'}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">{t('reviewTransfer.health')}:</span>
@@ -62,7 +66,7 @@ function TransferHeader({ transfer }) {
                 livestock.health_status === 'Critical' ? 'bg-red-100 text-red-800' :
                 'bg-gray-100 text-gray-800'
               }`}>
-                {livestock.health_status || t('common.noData')}
+                {livestock.health_status ? tStatus(tCommon, livestock.health_status) : t('common.noData')}
               </span>
             </div>
             <div className="flex items-center gap-2">

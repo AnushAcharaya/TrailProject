@@ -3,6 +3,7 @@ import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaE
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getReceivedRequests } from "../../services/friendsApi";
+import { getUnreadMessageCount } from "../../services/messagesApi";
 import "../../styles/farmerdashboard.css";
 
 const SideNav = () => {
@@ -10,9 +11,13 @@ const SideNav = () => {
   const location = useLocation();
   const { t } = useTranslation('dashboard');
   const [friendRequestCount, setFriendRequestCount] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   useEffect(() => {
     loadFriendRequestCount();
+    loadUnreadMessageCount();
+    const interval = setInterval(loadUnreadMessageCount, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const loadFriendRequestCount = async () => {
@@ -22,10 +27,17 @@ const SideNav = () => {
     }
   };
 
+  const loadUnreadMessageCount = async () => {
+    const result = await getUnreadMessageCount();
+    if (result.success) {
+      setUnreadMessageCount(result.data.unread_count || 0);
+    }
+  };
+
   const menuItems = [
     { name: t('sidebar.dashboard'), icon: FaHome, path: "/farmerpage" },
     { name: t('sidebar.vetAppointment'), icon: FaCalendarCheck, path: "/farmerappointment" },
-    { name: t('sidebar.messages'), icon: FaEnvelope, path: "/messages", badge: 5, badgeColor: "bg-blue-500" },
+    { name: t('sidebar.messages'), icon: FaEnvelope, path: "/messages", badge: unreadMessageCount, badgeColor: "bg-blue-500" },
     { name: t('sidebar.friendRequests'), icon: FaUserFriends, path: "/farmer/friends/requests", badge: friendRequestCount, badgeColor: "bg-green-500" },
     { name: t('sidebar.friends'), icon: FaUserFriends, path: "/farmer/friends/list" },
     { name: t('sidebar.livestock'), icon: FaPaw, path: "/livestock" },

@@ -38,17 +38,26 @@
   transform: translateY(-4px);
 }
 
-.card-header {
+/* Scoped to .plan-card so it doesn't clash with reports.css's .card-header */
+.plan-card .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.25rem;
+  /* Negative margins extend the banner to the card edges, then fixed padding */
+  margin: -1.75rem -1.75rem 1.5rem -1.75rem;
+  padding: 1.5rem 1.75rem;
+  /* Solid emerald to match the navbar (bg-emerald-500 = #10b981) */
+  background: #10b981;
+  background-image: none;  /* explicitly cancel any gradient inherited from .card-header in reports.css */
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
 }
 
-.shield-icon {
+.plan-card .shield-icon {
   width: 2.75rem;
   height: 2.75rem;
-  background-color: #d1fae5;
+  /* White tile on green so the icon stays visible */
+  background-color: #ffffff;
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
@@ -57,9 +66,9 @@
   font-size: 1.5rem;
 }
 
-.months-badge {
-  background-color: #f3f4f6;
-  color: #6b7280;
+.plan-card .months-badge {
+  background-color: #ffffff;
+  color: #047857;
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.375rem 0.875rem;

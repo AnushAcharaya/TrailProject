@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { updateVaccination } from "../../services/vaccinationApi";
 import "./../../styles/vaccination.css";
+import { tAnimal } from "../../utils/translateEnum";
 
 const VaccinationCard = ({ vaccination, onRefresh }) => {
   const { t } = useTranslation('vaccination');
+  const { t: tCommon } = useTranslation('common');
   const navigate = useNavigate();
   const [isCompleting, setIsCompleting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -77,7 +79,7 @@ const VaccinationCard = ({ vaccination, onRefresh }) => {
               <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
                 <FaPaw size={14} className="text-gray-500" />
                 <span>
-                  {vaccination.livestock.tag_id} - {vaccination.livestock.species_name}
+                  {vaccination.livestock.tag_id} - {tAnimal(tCommon, vaccination.livestock.species_name)}
                 </span>
               </div>
             )}

@@ -87,10 +87,10 @@ export default function StatsSection() {
   if (loading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <div className="bg-white rounded-xl shadow p-4 sm:p-6 h-64 sm:h-72 md:h-80 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow p-4 sm:p-6 h-[300px] flex items-center justify-center">
           <p className="text-gray-500">{t('common.loading')}</p>
         </div>
-        <div className="bg-white rounded-xl shadow p-4 sm:p-6 h-64 sm:h-72 md:h-80 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow p-4 sm:p-6 h-[300px] flex items-center justify-center">
           <p className="text-gray-500">{t('common.loading')}</p>
         </div>
       </div>
@@ -100,9 +100,9 @@ export default function StatsSection() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
       {/* Monthly Verifications Chart */}
-      <div className="bg-white rounded-xl shadow p-4 sm:p-6 h-64 sm:h-72 md:h-80">
+      <div className="bg-white rounded-xl shadow p-4 sm:p-6">
         <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">{t('dashboard.charts.monthlyVerifications')}</h3>
-        <ResponsiveContainer width="100%" height="80%">
+        <ResponsiveContainer width="100%" height={240}>
           <BarChart data={monthlyData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
@@ -123,9 +123,9 @@ export default function StatsSection() {
       </div>
 
       {/* Weekly Activity Chart */}
-      <div className="bg-white rounded-xl shadow p-4 sm:p-6 h-64 sm:h-72 md:h-80">
+      <div className="bg-white rounded-xl shadow p-4 sm:p-6">
         <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">{t('dashboard.charts.weeklyActivity')}</h3>
-        <ResponsiveContainer width="100%" height="80%">
+        <ResponsiveContainer width="100%" height={240}>
           <LineChart data={weeklyData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis

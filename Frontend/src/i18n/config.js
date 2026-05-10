@@ -31,6 +31,8 @@ import enMessages from './locales/en/messages.json';
 import neMessages from './locales/ne/messages.json';
 import enAdmin from './locales/en/admin.json';
 import neAdmin from './locales/ne/admin.json';
+import enLanding from './locales/en/landing.json';
+import neLanding from './locales/ne/landing.json';
 
 i18n
   .use(LanguageDetector)
@@ -51,7 +53,8 @@ i18n
         dashboard: enDashboard,
         vetDashboard: enVetDashboard,
         messages: enMessages,
-        admin: enAdmin
+        admin: enAdmin,
+        landing: enLanding
       },
       ne: {
         common: neCommon,
@@ -67,7 +70,8 @@ i18n
         dashboard: neDashboard,
         vetDashboard: neVetDashboard,
         messages: neMessages,
-        admin: neAdmin
+        admin: neAdmin,
+        landing: neLanding
       }
     },
     fallbackLng: 'en',

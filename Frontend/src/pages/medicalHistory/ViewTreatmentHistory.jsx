@@ -11,9 +11,11 @@ import ConfirmDeleteModal from "../../components/medicalHistory/ConfirmDeleteMod
 import ViewTreatmentModal from "../../components/medicalHistory/ViewTreatmentModal";
 import { getAllTreatments, deleteTreatment } from "../../services/medicalApi";
 import "../../styles/medicalHistory.css";
+import { useLocalizedNumber } from "../../utils/formatNumber";
 
 const ViewTreatmentHistory = () => {
   const { t } = useTranslation('medical');
+  const fmt = useLocalizedNumber();
   const [treatments, setTreatments] = useState([]);
   const [activeTab, setActiveTab] = useState("past");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -242,7 +244,7 @@ const ViewTreatmentHistory = () => {
             <div className="icon">
               <FaCalendar className="text-white" size={24} />
             </div>
-            <div className="count">{activeTreatments.length}</div>
+            <div className="count">{fmt(activeTreatments.length)}</div>
             <div className="label">{t('tabs.tracking') || 'Medicine Tracking'}</div>
           </div>
 
@@ -250,7 +252,7 @@ const ViewTreatmentHistory = () => {
             <div className="icon">
               <FaCheck className="text-white" size={24} />
             </div>
-            <div className="count">{filteredPastTreatments.length}</div>
+            <div className="count">{fmt(filteredPastTreatments.length)}</div>
             <div className="label">{t('tabs.past') || 'Past Treatments'}</div>
           </div>
 
@@ -258,7 +260,7 @@ const ViewTreatmentHistory = () => {
             <div className="icon">
               <FaClock className="text-white" size={24} />
             </div>
-            <div className="count">{filteredUpcomingTreatments.length}</div>
+            <div className="count">{fmt(filteredUpcomingTreatments.length)}</div>
             <div className="label">{t('tabs.inProgress') || 'In Progress'}</div>
           </div>
         </div>
@@ -276,19 +278,19 @@ const ViewTreatmentHistory = () => {
                 className={`pb-2 px-4 font-medium ${activeTab === "tracking" ? "text-primary border-b-2 border-primary" : "text-muted"}`}
                 onClick={() => setActiveTab("tracking")}
               >
-                {t('tabs.tracking')} ({activeTreatments.length})
+                {t('tabs.tracking')} ({fmt(activeTreatments.length)})
               </button>
               <button
                 className={`pb-2 px-4 font-medium ${activeTab === "past" ? "text-primary border-b-2 border-primary" : "text-muted"}`}
                 onClick={() => setActiveTab("past")}
               >
-                {t('tabs.past')} ({filteredPastTreatments.length})
+                {t('tabs.past')} ({fmt(filteredPastTreatments.length)})
               </button>
               <button
                 className={`pb-2 px-4 font-medium ${activeTab === "upcoming" ? "text-primary border-b-2 border-primary" : "text-muted"}`}
                 onClick={() => setActiveTab("upcoming")}
               >
-                {t('tabs.inProgress')} ({filteredUpcomingTreatments.length})
+                {t('tabs.inProgress')} ({fmt(filteredUpcomingTreatments.length)})
               </button>
             </div>
 
@@ -307,13 +309,17 @@ const ViewTreatmentHistory = () => {
             <p>{searchTerm ? t('empty.noResults') || `No results found for "${searchTerm}"` : t('empty.tracking.message')}</p>
           </div>
         ) : activeTab === "past" && filteredPastTreatments.length > 0 ? (
-          filteredPastTreatments.map((t, i) => (
-            <TreatmentCard key={i} treatment={t} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />
-          ))
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredPastTreatments.map((t, i) => (
+              <TreatmentCard key={i} treatment={t} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />
+            ))}
+          </div>
         ) : activeTab === "upcoming" && filteredUpcomingTreatments.length > 0 ? (
-          filteredUpcomingTreatments.map((t, i) => (
-            <TreatmentCard key={i} treatment={t} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />
-          ))
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredUpcomingTreatments.map((t, i) => (
+              <TreatmentCard key={i} treatment={t} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} />
+            ))}
+          </div>
         ) : (
           <div className="empty-state">
             <div>{t('empty.noRecords.icon')}</div>

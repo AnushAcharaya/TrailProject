@@ -1,81 +1,57 @@
 import React from "react";
-import { CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { CheckCircle2 } from "lucide-react";
 
 const MissionSection = () => {
+  const { t } = useTranslation("landing");
+
+  const points = [
+    t("mission.point1"),
+    t("mission.point2"),
+    t("mission.point3"),
+    t("mission.point4"),
+  ];
+
   return (
-    <section className="w-full bg-gradient-to-b from-green-50/40 to-white py-20">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16">
-
-        <div
-          className="
-            flex 
-            flex-col 
-            lg:flex-row 
-            items-center 
-            gap-10 
-            lg:gap-16 
-            xl:gap-20
-          "
-        >
-
-          {/* LEFT — IMAGE */}
-          <div className="w-full lg:w-1/2 h-full">
+    <section id="about" className="w-full bg-white py-20">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        <div className="flex flex-col lg:flex-row items-center gap-12">
+          {/* Image */}
+          <div className="w-full lg:w-1/2">
             <img
-              src="/your-image-path.jpg"
-              alt="Nepal Farming"
-              className="
-                w-full 
-                h-full 
-                object-cover 
-                rounded-2xl 
-                shadow-xl
-              "
+              src="/IMG_0096.JPG"
+              alt="Nepali livestock farming"
+              className="w-full h-[420px] md:h-[480px] object-cover rounded-2xl border border-gray-100 shadow-md"
             />
           </div>
 
-          {/* RIGHT — TEXT CONTENT */}
-          <div className="w-full lg:w-1/2 h-full flex flex-col justify-center space-y-5">
-            <h3 className="text-xl md:text-2xl font-semibold text-gray-800">
-              Our Mission
-            </h3>
+          {/* Text */}
+          <div className="w-full lg:w-1/2 space-y-6">
+            <span className="inline-block px-4 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-green-50 text-green-700 border border-green-100">
+              {t("mission.badge")}
+            </span>
 
-            <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-              LHMMS empowers Nepali farmers by reducing livestock mortality through
-              accessible and affordable digital health tracking.
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+              {t("mission.titleStart")}{" "}
+              <span className="text-green-600">{t("mission.titleAccent")}</span>{" "}
+              {t("mission.titleEnd")}
+            </h2>
+
+            <p className="text-gray-600 text-base md:text-lg leading-relaxed">
+              {t("mission.description")}
             </p>
 
-            {/* Why This Matters */}
-            <div className="mt-2">
-              <h4 className="font-semibold text-gray-800 mb-3">
-                Why This Matters
-              </h4>
-
-              <ul className="space-y-4">
-                {[
-                  "Works even in low-connectivity areas (SMS support)",
-                  "No hardware required, only phone or laptop",
-                  "Designed specifically for rural farmers & veterinarians",
-                  "Affordable and accessible for all",
-                ].map((point, index) => (
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-4 text-lg">
+                {t("mission.whyTitle")}
+              </h3>
+              <ul className="space-y-3">
+                {points.map((point, index) => (
                   <li
                     key={index}
-                    className="
-                      flex 
-                      items-start 
-                      gap-3 
-                      p-4 
-                      bg-white/40 
-                      backdrop-blur-sm 
-                      rounded-xl 
-                      shadow-sm 
-                      hover:shadow-md 
-                      hover:bg-white/70 
-                      transition-all 
-                      duration-300
-                      cursor-default
-                    "
+                    className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100 hover:border-green-600 transition-colors"
                   >
-                    <CheckCircle className="text-green-600 min-w-5" size={22} />
+                    <CheckCircle2 className="text-green-600 flex-shrink-0 mt-0.5" size={20} />
                     <span className="text-gray-700 text-sm md:text-base leading-snug">
                       {point}
                     </span>
@@ -84,13 +60,10 @@ const MissionSection = () => {
               </ul>
             </div>
 
-            {/* Bottom Quote */}
-            <p className="text-gray-500 italic text-sm mt-4 leading-relaxed">
-              "By providing farmers with digital tools, we're helping preserve Nepal’s
-              agricultural heritage while embracing modern technology."
-            </p>
+            <blockquote className="pl-4 border-l-4 border-green-600 italic text-gray-600 text-sm md:text-base">
+              "{t("mission.quote")}"
+            </blockquote>
           </div>
-
         </div>
       </div>
     </section>

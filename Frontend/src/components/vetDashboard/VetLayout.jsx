@@ -1,4 +1,4 @@
-import { FaHome, FaUser, FaCalendarAlt, FaCog, FaSignOutAlt, FaBell, FaEnvelope, FaUserFriends } from 'react-icons/fa';
+import { FaHome, FaUser, FaCalendarAlt, FaCog, FaSignOutAlt, FaEnvelope, FaUserFriends } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,12 +6,16 @@ import { getUserProfile } from '../../services/profileApi';
 import { getReceivedRequests } from '../../services/friendsApi';
 import { getUnreadMessageCount } from '../../services/messagesApi';
 import LanguageSwitcher from '../common/LanguageSwitcher';
+import NotificationBell from '../notifications/NotificationBell';
 import '../../styles/languageSwitcher.css';
+import '../../styles/notifications.css';
+import { useLocalizedNumber } from '../../utils/formatNumber';
 
 function VetLayout({ children, pageTitle = "Dashboard" }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation('vetDashboard');
+  const fmt = useLocalizedNumber();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [friendRequestCount, setFriendRequestCount] = useState(0);
@@ -222,7 +226,7 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             </div>
             {unreadMessageCount > 0 && (
               <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                {unreadMessageCount}
+                {fmt(unreadMessageCount)}
               </span>
             )}
           </div>
@@ -242,7 +246,7 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             </div>
             {friendRequestCount > 0 && (
               <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                {friendRequestCount}
+                {fmt(friendRequestCount)}
               </span>
             )}
           </div>
@@ -285,9 +289,7 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
         <div className="px-8 py-4 flex items-center justify-end bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-500 shadow-2xl">
           <div className="flex items-center space-x-6">
             {/* Notification Bell */}
-            <div className="relative cursor-pointer">
-              <FaBell className="text-white text-xl" />
-            </div>
+            <NotificationBell />
 
             {/* Language Switcher */}
             <LanguageSwitcher context="vet" />

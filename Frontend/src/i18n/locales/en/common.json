@@ -61,5 +61,66 @@
     "total": "Total",
     "amount": "Amount",
     "price": "Price"
+  },
+  "enums": {
+    "animals": {
+      "cow": "Cow",
+      "cattle": "Cattle",
+      "buffalo": "Buffalo",
+      "sheep": "Sheep",
+      "goat": "Goat",
+      "chicken": "Chicken",
+      "poultry": "Poultry",
+      "duck": "Duck",
+      "pig": "Pig",
+      "yak": "Yak",
+      "horse": "Horse",
+      "rabbit": "Rabbit",
+      "dog": "Dog",
+      "cat": "Cat",
+      "bee": "Bee",
+      "fish": "Fish",
+      "other": "Other"
+    },
+    "specializations": {
+      "general_practice": "General Practice",
+      "surgery": "Surgery",
+      "cardiology": "Cardiology",
+      "respiratory": "Respiratory",
+      "dermatology": "Dermatology",
+      "orthopedics": "Orthopedics",
+      "neurology": "Neurology",
+      "internal_medicine": "Internal Medicine",
+      "reproductive": "Reproductive Health",
+      "emergency": "Emergency",
+      "dental": "Dental",
+      "nutrition": "Nutrition",
+      "child_care": "Animal Child Care",
+      "authentic": "Authentic",
+      "other": "Other"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "declined": "Declined",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "rejected": "Rejected",
+      "active": "Active",
+      "inactive": "Inactive",
+      "expired": "Expired"
+    },
+    "roles": {
+      "farmer": "Farmer",
+      "vet": "Veterinarian",
+      "veterinarian": "Veterinarian",
+      "admin": "Administrator"
+    },
+    "availability": {
+      "available_any_time": "Available any time",
+      "available_weekdays": "Available weekdays",
+      "available_weekends": "Available weekends",
+      "available_evenings": "Available evenings"
+    }
   }
 }

@@ -175,6 +175,42 @@ export const verifyLoginOTP = async (email, emailCode, phoneCode, role) => {
   }
 };
 
+// Verify a registered email by proving ownership via Google sign-in.
+// The backend verifies the id_token with Google AND checks that the
+// Google-issued email matches the email the user registered with.
+// Emails that aren't real Google accounts cannot be verified.
+export const verifyEmailViaGoogle = async (idToken, email) => {
+  try {
+    const response = await api.post('/verify-email-google/', {
+      id_token: idToken,
+      email,
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data || { message: 'Email verification failed.' },
+    };
+  }
+};
+
+// Google OAuth: send the ID token from Google Identity Services to backend
+// `role` is only used for new sign-ups; for existing users it's ignored.
+export const loginWithGoogle = async (idToken, role = 'farmer') => {
+  try {
+    const response = await api.post('/google/', {
+      id_token: idToken,
+      role,
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data || { message: 'Google login failed.' },
+    };
+  }
+};
+
 // Admin APIs
 export const fetchAllUsers = async () => {
   try {

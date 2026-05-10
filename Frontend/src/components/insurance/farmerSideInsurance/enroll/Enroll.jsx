@@ -7,7 +7,8 @@ import SelectPlanStep from './SelectPlanStep';
 import UploadPaymentProofStep from './UploadPaymentProofStep';
 import ReviewSubmitStep from './ReviewSubmitStep';
 import Toast from '../../../common/Toast';
-import { createEnrollment } from '../../../../services/insuranceApi';
+import { createEnrollment, getInsurancePlans } from '../../../../services/insuranceApi';
+import { getLivestockById } from '../../../../services/livestockCrudApi';
 
 const Enroll = () => {
   const { t } = useTranslation('insurance');
@@ -20,20 +21,81 @@ const Enroll = () => {
   const [toast, setToast] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Check if returning from eSewa payment
+  // Re-hydrate state when the user returns from eSewa.
+  // Enroll.jsx is freshly mounted at /farmerinsuranceenroll so React state is
+  // empty. New flow saves the full livestock + plan objects to sessionStorage;
+  // legacy entries from before that fix only have IDs — for those we re-fetch
+  // from the API so the Review step still shows real data.
   useEffect(() => {
-    const pendingEnrollment = sessionStorage.getItem('pending_insurance_enrollment');
-    if (pendingEnrollment) {
-      const data = JSON.parse(pendingEnrollment);
+    const restorePending = async () => {
+      const pendingEnrollment = sessionStorage.getItem('pending_insurance_enrollment');
+      if (!pendingEnrollment) return;
+
+      let data;
+      try {
+        data = JSON.parse(pendingEnrollment);
+      } catch (err) {
+        console.error('[Enroll] sessionStorage entry is corrupt — clearing it:', err);
+        sessionStorage.removeItem('pending_insurance_enrollment');
+        return;
+      }
+
+      // 1) Direct rehydration (new format)
+      if (data.livestock) {
+        setSelectedLivestock(data.livestock);
+      } else if (data.livestock_id) {
+        // 2) Fallback for legacy entries — fetch by id
+        try {
+          const result = await getLivestockById(data.livestock_id);
+          const animal = result?.data || result;
+          if (animal && animal.id) {
+            const transformed = {
+              id: animal.id,
+              name: animal.species_name || 'Unknown',
+              type: animal.species_name || 'Unknown',
+              breed: animal.breed_name || 'Unknown',
+              tag: animal.tag_id,
+              originalData: animal,
+            };
+            setSelectedLivestock(transformed);
+            // Upgrade the saved entry so subsequent reloads don't re-fetch.
+            data.livestock = transformed;
+            sessionStorage.setItem('pending_insurance_enrollment', JSON.stringify(data));
+          }
+        } catch (err) {
+          console.error('[Enroll] Failed to refetch livestock:', err);
+        }
+      }
+
+      if (data.plan) {
+        setSelectedPlan(data.plan);
+      } else if (data.plan_id) {
+        try {
+          const plansResp = await getInsurancePlans();
+          const list = plansResp?.results || plansResp?.data || plansResp || [];
+          const plan = Array.isArray(list)
+            ? list.find((p) => p.id === data.plan_id)
+            : null;
+          if (plan) {
+            setSelectedPlan(plan);
+            data.plan = plan;
+            sessionStorage.setItem('pending_insurance_enrollment', JSON.stringify(data));
+          }
+        } catch (err) {
+          console.error('[Enroll] Failed to refetch plan:', err);
+        }
+      }
+
       if (data.payment_initiated) {
-        // User returned from eSewa, move to step 3 (upload proof)
         setCurrentStep(3);
         setToast({
           message: t('enroll.messages.paymentCompleted'),
-          type: 'success'
+          type: 'success',
         });
       }
-    }
+    };
+
+    restorePending();
   }, [t]);
 
   // Check if a plan was pre-selected from the plan cards page
@@ -103,7 +165,7 @@ const Enroll = () => {
 
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {
-        navigate('/farmer/insurance/dashboard');
+        navigate('/farmerinsurancedashboard');
       }, 2000);
 
     } catch (error) {

@@ -4,8 +4,10 @@ import AnimalReportCard from '../../components/reports/AnimalReportCard';
 import ViewRecordsModal from '../../components/reports/ViewRecordsModal';
 import { getAllLivestock } from '../../services/livestockCrudApi';
 import '../../styles/reports.css';
+import { useLocalizedNumber } from '../../utils/formatNumber';
 
 const ReportsPage = () => {
+  const fmt = useLocalizedNumber();
   const [animals, setAnimals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -105,7 +107,7 @@ const ReportsPage = () => {
 
             {/* Results Count */}
             <div className="mt-4 text-sm text-gray-600">
-              Showing {filteredAnimals.length} of {animals.length} animals
+              Showing {fmt(filteredAnimals.length)} of {fmt(animals.length)} animals
             </div>
           </div>
 

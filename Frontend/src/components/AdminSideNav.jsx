@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Users, CheckCircle, BarChart2, Settings, HelpCircle, X, LogOut, AlertTriangle, Shield, ArrowRightLeft } from "lucide-react";
+import { Users, CheckCircle, BarChart2, Settings, HelpCircle, X, LogOut, AlertTriangle, Shield, ArrowRightLeft, Megaphone } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -113,11 +113,17 @@ export default function SideNav({ isOpen, toggleSidebar }) {
           >
             <Shield size={18} /> {t('sideNav.insurance')}
           </a>
-          <a 
+          <a
             onClick={() => navigate('/profile-transfer/admin/dashboard')}
             className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition-colors text-white font-medium cursor-pointer"
           >
             <ArrowRightLeft size={18} /> {t('sideNav.profileTransfer')}
+          </a>
+          <a
+            onClick={() => navigate('/admin/broadcast')}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition-colors text-white font-medium cursor-pointer"
+          >
+            <Megaphone size={18} /> {t('sideNav.broadcast')}
           </a>
           <a className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-700 transition-colors text-white font-medium cursor-pointer">
             <BarChart2 size={18} /> {t('sideNav.analytics')}

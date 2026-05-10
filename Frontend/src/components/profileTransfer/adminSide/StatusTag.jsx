@@ -1,5 +1,9 @@
 // components/profile-transfer/admin-side/dashboard/components/StatusTag.jsx
+import { useTranslation } from 'react-i18next';
+import { tStatus } from '../../../utils/translateEnum';
+
 export default function StatusTag({ status }) {
+  const { t: tCommon } = useTranslation('common');
   const statusConfig = {
     'Pending': { 
       bg: 'bg-yellow-100', 
@@ -31,7 +35,7 @@ export default function StatusTag({ status }) {
 
   return (
     <span className={`inline-flex px-3 py-1 ${config.bg} ${config.text} ${config.border} border rounded-full text-xs font-medium`}>
-      {status}
+      {tStatus(tCommon, status)}
     </span>
   );
 }

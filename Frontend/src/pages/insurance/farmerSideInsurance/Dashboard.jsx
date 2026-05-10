@@ -6,9 +6,11 @@ import ClaimCard from '../../../components/insurance/farmerSideInsurance/dashboa
 import EnrollmentDetailsModal from '../../../components/insurance/farmerSideInsurance/dashboard/EnrollmentDetailsModal';
 import { getEnrollments, getMyClaims } from '../../../services/insuranceApi';
 import '../../../styles/farmerSideInsurance/dashboard.css';
+import { useLocalizedNumber } from '../../../utils/formatNumber';
 
 const Dashboard = () => {
   const { t } = useTranslation('insurance');
+  const fmt = useLocalizedNumber();
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEnrollmentId, setSelectedEnrollmentId] = useState(null);
@@ -129,7 +131,7 @@ const Dashboard = () => {
                 <div className="flex justify-center mb-4">
                   <StatusBadge status={item.status} size="large" />
                 </div>
-                <div className="text-2xl font-bold text-gray-900">{item.value}</div>
+                <div className="text-2xl font-bold text-gray-900">{fmt(item.value)}</div>
                 <div className="text-sm text-gray-500 uppercase tracking-wide">{item.label}</div>
               </div>
             ))}

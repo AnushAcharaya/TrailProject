@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* ===== Theme Variables ===== */
@@ -9,6 +9,13 @@
   --shadow-soft: 0 2px 15px -3px rgb(0 0 0 / 0.07), 0 10px 20px -2px rgb(0 0 0 / 0.04);
 }
 
+/* ===== Landing Page ===== */
+@keyframes fade-up {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 0.6s ease-out both; }
+
 /* ===== Base Styles ===== */
 * {
   box-sizing: border-box;
@@ -16,7 +23,10 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Inter handles Latin glyphs; Noto Sans Devanagari handles ०१२३४५६७८९ and नेपाली text.
+     The browser picks the right font per character automatically — Devanagari
+     glyphs no longer fall back to a smaller system font. */
+  font-family: 'Inter', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: white;
@@ -51,6 +61,12 @@ body.admin-page {
   border: 1px solid #dcfce7;
   box-shadow: var(--shadow-soft);
   padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 @media (min-width: 640px) {
@@ -76,7 +92,7 @@ body.admin-page {
 }
 
 .form-row .input-field {
-  width: 70%;
+  width: 100%;
 }
 
 @media (max-width: 640px) {
@@ -103,11 +119,20 @@ body.admin-page {
   border-radius: 0.75rem;
   outline: none;
   font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.input-field:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
 .input-field:focus {
   outline: 2px solid var(--color-primary);
   border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
 }
 
 @media (min-width: 640px) {

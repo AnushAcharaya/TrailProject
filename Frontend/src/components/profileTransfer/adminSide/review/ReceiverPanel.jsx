@@ -1,4 +1,11 @@
+import { useTranslation } from 'react-i18next';
+import { tStatus } from '../../../../utils/translateEnum';
+import { useLocalizedNumber } from '../../../../utils/formatNumber';
+
 function ReceiverPanel({ transfer }) {
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
+
   if (!transfer) return null;
 
   const receiver = transfer.receiver_details || {};
@@ -19,7 +26,7 @@ function ReceiverPanel({ transfer }) {
         </div>
         <div className="flex-1 min-w-0">
           <h4 className="text-lg font-bold text-gray-900 mb-1">{fullName}</h4>
-          <p className="text-sm text-gray-600">ID: {receiver.id || 'N/A'}</p>
+          <p className="text-sm text-gray-600">ID: {receiver.id ? fmt(receiver.id) : 'N/A'}</p>
         </div>
       </div>
       
@@ -62,7 +69,7 @@ function ReceiverPanel({ transfer }) {
                 <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
-                <span className="text-gray-600 font-medium capitalize">{status}</span>
+                <span className="text-gray-600 font-medium capitalize">{tStatus(tCommon, status)}</span>
               </>
             )}
           </span>

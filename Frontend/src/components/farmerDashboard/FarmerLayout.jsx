@@ -1,10 +1,12 @@
-import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaBell, FaCalendarCheck, FaUserFriends, FaEnvelope } from 'react-icons/fa';
+import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaCalendarCheck, FaUserFriends, FaEnvelope } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getUserProfile } from '../../services/profileApi';
 import { getReceivedRequests } from '../../services/friendsApi';
+import { getUnreadMessageCount } from '../../services/messagesApi';
 import LanguageSwitcher from '../common/LanguageSwitcher';
+import NotificationBell from '../notifications/NotificationBell';
 
 function FarmerLayout({ children, pageTitle = "Dashboard" }) {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [friendRequestCount, setFriendRequestCount] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -55,12 +58,23 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
   useEffect(() => {
     fetchProfile();
     loadFriendRequestCount();
+    loadUnreadMessageCount();
+    // Re-poll the unread message count every 30s so the badge stays in sync
+    const interval = setInterval(loadUnreadMessageCount, 30000);
+    return () => clearInterval(interval);
   }, [fetchProfile]);
 
   const loadFriendRequestCount = async () => {
     const result = await getReceivedRequests();
     if (result.success) {
       setFriendRequestCount(result.data.length);
+    }
+  };
+
+  const loadUnreadMessageCount = async () => {
+    const result = await getUnreadMessageCount();
+    if (result.success) {
+      setUnreadMessageCount(result.data.unread_count || 0);
     }
   };
 
@@ -142,7 +156,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
   const menuItems = [
     { name: t('dashboard:sidebar.dashboard'), icon: FaHome, path: "/farmerpage" },
     { name: t('dashboard:sidebar.vetAppointment'), icon: FaCalendarCheck, path: "/farmerappointment" },
-    { name: t('dashboard:sidebar.messages'), icon: FaEnvelope, path: "/messages", badge: 5, badgeColor: "bg-blue-500" },
+    { name: t('dashboard:sidebar.messages'), icon: FaEnvelope, path: "/messages", badge: unreadMessageCount, badgeColor: "bg-blue-500" },
     { name: t('dashboard:sidebar.friendRequests'), icon: FaUserFriends, path: "/farmer/friends/requests", badge: friendRequestCount, badgeColor: "bg-green-500" },
     { name: t('dashboard:sidebar.friends'), icon: FaUserFriends, path: "/farmer/friends/list" },
     { name: t('dashboard:sidebar.livestock'), icon: FaPaw, path: "/livestock" },
@@ -319,12 +333,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
           {/* Right: Notification Bell, Language Switcher and Profile */}
           <div className="flex-1 flex items-center justify-end space-x-6">
             {/* Notification Bell */}
-            <div className="relative cursor-pointer">
-              <FaBell className="text-white text-xl" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-                3
-              </span>
-            </div>
+            <NotificationBell />
 
             {/* Language Switcher */}
             <LanguageSwitcher context="farmer" />

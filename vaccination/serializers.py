@@ -22,7 +22,7 @@ class VaccinationSerializer(serializers.ModelSerializer):
         model = Vaccination
         fields = [
             'id', 'livestock', 'livestock_tag', 'vaccine_name', 'vaccine_type',
-            'date_given', 'next_due_date', 'notes', 'status', 'days_until_due',
+            'date_given', 'next_due_date', 'notes', 'vet_name', 'status', 'days_until_due',
             'status_display', 'created_at', 'updated_at'
         ]
         read_only_fields = ['user', 'status', 'days_until_due', 'status_display']

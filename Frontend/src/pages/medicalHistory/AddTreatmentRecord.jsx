@@ -22,6 +22,19 @@ const AddTreatmentRecord = () => {
                    document.referrer.includes('/farmerpage');
 
   const handleSave = async (data) => {
+    console.log('[AddTreatmentRecord] ========== HANDLE SAVE CALLED ==========');
+    console.log('[AddTreatmentRecord] Received data from TreatmentForm:', data);
+    console.log('[AddTreatmentRecord] data.medicines:', data.medicines);
+    console.log('[AddTreatmentRecord] medicines is array?', Array.isArray(data.medicines));
+    console.log('[AddTreatmentRecord] medicines length:', data.medicines?.length);
+    if (data.medicines && data.medicines.length > 0) {
+      console.log('[AddTreatmentRecord] First medicine:', data.medicines[0]);
+    } else {
+      console.error('[AddTreatmentRecord] ⚠️⚠️⚠️ NO MEDICINES RECEIVED FROM FORM! ⚠️⚠️⚠️');
+    }
+    console.log('[AddTreatmentRecord] About to call createTreatment...');
+    console.log('[AddTreatmentRecord] =====================================');
+    
     setIsSubmitting(true);
     const result = await createTreatment(data);
     setIsSubmitting(false);

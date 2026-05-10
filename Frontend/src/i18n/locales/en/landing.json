@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "features": "Features",
+    "contact": "Contact",
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "badge": "Made for Nepal's Farmers & Vets",
+    "headline1": "Smart Livestock",
+    "headline2": "Health Management",
+    "headline3": "made simple.",
+    "description": "Track vaccinations, book vet visits, manage insurance, and transfer animal records — all from one digital platform built for Nepali farms.",
+    "ctaPrimary": "Get Started Free",
+    "ctaSecondary": "See How It Works",
+    "trustGovt": "Govt-aligned data",
+    "trustVet": "Vet-verified care",
+    "trustSms": "SMS reminders",
+    "statsFarmers": "Registered Farmers",
+    "statsVets": "Active Veterinarians",
+    "statsAnimals": "Animals Tracked"
+  },
+  "features": {
+    "badge": "Features",
+    "titleStart": "Everything You Need to Manage",
+    "titleAccent": "Your Livestock",
+    "description": "A complete platform designed for farmers and veterinarians to monitor, manage, and improve the health and productivity of livestock.",
+    "items": {
+      "profiles": {
+        "title": "Digital Animal Profiles",
+        "desc": "Maintain complete records: breed, age, medical history & more in one place."
+      },
+      "appointments": {
+        "title": "Appointment Booking",
+        "desc": "Find and schedule veterinary professionals instantly from your phone."
+      },
+      "vaccination": {
+        "title": "Smart Vaccination Reminders",
+        "desc": "Automatic alerts via SMS and app for upcoming vaccinations and boosters."
+      },
+      "insurance": {
+        "title": "Insurance & Ownership Transfer",
+        "desc": "Secure livestock insurance and quick digital ownership transfer at a tap."
+      },
+      "verifiedVets": {
+        "title": "Verified Veterinarians",
+        "desc": "Connect with government-verified vets nearby for trusted advice and care."
+      },
+      "notifications": {
+        "title": "Real-time Notifications",
+        "desc": "Stay updated on appointments, claims, transfers, and treatment progress."
+      },
+      "community": {
+        "title": "Community Network",
+        "desc": "Build a friend network of farmers and vets to share knowledge and support."
+      },
+      "insights": {
+        "title": "Insights & Reports",
+        "desc": "Visual dashboards turn your livestock data into clear, actionable insights."
+      }
+    }
+  },
+  "mission": {
+    "badge": "Our Mission",
+    "titleStart": "Empowering Nepali farmers with",
+    "titleAccent": "accessible digital health",
+    "titleEnd": "for every animal.",
+    "description": "LHMMS empowers Nepali farmers by reducing livestock mortality through accessible and affordable digital health tracking — from the smallest village to the busiest dairy farm.",
+    "whyTitle": "Why This Matters",
+    "point1": "Works even in low-connectivity areas (SMS support)",
+    "point2": "No hardware required, only phone or laptop",
+    "point3": "Designed specifically for rural farmers & veterinarians",
+    "point4": "Affordable and accessible for all of Nepal",
+    "quote": "By providing farmers with digital tools, we're helping preserve Nepal's agricultural heritage while embracing modern technology."
+  },
+  "contact": {
+    "badge": "Contact Us",
+    "titleStart": "Get in",
+    "titleAccent": "Touch",
+    "description": "Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
+    "form": {
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email",
+      "emailPlaceholder": "your.email@example.com",
+      "role": "I am a",
+      "rolePlaceholder": "Select your role",
+      "roleFarmer": "Farmer",
+      "roleVet": "Veterinarian",
+      "roleNgo": "Institution / NGO",
+      "roleOther": "Other",
+      "message": "Message",
+      "messagePlaceholder": "Tell us how we can help you...",
+      "send": "Send Message"
+    },
+    "info": {
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location"
+    },
+    "socialTitle": "Stay connected"
+  },
+  "footer": {
+    "description": "Livestock Health Management & Monitoring System — empowering Nepali farmers and veterinarians with simple digital tools.",
+    "quickLinks": "Quick Links",
+    "account": "Account",
+    "contact": "Contact",
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "forgotPassword": "Forgot Password",
+    "copyright": "© {{year}} LHMMS — Livestock Health Management & Monitoring System."
+  }
+}

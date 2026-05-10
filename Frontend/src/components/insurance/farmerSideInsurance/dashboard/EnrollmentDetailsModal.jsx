@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
-import { FaTimes, FaFileAlt, FaCalendarAlt, FaMoneyBillWave, FaShieldAlt, FaPaw } from 'react-icons/fa';
+import { FaTimes, FaFileAlt, FaCalendarAlt, FaMoneyBillWave, FaShieldAlt, FaPaw, FaImage } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import { getEnrollmentById } from '../../../../services/insuranceApi';
+import { tAnimal, tStatus } from '../../../../utils/translateEnum';
+import { useLocalizedNumber } from '../../../../utils/formatNumber';
 import '../../../../styles/farmerSideInsurance/enrollmentDetailsModal.css';
 
 const EnrollmentDetailsModal = ({ enrollmentId, onClose }) => {
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
   const [enrollment, setEnrollment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -100,7 +105,7 @@ const EnrollmentDetailsModal = ({ enrollmentId, onClose }) => {
             <FaFileAlt className="modal-icon" />
             <div>
               <h2>Enrollment Details</h2>
-              <p className="modal-subtitle">Enrollment ID: {enrollment.id}</p>
+              <p className="modal-subtitle">Enrollment ID: {fmt(enrollment.id)}</p>
             </div>
           </div>
           <button onClick={onClose} className="btn-close-modal">
@@ -146,7 +151,7 @@ const EnrollmentDetailsModal = ({ enrollmentId, onClose }) => {
               </div>
               <div className="detail-item">
                 <label>Species</label>
-                <div className="detail-value">{enrollment.livestock_details?.species_name || 'N/A'}</div>
+                <div className="detail-value">{enrollment.livestock_details?.species_name ? tAnimal(tCommon, enrollment.livestock_details.species_name) : 'N/A'}</div>
               </div>
               <div className="detail-item">
                 <label>Breed</label>
@@ -154,13 +159,13 @@ const EnrollmentDetailsModal = ({ enrollmentId, onClose }) => {
               </div>
               <div className="detail-item">
                 <label>Age</label>
-                <div className="detail-value">{enrollment.livestock_details?.age ? `${enrollment.livestock_details.age} years` : 'N/A'}</div>
+                <div className="detail-value">{enrollment.livestock_details?.age ? `${fmt(enrollment.livestock_details.age)} years` : 'N/A'}</div>
               </div>
               <div className="detail-item">
                 <label>Health Status</label>
                 <div className="detail-value">
                   <span className={`health-badge ${enrollment.livestock_details?.health_status?.toLowerCase()}`}>
-                    {enrollment.livestock_details?.health_status || 'N/A'}
+                    {enrollment.livestock_details?.health_status ? tStatus(tCommon, enrollment.livestock_details.health_status) : 'N/A'}
                   </span>
                 </div>
               </div>
@@ -191,7 +196,7 @@ const EnrollmentDetailsModal = ({ enrollmentId, onClose }) => {
                 </div>
                 <div className="plan-detail-item">
                   <label>Waiting Period</label>
-                  <div className="plan-value">{enrollment.plan_details?.waiting_period_days || 0} days</div>
+                  <div className="plan-value">{fmt(enrollment.plan_details?.waiting_period_days || 0)} days</div>
                 </div>
               </div>
 
@@ -241,6 +246,39 @@ const EnrollmentDetailsModal = ({ enrollmentId, onClose }) => {
               </div>
             </div>
           </div>
+
+          {/* Payment Screenshot */}
+          {(enrollment.payment_screenshot_url || enrollment.payment_screenshot) && (
+            <div className="detail-section">
+              <div className="section-header">
+                <FaImage className="section-icon" />
+                <h3>Payment Screenshot</h3>
+              </div>
+              <div className="payment-screenshot-wrapper">
+                <a
+                  href={enrollment.payment_screenshot_url || enrollment.payment_screenshot}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Click to open full-size"
+                >
+                  <img
+                    src={enrollment.payment_screenshot_url || enrollment.payment_screenshot}
+                    alt="Payment screenshot uploaded by the farmer"
+                    className="payment-screenshot-img"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const placeholder = e.currentTarget.nextElementSibling;
+                      if (placeholder) placeholder.style.display = 'block';
+                    }}
+                  />
+                </a>
+                <p className="payment-screenshot-fallback" style={{ display: 'none' }}>
+                  The screenshot could not be loaded. It may have been moved or
+                  the file is no longer available.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Additional Notes */}
           {enrollment.notes && (

@@ -48,19 +48,22 @@ class PaymentInitiateSerializer(serializers.Serializer):
 
 
 class PaymentVerifySerializer(serializers.Serializer):
-    """Serializer for verifying payment"""
+    """Serializer for verifying payment.
+
+    In eSewa v2 the frontend doesn't strictly need to know the ref_id —
+    the backend fetches the authoritative one from the v2 Status Check API
+    using only the transaction_uuid. ref_id / refId are accepted for
+    backwards compatibility and for logging.
+    """
     transaction_uuid = serializers.CharField(max_length=100)
-    ref_id = serializers.CharField(max_length=100, required=False)
-    oid = serializers.CharField(max_length=100, required=False)
+    ref_id = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    oid = serializers.CharField(max_length=100, required=False, allow_blank=True)
     amt = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
-    refId = serializers.CharField(max_length=100, required=False)
-    
+    refId = serializers.CharField(max_length=100, required=False, allow_blank=True)
+
     def validate(self, data):
-        """Validate that we have ref_id from either field"""
-        ref_id = data.get('ref_id') or data.get('refId')
-        if not ref_id:
-            raise serializers.ValidationError("ref_id or refId is required")
-        data['ref_id'] = ref_id
+        # Whichever shape the frontend uses, normalise to ref_id (may be empty).
+        data['ref_id'] = data.get('ref_id') or data.get('refId') or ''
         return data
 
 

@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { FaUserMd, FaMapMarkerAlt, FaStethoscope, FaEnvelope } from "react-icons/fa";
+import { FaUserMd, FaMapMarkerAlt, FaStethoscope, FaEnvelope, FaMoneyBillWave } from "react-icons/fa";
 import { sendFriendRequest, checkFriendshipStatus } from "../../services/friendsApi";
+import { tSpecialization, tAvailability } from "../../utils/translateEnum";
+import { useLocalizedNumber } from "../../utils/formatNumber";
 
 const VetProfileCard = ({ vet, onAppointVet }) => {
   const { t } = useTranslation('appointments');
+  const { t: tCommon } = useTranslation('common');
+  const fmt = useLocalizedNumber();
   const [isSendingRequest, setIsSendingRequest] = useState(false);
   const [friendshipStatus, setFriendshipStatus] = useState('none'); // 'none', 'pending', 'friends'
   const [showToast, setShowToast] = useState(false);
@@ -127,13 +131,24 @@ const VetProfileCard = ({ vet, onAppointVet }) => {
           {vet.specialization && (
             <p className="vet-profile-detail">
               <FaStethoscope className="inline mr-2 text-gray-500" />
-              <span className="text-gray-700">{vet.specialization}</span>
+              <span className="text-gray-700">{tSpecialization(tCommon, vet.specialization)}</span>
+            </p>
+          )}
+
+          {/* Consultation fee */}
+          {vet.consultation_fee !== null && vet.consultation_fee !== undefined && (
+            <p className="vet-profile-detail">
+              <FaMoneyBillWave className="inline mr-2 text-emerald-600" />
+              <span className="text-gray-800 font-semibold">
+                NPR {fmt(Number(vet.consultation_fee).toFixed(0))}
+              </span>
+              <span className="text-gray-500 text-sm ml-1">/ visit</span>
             </p>
           )}
 
           {/* Bio (if available) */}
           {vet.bio && (
-            <p className="vet-profile-bio">{vet.bio}</p>
+            <p className="vet-profile-bio">{tAvailability(tCommon, vet.bio, vet.bio)}</p>
           )}
 
           {/* Action Buttons */}

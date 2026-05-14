@@ -124,15 +124,17 @@ class LivestockRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly]
 
 class SpeciesListCreateView(generics.ListCreateAPIView):
-    queryset = Species.objects.all()
+    queryset = Species.objects.all().order_by('name')
     serializer_class = SpeciesSerializer
+    pagination_class = None
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
     ordering_fields = ['name']
 
 class BreedListCreateView(generics.ListCreateAPIView):
-    queryset = Breed.objects.select_related('species')
+    queryset = Breed.objects.select_related('species').order_by('name')
     serializer_class = BreedSerializer
+    pagination_class = None
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['species']
     search_fields = ['name', 'species__name']

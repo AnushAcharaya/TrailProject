@@ -33,7 +33,7 @@ class LivestockSerializer(serializers.ModelSerializer):
         
     def validate_image(self, value):
         if value:
-            validator = FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])
+            validator = FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])
             validator(value)
             if value.size > 5 * 1024 * 1024:  # 5MB
                 raise serializers.ValidationError("Image size must be less than 5MB")

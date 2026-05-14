@@ -466,7 +466,8 @@ const LivestockForm = ({ initialData = null, onSubmit, isEditing = false }) => {
           <label className="block text-sm font-medium w-24">{t('form.fields.weight')}</label>
           <input
             type="number"
-            step="0.01"
+            step="10"
+            min="0"
             name="weight"
             value={formData.weight}
             onChange={handleChange}

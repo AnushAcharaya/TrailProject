@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, CheckCircle, Hourglass } from "lucide-react";
+import { Upload, CheckCircle, Hourglass, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { registerUser, loginWithGoogle } from "../services/api";
@@ -68,6 +68,7 @@ const CreateAccount = () => {
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [registeredEmail, setRegisteredEmail] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -117,7 +118,7 @@ const CreateAccount = () => {
   // ---- Google one-click signup (the button at the bottom) ----
   const handleGoogleSuccess = async (idToken) => {
     setFieldErrors({});
-    const result = await loginWithGoogle(idToken, formData.role || "farmer");
+    const result = await loginWithGoogle(idToken, "farmer");
     if (!result.success) {
       setFieldErrors({
         _general:
@@ -137,10 +138,8 @@ const CreateAccount = () => {
     sessionStorage.setItem("tabId", Date.now() + "_" + Math.random());
     window.dispatchEvent(new Event("userLoggedIn"));
 
-    const r = data.user.role;
-    if (r === "admin") navigate("/adminpage");
-    else if (r === "vet") navigate("/vet/dashboard");
-    else navigate("/farmerpage");
+    // Always redirect to complete-profile for Google signups
+    navigate("/complete-profile");
   };
 
   const handleGoogleError = (err) => {
@@ -242,14 +241,23 @@ const CreateAccount = () => {
                 </div>
 
                 <div>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    className={inputClass(!!errFor("password"))}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Password"
+                      className={inputClass(!!errFor("password")) + " pr-10"}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                   <InlineError msg={errFor("password")} />
                 </div>
 
@@ -263,6 +271,7 @@ const CreateAccount = () => {
                     <option value="">Select your role</option>
                     <option value="farmer">Farmer</option>
                     <option value="vet">Veterinarian</option>
+                    <option value="admin">Admin</option>
                   </select>
                   <InlineError msg={errFor("role")} />
                 </div>

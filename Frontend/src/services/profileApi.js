@@ -102,7 +102,10 @@ export const updateProfile = async (profileData) => {
     if (profileData.gender !== undefined) {
       formData.append('gender', profileData.gender);
     }
-    
+    if (profileData.consultation_fee !== undefined) {
+      formData.append('consultation_fee', profileData.consultation_fee);
+    }
+
     // Append image file if provided
     if (profileData.profile_image instanceof File) {
       console.log('[profileApi] Including profile image file:', profileData.profile_image.name);

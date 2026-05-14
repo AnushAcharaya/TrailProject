@@ -81,44 +81,9 @@ const ViewTreatmentHistory = () => {
   const filteredUpcomingTreatments = filterTreatments(upcomingTreatments);
   
   // Get active treatments (ongoing) for medicine tracking
-  const activeTreatments = filterTreatments(treatments.filter(t => {
-    console.log('[ViewTreatmentHistory] Checking treatment:', t.treatment_name);
-    console.log('[ViewTreatmentHistory]   - treatment_date:', t.treatment_date);
-    console.log('[ViewTreatmentHistory]   - medicines:', t.medicines);
-    console.log('[ViewTreatmentHistory]   - medicines length:', t.medicines?.length);
-    console.log('[ViewTreatmentHistory]   - status:', t.status);
-    
-    if (!t.treatment_date) {
-      console.log('[ViewTreatmentHistory]   ❌ No treatment_date');
-      return false;
-    }
-    if (!t.medicines) {
-      console.log('[ViewTreatmentHistory]   ❌ No medicines field');
-      return false;
-    }
-    if (t.medicines.length === 0) {
-      console.log('[ViewTreatmentHistory]   ❌ Medicines array is empty');
-      return false;
-    }
-    
-    const startDate = new Date(t.treatment_date);
-    const endDate = new Date(startDate);
-    const duration = t.medicines[0]?.duration || 0;
-    endDate.setDate(startDate.getDate() + duration);
-    const today = new Date();
-    
-    console.log('[ViewTreatmentHistory]   - startDate:', startDate.toISOString().split('T')[0]);
-    console.log('[ViewTreatmentHistory]   - endDate:', endDate.toISOString().split('T')[0]);
-    console.log('[ViewTreatmentHistory]   - today:', today.toISOString().split('T')[0]);
-    console.log('[ViewTreatmentHistory]   - today >= startDate:', today >= startDate);
-    console.log('[ViewTreatmentHistory]   - today <= endDate:', today <= endDate);
-    console.log('[ViewTreatmentHistory]   - status === "In Progress":', t.status === "In Progress");
-    
-    const passes = today >= startDate && today <= endDate && t.status === "In Progress";
-    console.log('[ViewTreatmentHistory]   - PASSES FILTER:', passes);
-    
-    return passes;
-  }));
+  const activeTreatments = filterTreatments(
+    treatments.filter(t => t.status === "In Progress" && t.medicines && t.medicines.length > 0)
+  );
 
   const handleEdit = (treatment) => {
     // Save treatment ID to edit in localStorage
@@ -240,7 +205,10 @@ const ViewTreatmentHistory = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="summary-card tracking">
+          <div
+            className={`summary-card tracking cursor-pointer transition-transform hover:-translate-y-1 ${activeTab === "tracking" ? "ring-2 ring-blue-400" : ""}`}
+            onClick={() => setActiveTab("tracking")}
+          >
             <div className="icon">
               <FaCalendar className="text-white" size={24} />
             </div>
@@ -248,7 +216,10 @@ const ViewTreatmentHistory = () => {
             <div className="label">{t('tabs.tracking') || 'Medicine Tracking'}</div>
           </div>
 
-          <div className="summary-card completed">
+          <div
+            className={`summary-card completed cursor-pointer transition-transform hover:-translate-y-1 ${activeTab === "past" ? "ring-2 ring-green-400" : ""}`}
+            onClick={() => setActiveTab("past")}
+          >
             <div className="icon">
               <FaCheck className="text-white" size={24} />
             </div>
@@ -256,7 +227,10 @@ const ViewTreatmentHistory = () => {
             <div className="label">{t('tabs.past') || 'Past Treatments'}</div>
           </div>
 
-          <div className="summary-card in-progress">
+          <div
+            className={`summary-card in-progress cursor-pointer transition-transform hover:-translate-y-1 ${activeTab === "upcoming" ? "ring-2 ring-orange-400" : ""}`}
+            onClick={() => setActiveTab("upcoming")}
+          >
             <div className="icon">
               <FaClock className="text-white" size={24} />
             </div>

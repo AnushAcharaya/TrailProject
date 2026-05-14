@@ -1,3 +1,4 @@
+import os
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -14,8 +15,9 @@ from .serializers import (
     ForgotPasswordTokenSerializer,
     ResetPasswordSerializer
 )
-from .email_utils import send_email_sync, send_sms_sync
+from .email_utils import send_email_sync, send_sms_sync, send_otp_email, send_account_approved_email, send_account_declined_email, send_password_reset_email
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import MultiPartParser, FormParser
 import random
 
 
@@ -70,10 +72,12 @@ class ResendVerificationView(APIView):
             return Response({'success': False, 'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
         token = EmailVerificationToken.objects.create(user=user)
         
-        # Send email synchronously
-        subject = 'Verify your email'
-        message = f'Your email verification code is: {token.code}\n\nThis code will expire in 10 minutes.'
-        send_email_sync(user.email, subject, message)
+        send_otp_email(
+            user.email,
+            user.full_name or user.username,
+            token.code,
+            heading="Email Verification Code",
+        )
         
         return Response({'success': True, 'message': 'Verification email resent.'})
 
@@ -203,10 +207,7 @@ class ForgotPasswordEmailView(APIView):
 
         token_obj = PasswordResetToken.objects.create(user=user)
         
-        # Send password reset email synchronously
-        subject = "Password Reset Request"
-        message = f"Hello {user.full_name},\n\nUse the following token to reset your password: {token_obj.token}\n\nThis token is valid for 30 minutes."
-        send_email_sync(user.email, subject, message)
+        send_password_reset_email(user, token_obj.token)
 
         return Response({"message": "Reset token sent to your email"}, status=status.HTTP_200_OK)
 
@@ -357,31 +358,12 @@ class AdminDashboardStatsView(APIView):
 
 
 def _send_account_status_email(user, approved: bool):
-    """Send a plain-text email notifying the user about admin's decision."""
+    """Send a branded email notifying the user about admin's decision."""
     try:
-        full_name = user.full_name or user.username
-        role_label = (user.role or 'user').capitalize()
         if approved:
-            subject = "Your LHMMS account has been approved"
-            body = (
-                f"Hello {full_name},\n\n"
-                f"Good news! An administrator has approved your LHMMS account.\n\n"
-                f"You can now sign in with your registered email and password as a {role_label}.\n"
-                f"Sign in here: http://localhost:5173/login\n\n"
-                f"Welcome to LHMMS — Livestock Health Management & Monitoring System.\n\n"
-                f"— LHMMS Team"
-            )
+            send_account_approved_email(user)
         else:
-            subject = "Your LHMMS account verification was declined"
-            body = (
-                f"Hello {full_name},\n\n"
-                f"We're sorry — an administrator was unable to approve your LHMMS account at this time.\n\n"
-                f"This usually means the documents you submitted couldn't be verified, "
-                f"or some of the information needed clarification.\n\n"
-                f"If you believe this was a mistake, please contact LHMMS support and we'll be happy to help.\n\n"
-                f"— LHMMS Team"
-            )
-        send_email_sync(user.email, subject, body)
+            send_account_declined_email(user)
     except Exception as exc:  # noqa: BLE001
         # Never let an email transport failure break the admin's approval action.
         import logging
@@ -507,24 +489,20 @@ class SendLoginOTPView(APIView):
         # Create login OTP
         login_otp = LoginOTP.objects.create(user=user)
         
-        # Send email OTP synchronously
-        subject = 'Login Verification Code'
-        message = f'Your login verification code is: {login_otp.email_code}\n\nThis code will expire in 10 minutes.'
-        send_email_sync(user.email, subject, message)
+        send_otp_email(
+            user.email,
+            user.full_name or user.username,
+            login_otp.email_code,
+            heading="Login Verification Code",
+        )
         
-        # Send phone OTP for farmer/vet
-        if role in ['farmer', 'vet']:
-            import os
-            enable_sms = os.getenv('ENABLE_SMS_OTP', 'True') == 'True'
-            
-            if enable_sms:
-                otp_message = f'Your login verification code is: {login_otp.phone_code}'
+        # Send phone OTP via SMS only if enabled
+        if role in ['farmer', 'vet'] and os.getenv('ENABLE_SMS_OTP', 'False') == 'True':
+            otp_message = f'Your login verification code is: {login_otp.phone_code}'
+            try:
                 send_sms_sync(user.phone, otp_message)
-            else:
-                # For development: Send phone OTP via email
-                subject = 'Phone Login Verification Code'
-                message = f'Your phone login verification code is: {login_otp.phone_code}\n\n(SMS disabled in development mode)'
-                send_email_sync(user.email, subject, message)
+            except Exception as e:
+                print(f'[SMS] Failed to send SMS OTP: {e}')
         
         return Response({'success': True, 'message': 'OTP sent successfully'}, status=status.HTTP_200_OK)
 
@@ -685,6 +663,51 @@ class VerifyEmailViaGoogleView(APIView):
         )
 
 
+class CompleteProfileView(APIView):
+    """
+    Called after Google signup to fill in role-specific details.
+    Only works for users whose phone still starts with 'oauth_' (incomplete profile).
+    """
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        from .serializers import CompleteProfileSerializer
+        user = request.user
+
+        if not (user.phone and user.phone.startswith('oauth_')):
+            return Response(
+                {'success': False, 'error': 'Profile already completed.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = CompleteProfileSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {'success': False, 'errors': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        data = serializer.validated_data
+        user.role = data['role']
+        user.phone = data['phone']
+        user.status = 'pending'
+
+        if data['role'] == 'farmer':
+            user.farm_name = data['farm_name']
+            user.nid_photo = data.get('nid_photo')
+        elif data['role'] == 'vet':
+            user.specialization = data['specialization']
+            user.certificate_photo = data.get('certificate_photo')
+
+        user.save()
+
+        return Response(
+            {'success': True, 'message': 'Profile completed. Awaiting admin approval.'},
+            status=status.HTTP_200_OK,
+        )
+
+
 class GoogleLoginView(APIView):
     """
     Verifies a Google ID token from the frontend (Google Identity Services),
@@ -772,12 +795,28 @@ class GoogleLoginView(APIView):
                 phone=placeholder_phone,
                 address='',
                 role=requested_role,
-                status='approved' if requested_role == 'farmer' else 'pending',
+                status='pending',
                 is_email_verified=True,  # Google verified
             )
             user.set_unusable_password()
             user.save()
             created = True
+
+        # Block declined accounts always
+        if user.status == 'declined':
+            return Response(
+                {'success': False, 'error': 'Your account has been declined.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        profile_incomplete = bool(user.phone and user.phone.startswith('oauth_'))
+
+        # Block pending users who have already completed their profile (waiting for admin)
+        if user.status != 'approved' and not profile_incomplete:
+            return Response(
+                {'success': False, 'error': 'Your account is pending admin approval. You will be notified once approved.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         refresh = RefreshToken.for_user(user)
 
@@ -787,7 +826,7 @@ class GoogleLoginView(APIView):
             'access': str(refresh.access_token),
             'refresh': str(refresh),
             'is_new_user': created,
-            'profile_incomplete': user.phone.startswith('oauth_') if user.phone else True,
+            'profile_incomplete': profile_incomplete,
             'user': {
                 'id': user.id,
                 'username': user.username,

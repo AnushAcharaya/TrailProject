@@ -56,11 +56,11 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
         scheduleType: "interval", // "exact" or "interval"
         startTime: "08:00",
         intervalHours: 5,
-        exactTimes: ["08:00", "13:00", "18:00"], // for 3x/day
+        exactTimes: ["08:00"],
       },
     ],
   });
-  
+
   console.log('[TreatmentForm] formData.medicines:', formData.medicines);
 
   const [livestockList, setLivestockList] = useState([]);
@@ -97,7 +97,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
             scheduleType: "interval",
             startTime: "08:00",
             intervalHours: 5,
-            exactTimes: ["08:00", "13:00", "18:00"],
+            exactTimes: ["08:00"],
           },
         ],
       });
@@ -329,10 +329,15 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
       return;
     }
     
-    // Filter out empty medicines before submitting
-    const validMedicines = formData.medicines.filter(med => 
-      med.name.trim() !== "" && med.dosage.trim() !== ""
-    );
+    // Filter out empty medicines and trim exactTimes to match frequency
+    const validMedicines = formData.medicines
+      .filter(med => med.name.trim() !== "" && med.dosage.trim() !== "")
+      .map(med => ({
+        ...med,
+        exactTimes: med.scheduleType === "exact"
+          ? (med.exactTimes || []).slice(0, med.frequency)
+          : med.exactTimes,
+      }));
     
     console.log('[TreatmentForm] Valid medicines AFTER filtering:', validMedicines);
     console.log('[TreatmentForm] Valid medicines count:', validMedicines.length);

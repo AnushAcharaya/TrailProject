@@ -504,3 +504,19 @@ body.admin-page {
 .decline-btn {
   background: #f44336;
 }
+
+.approve-btn:disabled {
+  background: #a5d6a7;
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.decline-btn:disabled {
+  background: #ef9a9a;
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

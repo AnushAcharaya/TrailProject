@@ -1,6 +1,7 @@
 // PasswordTab.jsx
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Eye, EyeOff } from "lucide-react";
 import { changePassword } from "../../services/profileApi";
 
 const BRAND = {
@@ -25,6 +26,7 @@ const PasswordTab = () => {
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [show, setShow] = useState({ old: false, new: false, confirm: false });
 
   const validatePassword = () => {
     if (data.new_password.length < 8) {
@@ -100,14 +102,15 @@ const PasswordTab = () => {
           >
             {t('passwordTab.fields.current')}
           </label>
+          <div className="relative">
           <input
-            type="password"
+            type={show.old ? "text" : "password"}
             placeholder={t('passwordTab.fields.currentPlaceholder')}
             value={data.old_password}
             onChange={(e) =>
               setData({ ...data, old_password: e.target.value })
             }
-            className="w-full rounded-md px-3 py-2 text-sm outline-none transition-all duration-200"
+            className="w-full rounded-md px-3 py-2 pr-9 text-sm outline-none transition-all duration-200"
             style={{
               border: `1px solid ${BRAND.border}`,
               backgroundColor: "#FFFFFF",
@@ -133,90 +136,59 @@ const PasswordTab = () => {
               }
             }}
           />
+          <button type="button" onClick={() => setShow(s => ({ ...s, old: !s.old }))}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            {show.old ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+          </div>
         </div>
 
         <div>
-          <label
-            className="block text-xs font-medium mb-1"
-            style={{ color: BRAND.textMedium }}
-          >
+          <label className="block text-xs font-medium mb-1" style={{ color: BRAND.textMedium }}>
             {t('passwordTab.fields.new')}
           </label>
+          <div className="relative">
           <input
-            type="password"
+            type={show.new ? "text" : "password"}
             placeholder={t('passwordTab.fields.newPlaceholder')}
             value={data.new_password}
-            onChange={(e) =>
-              setData({ ...data, new_password: e.target.value })
-            }
-            className="w-full rounded-md px-3 py-2 text-sm outline-none transition-all duration-200"
-            style={{
-              border: `1px solid ${BRAND.border}`,
-              backgroundColor: "#FFFFFF",
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = BRAND.primaryLight;
-              e.target.style.boxShadow = `0 0 0 2px ${BRAND.hoverLight || "#C8E6C9"}`;
-              e.target.style.backgroundColor = BRAND.bgLight;
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = BRAND.border;
-              e.target.style.boxShadow = "none";
-              e.target.style.backgroundColor = "#FFFFFF";
-            }}
-            onMouseEnter={(e) => {
-              if (document.activeElement !== e.target) {
-                e.target.style.backgroundColor = BRAND.bgLight;
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (document.activeElement !== e.target) {
-                e.target.style.backgroundColor = "#FFFFFF";
-              }
-            }}
+            onChange={(e) => setData({ ...data, new_password: e.target.value })}
+            className="w-full rounded-md px-3 py-2 pr-9 text-sm outline-none transition-all duration-200"
+            style={{ border: `1px solid ${BRAND.border}`, backgroundColor: "#FFFFFF" }}
+            onFocus={(e) => { e.target.style.borderColor = BRAND.primaryLight; e.target.style.boxShadow = `0 0 0 2px #C8E6C9`; e.target.style.backgroundColor = BRAND.bgLight; }}
+            onBlur={(e) => { e.target.style.borderColor = BRAND.border; e.target.style.boxShadow = "none"; e.target.style.backgroundColor = "#FFFFFF"; }}
+            onMouseEnter={(e) => { if (document.activeElement !== e.target) e.target.style.backgroundColor = BRAND.bgLight; }}
+            onMouseLeave={(e) => { if (document.activeElement !== e.target) e.target.style.backgroundColor = "#FFFFFF"; }}
           />
+          <button type="button" onClick={() => setShow(s => ({ ...s, new: !s.new }))}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            {show.new ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+          </div>
         </div>
 
         <div>
-          <label
-            className="block text-xs font-medium mb-1"
-            style={{ color: BRAND.textMedium }}
-          >
+          <label className="block text-xs font-medium mb-1" style={{ color: BRAND.textMedium }}>
             {t('passwordTab.fields.confirm')}
           </label>
+          <div className="relative">
           <input
-            type="password"
+            type={show.confirm ? "text" : "password"}
             placeholder={t('passwordTab.fields.confirmPlaceholder')}
             value={data.confirm_password}
-            onChange={(e) =>
-              setData({ ...data, confirm_password: e.target.value })
-            }
-            className="w-full rounded-md px-3 py-2 text-sm outline-none transition-all duration-200"
-            style={{
-              border: `1px solid ${BRAND.border}`,
-              backgroundColor: "#FFFFFF",
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = BRAND.primaryLight;
-              e.target.style.boxShadow = `0 0 0 2px ${BRAND.hoverLight || "#C8E6C9"}`;
-              e.target.style.backgroundColor = BRAND.bgLight;
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = BRAND.border;
-              e.target.style.boxShadow = "none";
-              e.target.style.backgroundColor = "#FFFFFF";
-            }}
-            onMouseEnter={(e) => {
-              if (document.activeElement !== e.target) {
-                e.target.style.backgroundColor = BRAND.bgLight;
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (document.activeElement !== e.target) {
-                e.target.style.backgroundColor = "#FFFFFF";
-              }
-            }}
+            onChange={(e) => setData({ ...data, confirm_password: e.target.value })}
+            className="w-full rounded-md px-3 py-2 pr-9 text-sm outline-none transition-all duration-200"
+            style={{ border: `1px solid ${BRAND.border}`, backgroundColor: "#FFFFFF" }}
+            onFocus={(e) => { e.target.style.borderColor = BRAND.primaryLight; e.target.style.boxShadow = `0 0 0 2px #C8E6C9`; e.target.style.backgroundColor = BRAND.bgLight; }}
+            onBlur={(e) => { e.target.style.borderColor = BRAND.border; e.target.style.boxShadow = "none"; e.target.style.backgroundColor = "#FFFFFF"; }}
+            onMouseEnter={(e) => { if (document.activeElement !== e.target) e.target.style.backgroundColor = BRAND.bgLight; }}
+            onMouseLeave={(e) => { if (document.activeElement !== e.target) e.target.style.backgroundColor = "#FFFFFF"; }}
           />
+          <button type="button" onClick={() => setShow(s => ({ ...s, confirm: !s.confirm }))}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            {show.confirm ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+          </div>
         </div>
       </div>
 

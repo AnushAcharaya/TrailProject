@@ -11,13 +11,24 @@ const api = axios.create({
   },
 });
 
+// Public endpoints that must NOT send an auth token
+const PUBLIC_PATHS = [
+  '/register/', '/verify-email/', '/resend-verification/',
+  '/login/send-otp/', '/login/verify-otp/',
+  '/forgot-password/', '/verify-token/', '/reset-password/',
+  '/google/',
+];
+
 // Add request interceptor to include JWT token
 // Prioritize sessionStorage (tab-specific) over localStorage (shared across tabs)
 api.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const isPublic = PUBLIC_PATHS.some((p) => config.url?.includes(p));
+    if (!isPublic) {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -207,6 +218,19 @@ export const loginWithGoogle = async (idToken, role = 'farmer') => {
     return {
       success: false,
       error: error.response?.data || { message: 'Google login failed.' },
+    };
+  }
+};
+
+// Complete profile after Google signup
+export const completeProfile = async (formData) => {
+  try {
+    const response = await api.post('/complete-profile/', formData);
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data || { message: 'Failed to complete profile.' },
     };
   }
 };

@@ -14,6 +14,11 @@ from .vet_dashboard_views import (
     VetDashboardActivitiesView,
     VetDashboardAlertsView
 )
+from .farmer_dashboard_views import (
+    FarmerDashboardStatsView,
+    FarmerDashboardChartsView,
+    FarmerDashboardActivitiesView,
+)
 
 app_name = 'userprofile'
 
@@ -46,4 +51,9 @@ urlpatterns = [
     path('vet/dashboard/stats/', VetDashboardStatsView.as_view(), name='vet-dashboard-stats'),
     path('vet/dashboard/activities/', VetDashboardActivitiesView.as_view(), name='vet-dashboard-activities'),
     path('vet/dashboard/alerts/', VetDashboardAlertsView.as_view(), name='vet-dashboard-alerts'),
+
+    # Farmer Dashboard endpoints
+    path('farmer/dashboard/stats/', FarmerDashboardStatsView.as_view(), name='farmer-dashboard-stats'),
+    path('farmer/dashboard/charts/', FarmerDashboardChartsView.as_view(), name='farmer-dashboard-charts'),
+    path('farmer/dashboard/activities/', FarmerDashboardActivitiesView.as_view(), name='farmer-dashboard-activities'),
 ]

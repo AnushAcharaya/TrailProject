@@ -185,51 +185,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
                   'phone', 'farm_name', 'nid_photo', 'specialization', 'certificate_photo']
 
     def validate_email(self, value):
-        """
-        Reject obviously fake emails using stacked server-side checks.
-        No user-facing verification step is involved.
-
-        Layers (cheapest → most expensive):
-          1. Domain must be Google-hosted (gmail.com or Google Workspace MX)
-          2. Domain must not be a known disposable / throwaway service
-          3. Local part must not match obvious fake patterns
-             (test123, qwerty, aaaaa, keyboard mashes, etc.)
-          4. SMTP RCPT TO probe — best-effort. Only blocks the registration
-             when the mail server responds with a clear 5xx "no such mailbox".
-        """
         value = (value or '').strip().lower()
 
-        # 1. Google-hosted domain
-        if not _is_google_hosted_email(value):
-            raise serializers.ValidationError(
-                'Please use a valid Google email (Gmail or a domain hosted by Google).'
-            )
-
-        # 2. Disposable / throwaway service
-        domain = value.rsplit('@', 1)[1]
-        if domain in _DISPOSABLE_DOMAINS:
-            raise serializers.ValidationError(
-                'Disposable / temporary email addresses are not allowed.'
-            )
-
-        # 3. Suspicious local-part patterns
-        local = value.split('@', 1)[0]
-        if _looks_like_fake_pattern(local):
-            raise serializers.ValidationError(
-                "This email looks invalid. Please use your real Gmail address."
-            )
-
-        # 4. SMTP probe — best-effort, opt-in via env var.
-        # Most residential ISPs and cloud providers block outbound port 25,
-        # so this layer is OFF by default (otherwise every registration
-        # waits ~5s for nothing). Set ENABLE_SMTP_VERIFY=True in .env when
-        # deployed somewhere that allows outbound port 25.
-        import os as _os
-        if _os.getenv('ENABLE_SMTP_VERIFY', 'False').lower() == 'true':
-            exists, reason = _smtp_mailbox_exists(value, timeout=6.0)
-            if not exists:
+        # Block known disposable/throwaway domains
+        if '@' in value:
+            domain = value.rsplit('@', 1)[1]
+            if domain in _DISPOSABLE_DOMAINS:
                 raise serializers.ValidationError(
-                    "This email address doesn't exist. Please use a real Gmail account."
+                    'Disposable / temporary email addresses are not allowed.'
                 )
 
         return value
@@ -378,6 +341,29 @@ class VerifyLoginOTPSerializer(serializers.Serializer):
     email_code = serializers.CharField(max_length=6)
     phone_code = serializers.CharField(max_length=6, required=False, allow_blank=True)
     role = serializers.CharField()
+
+
+class CompleteProfileSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=['farmer', 'vet'])
+    phone = serializers.CharField()
+    farm_name = serializers.CharField(required=False, allow_blank=True)
+    nid_photo = serializers.ImageField(required=False)
+    specialization = serializers.CharField(required=False, allow_blank=True)
+    certificate_photo = serializers.ImageField(required=False)
+
+    def validate(self, data):
+        role = data.get('role')
+        if role == 'farmer':
+            if not data.get('farm_name'):
+                raise serializers.ValidationError({'farm_name': 'Farm name is required for farmers.'})
+            if not data.get('nid_photo'):
+                raise serializers.ValidationError({'nid_photo': 'NID photo is required for farmers.'})
+        elif role == 'vet':
+            if not data.get('specialization'):
+                raise serializers.ValidationError({'specialization': 'Specialization is required for vets.'})
+            if not data.get('certificate_photo'):
+                raise serializers.ValidationError({'certificate_photo': 'Certificate photo is required for vets.'})
+        return data
 
 
 class AdminUserListSerializer(serializers.ModelSerializer):

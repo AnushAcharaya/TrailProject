@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Eye, EyeOff } from "lucide-react";
 import { sendLoginOTP, verifyLoginOTP, loginWithGoogle } from "../services/api";
 import BrandLogo from "./common/BrandLogo";
 import GoogleSignInButton from "./common/GoogleSignInButton";
@@ -24,6 +25,7 @@ const Login = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [apiError, setApiError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -193,6 +195,12 @@ const Login = () => {
         sessionStorage.setItem('tabId', Date.now() + '_' + Math.random());
         window.dispatchEvent(new Event('userLoggedIn'));
 
+        // Redirect to complete-profile if profile is incomplete
+        if (data.profile_incomplete) {
+            navigate('/complete-profile');
+            return;
+        }
+
         const role = data.user.role;
         if (role === 'admin') navigate('/adminpage');
         else if (role === 'vet') navigate('/vet/dashboard');
@@ -307,15 +315,24 @@ const Login = () => {
                     {/* Password */}
                     {formData.role && (
                         <div>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                autoComplete="off"
-                                className={`input-field w-full ${errors.password ? "border-red-400 focus:outline-red-400" : ""}`}
-                                placeholder={t('login.enterPassword')}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    autoComplete="off"
+                                    className={`input-field w-full pr-10 ${errors.password ? "border-red-400 focus:outline-red-400" : ""}`}
+                                    placeholder={t('login.enterPassword')}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                             {errors.password && (
                                 <p className="text-red-500 text-xs mt-1">{errors.password}</p>
                             )}

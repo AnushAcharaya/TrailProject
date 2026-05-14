@@ -3,34 +3,78 @@ from livestockcrud.models import Species, Breed
 
 
 class Command(BaseCommand):
-    help = 'Populate database with default species and breeds'
+    help = 'Populate database with default species and breeds (Nepal-relevant)'
 
     def handle(self, *args, **kwargs):
         self.stdout.write('Populating species and breeds...')
 
-        # Define species and their breeds
         species_breeds = {
-            'Cattle': ['Holstein', 'Jersey', 'Angus', 'Hereford', 'Brahman', 'Simmental', 'Charolais'],
-            'Buffalo': ['Murrah', 'Jaffarabadi', 'Mehsana', 'Surti', 'Nili-Ravi', 'Bhadawari'],
-            'Goat': ['Boer', 'Saanen', 'Alpine', 'Nubian', 'Toggenburg', 'LaMancha', 'Kiko'],
-            'Sheep': ['Merino', 'Suffolk', 'Dorper', 'Hampshire', 'Rambouillet', 'Texel', 'Katahdin'],
-            'Pig': ['Yorkshire', 'Duroc', 'Hampshire', 'Landrace', 'Berkshire', 'Chester White'],
-            'Chicken': ['Rhode Island Red', 'Leghorn', 'Plymouth Rock', 'Brahma', 'Orpington', 'Sussex'],
-            'Duck': ['Pekin', 'Muscovy', 'Khaki Campbell', 'Indian Runner', 'Rouen', 'Cayuga'],
-            'Horse': ['Arabian', 'Thoroughbred', 'Quarter Horse', 'Morgan', 'Appaloosa', 'Mustang'],
+            'Cattle': [
+                # Nepal local breeds
+                'Lulu', 'Khari', 'Siri', 'Rana', 'Achhami', 'Pahadi',
+                # Cross/exotic breeds common in Nepal
+                'Holstein Friesian', 'Jersey', 'Brown Swiss', 'Sahiwal',
+                'Gir', 'Tharparkar', 'Hariana',
+            ],
+            'Buffalo': [
+                # Nepal/South Asian breeds
+                'Lime', 'Parkote', 'Gaddi', 'Murrah', 'Jaffarabadi',
+                'Mehsana', 'Surti', 'Nili-Ravi', 'Bhadawari',
+            ],
+            'Goat': [
+                # Nepal local breeds
+                'Chyangra', 'Khari', 'Sinhal', 'Jumli', 'Terai',
+                # Common exotic/cross breeds
+                'Boer', 'Saanen', 'Alpine', 'Nubian', 'Jamunapari',
+                'Barbari', 'Beetal',
+            ],
+            'Sheep': [
+                # Nepal local breeds
+                'Baruwal', 'Bhyanglung', 'Kage', 'Lampuchhre', 'Maigra',
+                'Jumli', 'Karnali',
+                # Common breeds
+                'Merino', 'Corriedale', 'Suffolk', 'Dorper',
+            ],
+            'Pig': [
+                # Nepal local / South Asian
+                'Hurra', 'Local Hill Pig',
+                # Common commercial breeds
+                'Large White Yorkshire', 'Landrace', 'Duroc',
+                'Hampshire', 'Berkshire',
+            ],
+            'Chicken': [
+                # Nepal / South Asian
+                'Sakini', 'Pwankh Kauwa', 'Desi (Local)',
+                # Commercial/exotic
+                'Rhode Island Red', 'Plymouth Rock', 'Brahma',
+                'Leghorn', 'Aseel', 'Kadaknath',
+            ],
+            'Duck': [
+                'Khaki Campbell', 'Indian Runner', 'Muscovy',
+                'Pekin', 'Rouen', 'Local Deshi',
+            ],
+            'Horse': [
+                'Spiti', 'Zanskari', 'Marwari',
+                'Arabian', 'Thoroughbred', 'Local Hill Horse',
+            ],
+            'Yak': [
+                'Yak (Pure)', 'Chauri (Yak x Cattle)', 'Dimzo', 'Urang',
+            ],
+            'Rabbit': [
+                'New Zealand White', 'Californian', 'Soviet Chinchilla',
+                'Gray Giant', 'Local Deshi',
+            ],
         }
 
         created_species = 0
         created_breeds = 0
 
         for species_name, breeds in species_breeds.items():
-            # Create or get species
             species, created = Species.objects.get_or_create(name=species_name)
             if created:
                 created_species += 1
                 self.stdout.write(self.style.SUCCESS(f'Created species: {species_name}'))
 
-            # Create breeds for this species
             for breed_name in breeds:
                 breed, created = Breed.objects.get_or_create(
                     name=breed_name,

@@ -85,16 +85,18 @@ const LivestockCard = ({ livestock, onDelete }) => {
 
       {/* Action Buttons */}
       <div className="card-actions">
-        <button onClick={handleAddVaccine} className="btn bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded flex items-center gap-2">
-          <FaSyringe size={14} />
+        <button onClick={handleAddVaccine} className="vaccine-btn">
+          <FaSyringe size={13} />
           {t('form.buttons.addVaccine')}
         </button>
-        <Link to={`/livestock/edit/${livestock.id}`} className="edit-btn">
-          {t('form.buttons.edit')}
-        </Link>
-        <button onClick={handleDeleteClick} className="delete-btn">
-          {t('form.buttons.delete')}
-        </button>
+        <div className="card-actions-row">
+          <Link to={`/livestock/edit/${livestock.id}`} className="edit-btn">
+            {t('form.buttons.edit')}
+          </Link>
+          <button onClick={handleDeleteClick} className="delete-btn">
+            {t('form.buttons.delete')}
+          </button>
+        </div>
       </div>
 
       {/* Confirmation Modal */}

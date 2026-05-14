@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Key, Lock, ArrowLeft, CheckCircle } from "lucide-react";
+import { Mail, Key, Lock, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { forgotPassword, verifyResetToken, resetPassword } from "../services/api";
@@ -17,6 +17,8 @@ const ForgotPassword = () => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -301,14 +303,20 @@ const ForgotPassword = () => {
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
                 <label className="label">{t('forgotPassword.newPassword')}</label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                  className={`input-field ${errors.newPassword ? 'border-red-300 bg-red-50' : ''}`}
-                  placeholder={t('forgotPassword.enterNewPasswordPlaceholder')}
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    name="newPassword"
+                    value={formData.newPassword}
+                    onChange={handleChange}
+                    className={`input-field pr-10 ${errors.newPassword ? 'border-red-300 bg-red-50' : ''}`}
+                    placeholder={t('forgotPassword.enterNewPasswordPlaceholder')}
+                  />
+                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 {errors.newPassword && (
                   <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
                 )}
@@ -316,14 +324,20 @@ const ForgotPassword = () => {
 
               <div>
                 <label className="label">{t('forgotPassword.confirmPassword')}</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className={`input-field ${errors.confirmPassword ? 'border-red-300 bg-red-50' : ''}`}
-                  placeholder={t('forgotPassword.confirmPasswordPlaceholder')}
-                />
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className={`input-field pr-10 ${errors.confirmPassword ? 'border-red-300 bg-red-50' : ''}`}
+                    placeholder={t('forgotPassword.confirmPasswordPlaceholder')}
+                  />
+                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 {errors.confirmPassword && (
                   <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
                 )}

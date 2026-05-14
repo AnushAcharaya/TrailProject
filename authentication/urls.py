@@ -3,7 +3,7 @@ from .views import (RegisterView, VerifyEmailView, ResendVerificationView, SendP
                     VerifyPhoneOTPView, LoginView, ForgotPasswordEmailView, VerifyTokenView,
                     ResetPasswordView, AdminUserListView, AdminDashboardStatsView, ApproveUserView, DeclineUserView,
                     SendLoginOTPView, VerifyLoginOTPView, VetListView, GoogleLoginView,
-                    VerifyEmailViaGoogleView)
+                    VerifyEmailViaGoogleView, CompleteProfileView)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -39,4 +39,5 @@ urlpatterns = [
     # Google OAuth (ID token verification)
     path('google/', GoogleLoginView.as_view(), name='google-login'),
     path('verify-email-google/', VerifyEmailViaGoogleView.as_view(), name='verify-email-google'),
+    path('complete-profile/', CompleteProfileView.as_view(), name='complete-profile'),
 ]

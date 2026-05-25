@@ -7,7 +7,7 @@ from django.utils import timezone
 
 class Appointment(models.Model):
     """Appointment model for farmer-vet appointments"""
-    
+
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
@@ -15,22 +15,14 @@ class Appointment(models.Model):
         ('Cancelled', 'Cancelled'),
         ('Declined', 'Declined'),
     ]
-    
+
     PAYMENT_STATUS_CHOICES = [
         ('not_required', 'Not Required'),
         ('pending', 'Payment Pending'),
         ('paid', 'Paid'),
         ('failed', 'Payment Failed'),
     ]
-    
-    ANIMAL_TYPE_CHOICES = [
-        ('cattle', 'Cattle'),
-        ('sheep', 'Sheep'),
-        ('goat', 'Goat'),
-        ('pig', 'Pig'),
-        ('poultry', 'Poultry'),
-    ]
-    
+
     # Relationships
     farmer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -46,7 +38,15 @@ class Appointment(models.Model):
     )
     
     # Appointment details
-    animal_type = models.CharField(max_length=20, choices=ANIMAL_TYPE_CHOICES)
+    livestock = models.ForeignKey(
+        'livestockcrud.Livestock',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='appointments',
+        help_text="The specific livestock animal for this appointment"
+    )
+    animal_type = models.CharField(max_length=100, blank=True, default='')
     reason = models.TextField(help_text="Reason for the appointment")
     preferred_date = models.DateField()
     preferred_time = models.TimeField()

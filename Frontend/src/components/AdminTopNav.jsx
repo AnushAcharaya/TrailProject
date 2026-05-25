@@ -1,130 +1,87 @@
 import { useState, useEffect } from "react";
-import { Menu } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useNavigate, useLocation } from "react-router-dom";
 import LanguageSwitcher from "./common/LanguageSwitcher";
 import NotificationBell from "./notifications/NotificationBell";
 import { getUserProfile } from "../services/profileApi";
-import "../styles/languageSwitcher.css";
 import "../styles/notifications.css";
 
-export default function TopNav({ toggleSidebar }) {
+const PAGE_TITLES = {
+  '/adminpage':                      'Dashboard',
+  '/admin/account-verifications':    'Account Verifications',
+  '/admin/insurance':                'Insurance',
+  '/admin/broadcast':                'Send Announcement',
+  '/admin/analytics':                'Analytics',
+  '/profile-transfer/admin':         'Profile Transfer',
+};
+
+export default function TopNav() {
   const navigate = useNavigate();
-  const { t } = useTranslation('admin');
+  const location = useLocation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Fetch user profile from API
     const fetchProfile = async () => {
       const result = await getUserProfile();
       if (result.success) {
-        console.log('[AdminTopNav] Profile data received:', result.data);
-        console.log('[AdminTopNav] Profile image URL:', result.data.profile_image_url);
-        console.log('[AdminTopNav] Profile image:', result.data.profile_image);
         setUser(result.data);
       } else {
-        console.error('[AdminTopNav] Failed to fetch profile:', result.error);
-        // Fallback to localStorage if API fails
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          try {
-            const userData = JSON.parse(storedUser);
-            setUser(userData);
-          } catch (error) {
-            console.error("Error parsing user data:", error);
-          }
+        const stored = localStorage.getItem('user');
+        if (stored) {
+          try { setUser(JSON.parse(stored)); } catch {}
         }
       }
     };
-    
     fetchProfile();
   }, []);
 
-  // Get initials from name for avatar
   const getInitials = (name) => {
     if (!name) return "A";
-    const names = name.split(" ");
-    if (names.length >= 2) {
-      return (names[0][0] + names[1][0]).toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
+    const parts = name.split(" ");
+    return parts.length >= 2
+      ? (parts[0][0] + parts[1][0]).toUpperCase()
+      : name.substring(0, 2).toUpperCase();
   };
 
-  // Navigate to profile page
-  const handleProfileClick = () => {
-    navigate('/profile');
-  };
+  const pageTitle = Object.entries(PAGE_TITLES).find(([path]) =>
+    location.pathname.startsWith(path)
+  )?.[1] ?? 'Dashboard';
+
+  const imageUrl =
+    user?.profile_image_url ||
+    (user?.profile_image ? `http://localhost:8000${user.profile_image}` : null);
 
   return (
-    <div className="w-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-500 shadow-2xl fixed top-0 left-0 z-50">
-      <div className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Left */}
-        <div className="flex items-center gap-0 md:gap-3">
-          {/* Hamburger button */}
-          <button
-            className="md:hidden p-2 rounded-lg border border-white/30 text-white hover:bg-white/10"
-            onClick={toggleSidebar}
-          >
-            <Menu size={22} />
-          </button>
+    <div className="px-8 py-4 flex items-center bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-500 shadow-2xl flex-shrink-0">
+      {/* Left: Page Title */}
+      <div className="flex-1">
+        <h1 className="text-2xl font-bold text-white">{pageTitle}</h1>
+      </div>
 
-          <div className="ml-0">
-            <h1 className="text-lg lg:text-xl font-semibold text-white">
-              {t('topNav.title')}
-            </h1>
-            <p className="text-xs text-emerald-50 hidden sm:block">
-              {t('topNav.subtitle')}
-            </p>
-          </div>
-        </div>
+      {/* Right: Bell → Language → Avatar  (same order as FarmerLayout) */}
+      <div className="flex items-center space-x-6">
+        <NotificationBell />
+        <LanguageSwitcher context="admin" theme="dark" />
 
-        {/* Right */}
-        <div className="flex items-center gap-4 md:gap-6">
-          {/* Language Switcher */}
-          <LanguageSwitcher context="admin" theme="dark" />
-          
-          {/* Notification Bell */}
-          <NotificationBell />
-          
-          {/* Profile Section */}
-          <div 
-            className="flex flex-col items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={handleProfileClick}
-          >
-            {/* Round Profile Image/Icon */}
-            {(() => {
-              const hasImageUrl = user?.profile_image_url;
-              const hasImage = user?.profile_image;
-              const imageUrl = hasImageUrl || (hasImage ? `http://localhost:8000${user.profile_image}` : null);
-              
-              console.log('[AdminTopNav] Rendering profile image:', {
-                hasImageUrl,
-                hasImage,
-                imageUrl,
-                user
-              });
-              
-              return imageUrl ? (
-                <img 
-                  src={imageUrl}
-                  alt="Profile" 
-                  className="w-10 h-10 rounded-full object-cover shadow-md hover:shadow-lg transition-shadow border-2 border-white"
-                  onError={(e) => {
-                    console.error('[AdminTopNav] Image failed to load:', imageUrl);
-                    e.target.style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-emerald-600 font-semibold shadow-md hover:shadow-lg transition-shadow border-2 border-white">
-                  {getInitials(user?.full_name || user?.username || "Admin")}
-                </div>
-              );
-            })()}
-            {/* Name below icon */}
-            <p className="text-xs font-medium text-white hidden sm:block">
-              {user?.full_name || user?.username || "Admin"}
-            </p>
-          </div>
+        {/* Avatar + name */}
+        <div
+          className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => navigate('/profile')}
+        >
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt="Profile"
+              className="w-10 h-10 rounded-full object-cover border-2 border-white"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-emerald-600 font-semibold border-2 border-white">
+              {getInitials(user?.full_name || user?.username || "Admin")}
+            </div>
+          )}
+          <p className="text-xs font-medium text-white">
+            {user?.full_name || user?.username || "Admin"}
+          </p>
         </div>
       </div>
     </div>

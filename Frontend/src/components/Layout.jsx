@@ -1,20 +1,11 @@
 import React, { useState, useEffect } from "react";
 import TopNav from "./AdminTopNav";
 import SideNav from "./AdminSideNav";
-import { useLocation } from "react-router-dom";
 import ProfilePage from "./profile/ProfilePage";
 
 export default function Layout({ children }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const location = useLocation();
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
-  // Check if we're on a Profile Transfer admin page
-  const isProfileTransferAdmin = location.pathname.startsWith('/profile-transfer/admin');
-
-  // Listen for profile modal open event
   useEffect(() => {
     const handleOpenProfile = () => setIsProfileOpen(true);
     window.addEventListener('openProfileModal', handleOpenProfile);
@@ -22,22 +13,22 @@ export default function Layout({ children }) {
   }, []);
 
   return (
-    <div className="w-full h-screen overflow-hidden">
-      {/* Top Navigation - Hide on Profile Transfer admin pages */}
-      {!isProfileTransferAdmin && <TopNav toggleSidebar={toggleSidebar} />}
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar — fixed left, full height, matches FarmerLayout */}
+      <SideNav />
 
-      {/* Flex container: Sidebar + Main Content */}
-      <div className={`${!isProfileTransferAdmin ? 'pt-16' : ''} flex h-full`}>
-        {/* Sidebar - Fixed, non-scrollable */}
-        <SideNav isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      {/* Content column — offset by sidebar width */}
+      <div className="flex-1 flex flex-col ml-64 h-screen overflow-hidden">
+        {/* Navbar — inside content column, not fixed full-width */}
+        <TopNav />
 
-        {/* Main content - Scrollable area */}
-        <main className="flex-1 md:ml-64 w-full overflow-y-auto overflow-x-hidden">
+        {/* Scrollable page content */}
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>
 
-      {/* Profile Modal Overlay */}
+      {/* Profile Modal */}
       {isProfileOpen && (
         <div className="fixed inset-0 z-[60]">
           <ProfilePage onClose={() => setIsProfileOpen(false)} />

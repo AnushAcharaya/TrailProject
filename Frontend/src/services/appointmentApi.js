@@ -323,10 +323,11 @@ const convertTo24Hour = (time12h) => {
  */
 export const formatAppointmentData = (formData) => {
   const preferredTime = formData.preferredTime || formData.preferred_time;
-  
+
   return {
     veterinarian_id: formData.veterinarian || formData.veterinarian_id,
-    animal_type: formData.animalType || formData.animal_type,
+    livestock_id: formData.livestockId || formData.livestock_id || undefined,
+    animal_type: formData.animalType || formData.animal_type || '',
     reason: formData.reason,
     preferred_date: formData.preferredDate || formData.preferred_date,
     preferred_time: convertTo24Hour(preferredTime),

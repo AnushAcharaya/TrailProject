@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from .models import Appointment
 from django.contrib.auth import get_user_model
+from livestockcrud.models import Livestock
 
 User = get_user_model()
 
@@ -23,25 +24,25 @@ class UserBasicSerializer(serializers.ModelSerializer):
 class AppointmentSerializer(serializers.ModelSerializer):
     farmer_details = UserBasicSerializer(source='farmer', read_only=True)
     veterinarian_details = UserBasicSerializer(source='veterinarian', read_only=True)
-    
-    # Write-only fields for creating appointments - accept either ID or username
+
+    # Write-only fields for creating appointments
     veterinarian_id = serializers.CharField(write_only=True, required=True)
-    
+    livestock_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+
     class Meta:
         model = Appointment
         fields = [
             'id', 'farmer', 'farmer_details', 'veterinarian', 'veterinarian_id',
-            'veterinarian_details', 'animal_type', 'reason', 'preferred_date',
-            'preferred_time', 'status', 'vet_notes', 'created_at', 'updated_at',
-            'payment', 'payment_status', 'appointment_fee'
+            'veterinarian_details', 'livestock', 'livestock_id', 'animal_type',
+            'reason', 'preferred_date', 'preferred_time', 'status', 'vet_notes',
+            'created_at', 'updated_at', 'payment', 'payment_status', 'appointment_fee'
         ]
-        read_only_fields = ['farmer', 'veterinarian', 'created_at', 'updated_at', 'payment', 'payment_status']
-    
+        read_only_fields = ['farmer', 'veterinarian', 'livestock', 'created_at', 'updated_at', 'payment', 'payment_status']
+
     def create(self, validated_data):
-        # Set farmer from request user
         validated_data['farmer'] = self.context['request'].user
 
-        # Get veterinarian from veterinarian_id (can be ID or username)
+        # Resolve veterinarian
         vet_identifier = validated_data.pop('veterinarian_id', None)
         veterinarian = None
         if vet_identifier:
@@ -54,10 +55,21 @@ class AppointmentSerializer(serializers.ModelSerializer):
             except User.DoesNotExist:
                 raise serializers.ValidationError({"veterinarian_id": "Invalid veterinarian ID or username"})
 
-        # Fee resolution. Priority:
-        #   1) request explicitly provided appointment_fee
-        #   2) the chosen vet's profile.consultation_fee
-        #   3) hard fallback NPR 500
+        # Resolve livestock and auto-fill animal_type from species name
+        livestock_id = validated_data.pop('livestock_id', None)
+        if livestock_id:
+            try:
+                livestock = Livestock.objects.select_related('species').get(
+                    id=livestock_id,
+                    user=validated_data['farmer']
+                )
+                validated_data['livestock'] = livestock
+                if not validated_data.get('animal_type'):
+                    validated_data['animal_type'] = livestock.species.name if livestock.species else ''
+            except Livestock.DoesNotExist:
+                raise serializers.ValidationError({"livestock_id": "Invalid livestock ID or not owned by you"})
+
+        # Fee resolution
         if validated_data.get('appointment_fee') is None and veterinarian is not None:
             profile = getattr(veterinarian, 'profile', None)
             if profile and profile.consultation_fee is not None:

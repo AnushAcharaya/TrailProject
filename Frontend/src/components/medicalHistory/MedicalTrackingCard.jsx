@@ -24,8 +24,21 @@ const formatTime12 = (timeStr) => {
 
 const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
   const [doses, setDoses] = useState([]);
+  const [todayStr, setTodayStr] = useState(() => getLocalDateStr(new Date()));
 
-  const todayStr = getLocalDateStr(new Date());
+  // Auto-refresh todayStr at midnight so doses reset without a page reload
+  useEffect(() => {
+    const msUntilMidnight = () => {
+      const now = new Date();
+      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      return midnight - now;
+    };
+    const timer = setTimeout(() => {
+      setTodayStr(getLocalDateStr(new Date()));
+    }, msUntilMidnight());
+    return () => clearTimeout(timer);
+  }, [todayStr]);
+
   const startDateStr = treatment.treatment_date;
   const startDate = parseLocalDate(startDateStr);
 
@@ -94,7 +107,7 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
 
   const takenCount = doses.filter((d) => d.taken).length;
   const allTaken = doses.length > 0 && takenCount === doses.length;
-  const progressPercent = duration > 1 ? Math.round(((treatmentDay - 1) / (duration - 1)) * 100) : 100;
+  const progressPercent = Math.round((treatmentDay / duration) * 100);
 
   return (
     <div className="medicine-tracking-card">

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FiCalendar, FiUser, FiFileText, FiClock } from "react-icons/fi";
 import { MdPets } from "react-icons/md";
 import { getAllVets } from "../../services/profileApi";
+import { getAllLivestock } from "../../services/livestockCrudApi";
 import { createAppointment, formatAppointmentData } from "../../services/appointmentApi";
 import { initiatePayment, redirectToEsewa } from "../../services/paymentApi";
 import PaymentMethodModal from "./PaymentMethodModal";
@@ -14,6 +15,11 @@ const AppointmentRequestForm = () => {
   const navigate = useNavigate();
   const [vets, setVets] = useState([]);
   const [isLoadingVets, setIsLoadingVets] = useState(true);
+  const [myLivestock, setMyLivestock] = useState([]);
+  const [isLoadingLivestock, setIsLoadingLivestock] = useState(true);
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
+  const [animalSearchQuery, setAnimalSearchQuery] = useState("");
+  const [showAnimalDropdown, setShowAnimalDropdown] = useState(false);
   const [vetSearchQuery, setVetSearchQuery] = useState("");
   const [showVetDropdown, setShowVetDropdown] = useState(false);
   const [selectedVet, setSelectedVet] = useState(null);
@@ -25,6 +31,7 @@ const AppointmentRequestForm = () => {
   
   const [formData, setFormData] = useState({
     veterinarian: "",
+    livestockId: null,
     animalType: "",
     reason: "",
     preferredDate: "",
@@ -34,6 +41,19 @@ const AppointmentRequestForm = () => {
   // Load vets and check for pre-selected vet from card
   useEffect(() => {
     loadVets();
+    getAllLivestock().then(result => {
+      if (result.success) {
+        const raw = result.data;
+        const list = Array.isArray(raw) ? raw : (raw?.results ?? []);
+        setMyLivestock(list);
+      } else {
+        console.error('[AppointmentForm] Livestock fetch failed:', result.error);
+      }
+      setIsLoadingLivestock(false);
+    }).catch(err => {
+      console.error('[AppointmentForm] Livestock fetch exception:', err);
+      setIsLoadingLivestock(false);
+    });
     
     // Check if vet was selected from card
     const preSelectedVetName = localStorage.getItem("selectedVetName");
@@ -72,6 +92,36 @@ const AppointmentRequestForm = () => {
       vet.specialization?.toLowerCase().includes(query)
     );
   });
+
+  // Filter animals based on search query
+  const filteredAnimals = myLivestock.filter(animal => {
+    const query = animalSearchQuery.toLowerCase();
+    return (
+      animal.species_name?.toLowerCase().includes(query) ||
+      animal.breed_name?.toLowerCase().includes(query) ||
+      animal.tag_id?.toLowerCase().includes(query)
+    );
+  });
+
+  const handleAnimalSearch = (value) => {
+    setAnimalSearchQuery(value);
+    setShowAnimalDropdown(true);
+    if (selectedAnimal) {
+      setSelectedAnimal(null);
+      setFormData(prev => ({ ...prev, animalType: "" }));
+    }
+  };
+
+  const handleAnimalSelect = (animal) => {
+    setSelectedAnimal(animal);
+    setAnimalSearchQuery(`${animal.species_name || 'Animal'}${animal.breed_name ? ' · ' + animal.breed_name : ''} (${animal.tag_id})`);
+    setFormData(prev => ({
+      ...prev,
+      livestockId: animal.id,
+      animalType: animal.species_name || animal.tag_id,
+    }));
+    setShowAnimalDropdown(false);
+  };
 
   const handleVetSearch = (value) => {
     setVetSearchQuery(value);
@@ -120,6 +170,12 @@ const AppointmentRequestForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    if (!selectedAnimal) {
+      setError("Please select one of your animals.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -235,6 +291,7 @@ const AppointmentRequestForm = () => {
             value={vetSearchQuery}
             onChange={(e) => handleVetSearch(e.target.value)}
             onFocus={() => setShowVetDropdown(true)}
+            onBlur={() => setTimeout(() => setShowVetDropdown(false), 150)}
             placeholder={t('form.vetSearch')}
             required
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-700"
@@ -246,7 +303,7 @@ const AppointmentRequestForm = () => {
               {filteredVets.map((vet) => (
                 <div
                   key={vet.username}
-                  onClick={() => handleVetSelect(vet)}
+                  onMouseDown={(e) => { e.preventDefault(); handleVetSelect(vet); }}
                   className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                 >
                   <div className="font-medium text-gray-900">
@@ -312,23 +369,90 @@ const AppointmentRequestForm = () => {
               <MdPets className="text-blue-600" size={22} />
             </div>
             <label className="block text-sm font-medium text-gray-700">
-              {t('form.animalType')} <span className="text-red-500">{t('form.required')}</span>
+              Select Your Animal <span className="text-red-500">{t('form.required')}</span>
             </label>
           </div>
-          <select
-            name="animalType"
-            value={formData.animalType}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-700"
-          >
-            <option value="">{t('form.selectAnimal')}</option>
-            <option value="cattle">{t('form.animals.cattle')}</option>
-            <option value="sheep">{t('form.animals.sheep')}</option>
-            <option value="goat">{t('form.animals.goat')}</option>
-            <option value="pig">{t('form.animals.pig')}</option>
-            <option value="poultry">{t('form.animals.poultry')}</option>
-          </select>
+          <div className="relative">
+            <input
+              type="text"
+              value={animalSearchQuery}
+              onChange={(e) => handleAnimalSearch(e.target.value)}
+              onFocus={() => setShowAnimalDropdown(true)}
+              onBlur={() => setTimeout(() => setShowAnimalDropdown(false), 150)}
+              placeholder={
+                isLoadingLivestock
+                  ? "Loading your animals..."
+                  : "Search by species, breed or tag ID..."
+              }
+              disabled={isLoadingLivestock}
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-700 disabled:bg-gray-50 disabled:text-gray-400"
+            />
+
+            {/* Animal Dropdown */}
+            {showAnimalDropdown && !isLoadingLivestock && filteredAnimals.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {filteredAnimals.map((animal) => (
+                  <div
+                    key={animal.id}
+                    onMouseDown={(e) => { e.preventDefault(); handleAnimalSelect(animal); }}
+                    className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                  >
+                    <div className="w-9 h-9 rounded-full overflow-hidden bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                      {animal.image_preview ? (
+                        <img src={animal.image_preview} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <MdPets className="text-emerald-600" size={18} />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 text-sm">
+                        {animal.species_name || 'Animal'}
+                        {animal.breed_name && <span className="text-gray-500 font-normal"> · {animal.breed_name}</span>}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Tag: {animal.tag_id} · {animal.gender}{animal.age ? ` · ${animal.age}y` : ''}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* No results */}
+            {showAnimalDropdown && !isLoadingLivestock && animalSearchQuery && filteredAnimals.length === 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
+                <p className="text-gray-500 text-sm">No animals match "{animalSearchQuery}"</p>
+              </div>
+            )}
+
+            {/* No livestock at all */}
+            {showAnimalDropdown && !isLoadingLivestock && myLivestock.length === 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
+                <p className="text-yellow-700 text-sm">No livestock registered yet. Please add your animals first.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Selected animal chip */}
+          {selectedAnimal && (
+            <div className="mt-3 flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                {selectedAnimal.image_preview ? (
+                  <img src={selectedAnimal.image_preview} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <MdPets className="text-emerald-600" size={18} />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-green-800">
+                  {selectedAnimal.species_name || 'Animal'}
+                  {selectedAnimal.breed_name && ` · ${selectedAnimal.breed_name}`}
+                </p>
+                <p className="text-xs text-green-700">Tag: {selectedAnimal.tag_id} · {selectedAnimal.gender}</p>
+              </div>
+              <span className="text-green-600 font-bold text-lg">✓</span>
+            </div>
+          )}
         </div>
 
         <div>

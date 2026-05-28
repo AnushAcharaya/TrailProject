@@ -99,8 +99,41 @@ const CreateAccount = () => {
     });
   };
 
+  const validate = () => {
+    const errors = {};
+    if (!formData.username.trim())           errors.username      = "Username is required.";
+    if (!formData.fullName.trim())           errors.fullName      = "Full name is required.";
+    if (!formData.address.trim())            errors.address       = "Address is required.";
+    if (!formData.phone.trim())              errors.phone         = "Phone number is required.";
+    else if (!/^\d{10}$/.test(formData.phone.trim()))
+                                             errors.phone         = "Phone must be 10 digits.";
+    if (!formData.email.trim())              errors.email         = "Email is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()))
+                                             errors.email         = "Enter a valid email address.";
+    if (!formData.password)                  errors.password      = "Password is required.";
+    else if (formData.password.length < 8)   errors.password      = "Password must be at least 8 characters.";
+    if (!formData.role)                      errors.role          = "Please select a role.";
+
+    if (formData.role === "farmer") {
+      if (!formData.farmName.trim())         errors.farmName      = "Farm name is required.";
+      if (!formData.nidPhoto)                errors.nidPhoto      = "NID photo is required.";
+    }
+    if (formData.role === "vet") {
+      if (!formData.specialization.trim())   errors.specialization  = "Specialization is required.";
+      if (!formData.certificatePhoto)        errors.certificatePhoto = "Certificate photo is required.";
+    }
+    return errors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const clientErrors = validate();
+    if (Object.keys(clientErrors).length > 0) {
+      setFieldErrors(clientErrors);
+      return;
+    }
+
     setSubmitting(true);
     setFieldErrors({});
 
@@ -184,70 +217,89 @@ const CreateAccount = () => {
               )}
 
               <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
+
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Username <span className="text-red-500">*</span>
+                  </label>
                   <input
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
-                    placeholder="Username"
+                    placeholder="Enter username"
                     className={inputClass(!!errFor("username"))}
                   />
                   <InlineError msg={errFor("username")} />
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
                   <input
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
-                    placeholder="Full Name"
+                    placeholder="Enter your full name"
                     className={inputClass(!!errFor("fullName"))}
                   />
                   <InlineError msg={errFor("fullName")} />
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address <span className="text-red-500">*</span>
+                  </label>
                   <input
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                    placeholder="Address"
+                    placeholder="Enter your address"
                     className={inputClass(!!errFor("address"))}
                   />
                   <InlineError msg={errFor("address")} />
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone <span className="text-red-500">*</span>
+                  </label>
                   <input
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="Phone"
+                    placeholder="10-digit phone number"
                     className={inputClass(!!errFor("phone"))}
                   />
                   <InlineError msg={errFor("phone")} />
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="Email"
+                    placeholder="Enter your email"
                     className={inputClass(!!errFor("email"))}
                   />
                   <InlineError msg={errFor("email")} />
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password <span className="text-red-500">*</span>
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      placeholder="Password"
+                      placeholder="Min. 8 characters"
                       className={inputClass(!!errFor("password")) + " pr-10"}
                     />
                     <button
@@ -262,6 +314,9 @@ const CreateAccount = () => {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Role <span className="text-red-500">*</span>
+                  </label>
                   <select
                     name="role"
                     value={formData.role}
@@ -284,17 +339,23 @@ const CreateAccount = () => {
                     className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 space-y-3"
                   >
                     <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Farm Name <span className="text-red-500">*</span>
+                      </label>
                       <input
                         name="farmName"
                         value={formData.farmName}
                         onChange={handleChange}
-                        placeholder="Farm name"
+                        placeholder="Enter your farm name"
                         className={inputClass(!!errFor("farmName"))}
                       />
                       <InlineError msg={errFor("farmName")} />
                     </div>
                     <div>
-                      <label className="flex items-center justify-center gap-2 cursor-pointer bg-white border-2 border-dashed border-emerald-300 rounded-xl px-4 py-3 hover:border-emerald-500 transition-colors">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        NID Photo <span className="text-red-500">*</span>
+                      </label>
+                      <label className={`flex items-center justify-center gap-2 cursor-pointer bg-white rounded-xl px-4 py-3 transition-colors border-2 border-dashed ${errFor("nidPhoto") ? "border-red-400" : "border-emerald-300 hover:border-emerald-500"}`}>
                         <Upload size={18} className="text-emerald-600" />
                         <span className="text-sm text-gray-700 truncate">
                           {formData.nidPhoto ? formData.nidPhoto.name : "Upload NID photo"}
@@ -320,17 +381,23 @@ const CreateAccount = () => {
                     className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 space-y-3"
                   >
                     <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Specialization <span className="text-red-500">*</span>
+                      </label>
                       <input
                         name="specialization"
                         value={formData.specialization}
                         onChange={handleChange}
-                        placeholder="Specialization"
+                        placeholder="e.g. Large Animal Medicine"
                         className={inputClass(!!errFor("specialization"))}
                       />
                       <InlineError msg={errFor("specialization")} />
                     </div>
                     <div>
-                      <label className="flex items-center justify-center gap-2 cursor-pointer bg-white border-2 border-dashed border-emerald-300 rounded-xl px-4 py-3 hover:border-emerald-500 transition-colors">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Certificate Photo <span className="text-red-500">*</span>
+                      </label>
+                      <label className={`flex items-center justify-center gap-2 cursor-pointer bg-white rounded-xl px-4 py-3 transition-colors border-2 border-dashed ${errFor("certificatePhoto") ? "border-red-400" : "border-emerald-300 hover:border-emerald-500"}`}>
                         <Upload size={18} className="text-emerald-600" />
                         <span className="text-sm text-gray-700 truncate">
                           {formData.certificatePhoto ? formData.certificatePhoto.name : "Upload certificate photo"}

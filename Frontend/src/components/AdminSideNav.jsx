@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  Users, CheckCircle, BarChart2, Settings,
+  Users, CheckCircle, Settings,
   HelpCircle, LogOut, AlertTriangle, Shield,
   ArrowRightLeft, Megaphone,
 } from "lucide-react";
@@ -25,8 +25,7 @@ export default function SideNav() {
     { icon: Shield,         label: t('sideNav.insurance'),             path: '/admin/insurance' },
     { icon: ArrowRightLeft, label: t('sideNav.profileTransfer'),       path: '/profile-transfer/admin/dashboard' },
     { icon: Megaphone,      label: t('sideNav.broadcast'),             path: '/admin/broadcast' },
-    { icon: BarChart2,      label: t('sideNav.analytics'),             path: '/admin/analytics' },
-    {
+{
       icon: Settings,
       label: t('sideNav.settings'),
       path: null,

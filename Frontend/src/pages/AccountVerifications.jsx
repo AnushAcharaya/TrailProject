@@ -9,7 +9,9 @@ const AccountVerifications = () => {
   const { t } = useTranslation('admin');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, pending, approved, declined
+  const [filter, setFilter] = useState('all');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [search, setSearch] = useState('');
 
   // Add gray background to body when component mounts
   useEffect(() => {
@@ -60,10 +62,19 @@ const AccountVerifications = () => {
     }
   };
 
-  // Filter users based on status
+  // Filter users based on status, role and search
   const filteredUsers = users.filter(user => {
-    if (filter === 'all') return true;
-    return user.status.toLowerCase() === filter;
+    if (filter !== 'all' && user.status.toLowerCase() !== filter) return false;
+    if (roleFilter !== 'all' && user.role.toLowerCase() !== roleFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (
+        !user.name?.toLowerCase().includes(q) &&
+        !user.email?.toLowerCase().includes(q) &&
+        !user.phone?.includes(q)
+      ) return false;
+    }
+    return true;
   });
 
   // Transform backend data to match component format
@@ -96,7 +107,13 @@ const AccountVerifications = () => {
 
   return (
     <Layout>
-      <FilterBar onFilterChange={setFilter} currentFilter={filter} />
+      <FilterBar
+        onFilterChange={setFilter}
+        currentFilter={filter}
+        onRoleChange={setRoleFilter}
+        onSearchChange={setSearch}
+        users={users}
+      />
       
       {loading ? (
         <div className="text-center py-10">

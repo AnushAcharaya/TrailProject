@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import VetLayout from "../../components/vetDashboard/VetLayout";
 import { getFriends } from "../../services/friendsApi";
 import { getMessages, sendMessage, markAllMessagesRead } from "../../services/messagesApi";
 import { FaSearch, FaPaperPlane, FaSmile, FaCalendarAlt } from "react-icons/fa";
+
+const WS_BASE = "ws://localhost:8000";
 
 const VetMessagesPage = () => {
   const navigate = useNavigate();
@@ -17,11 +19,13 @@ const VetMessagesPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isConversationExpanded, setIsConversationExpanded] = useState(true);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const wsRef = useRef(null);
+  const messagesEndRef = useRef(null);
+  const tokenRef = useRef(null);
 
   useEffect(() => {
-    loadFriends();
-    // Get current user ID from token
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    tokenRef.current = token;
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
@@ -30,50 +34,100 @@ const VetMessagesPage = () => {
         console.error('Error parsing token:', error);
       }
     }
+    loadFriends();
+  }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const connectWebSocket = useCallback((friendshipId) => {
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+
+    const token = tokenRef.current;
+    if (!token || !friendshipId) return;
+
+    const ws = new WebSocket(`${WS_BASE}/ws/chat/${friendshipId}/?token=${token}`);
+
+    ws.onopen = () => {
+      console.log('[WS] Chat connected for friendship', friendshipId);
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        setMessages(prev => {
+          if (prev.some(m => m.id === message.id)) return prev;
+          return [...prev, message];
+        });
+      } catch (e) {
+        console.error('[WS] Failed to parse message', e);
+      }
+    };
+
+    ws.onclose = (event) => {
+      console.log('[WS] Chat disconnected', event.code);
+    };
+
+    ws.onerror = (error) => {
+      console.error('[WS] Chat error', error);
+    };
+
+    wsRef.current = ws;
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
   }, []);
 
   useEffect(() => {
     if (friendId && friends.length > 0) {
-      const friend = friends.find(f => f.id === parseInt(friendId));
-      if (friend) {
-        setSelectedFriend(friend.friend);
+      const friendship = friends.find(f => f.id === parseInt(friendId));
+      if (friendship) {
+        setSelectedFriend(friendship.friend);
         loadMessages(friendId);
+        connectWebSocket(friendId);
       }
     }
-  }, [friendId, friends]);
+  }, [friendId, friends, connectWebSocket]);
 
   const loadFriends = async () => {
     setIsLoading(true);
     const result = await getFriends();
-    
+
     if (result.success) {
-      const friendsList = Array.isArray(result.data) 
-        ? result.data 
+      const friendsList = Array.isArray(result.data)
+        ? result.data
         : result.data.results || [];
       setFriends(friendsList);
-      
+
       if (friendsList.length > 0 && !friendId) {
         setSelectedFriend(friendsList[0].friend);
         navigate(`/vet/messages/${friendsList[0].id}`);
       }
     }
-    
+
     setIsLoading(false);
   };
 
   const loadMessages = async (friendshipId) => {
     const result = await getMessages(friendshipId);
-    
+
     if (result.success) {
-      const messagesList = Array.isArray(result.data) 
-        ? result.data 
+      const messagesList = Array.isArray(result.data)
+        ? result.data
         : result.data.results || [];
       setMessages(messagesList);
-      
-      // Mark all messages in this conversation as read
+
       const markResult = await markAllMessagesRead(friendshipId);
-      
-      // If messages were marked as read, dispatch event to update unread count
       if (markResult.success && markResult.data.marked_read > 0) {
         window.dispatchEvent(new Event('messagesRead'));
       }
@@ -85,27 +139,32 @@ const VetMessagesPage = () => {
 
   const handleSendMessage = async () => {
     if (!messageText.trim() || !friendId) return;
-    
-    const result = await sendMessage(friendId, messageText, 'text');
-    
-    if (result.success) {
-      // Add the new message to the list
-      setMessages(prev => [...prev, result.data]);
-      setMessageText("");
+
+    const text = messageText.trim();
+    setMessageText("");
+
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ text, message_type: 'text' }));
     } else {
-      console.error('Failed to send message:', result.error);
-      alert(t('errors.sendFailed'));
+      const result = await sendMessage(friendId, text, 'text');
+      if (result.success) {
+        setMessages(prev => [...prev, result.data]);
+      } else {
+        console.error('Failed to send message:', result.error);
+        alert(t('errors.sendFailed'));
+        setMessageText(text);
+      }
     }
   };
 
   const handleSendAppointmentCard = async () => {
     if (!friendId) return;
-    
+
     const appointmentText = t('appointmentCard.title');
     const result = await sendMessage(friendId, appointmentText, 'appointment_card');
-    
+
     if (result.success) {
-      // Add the new appointment card message to the list
       setMessages(prev => [...prev, result.data]);
     } else {
       console.error('Failed to send appointment card:', result.error);
@@ -121,8 +180,7 @@ const VetMessagesPage = () => {
 
   const getLastMessage = () => {
     if (messages.length === 0) return t('noMessagesYet');
-    const lastMsg = messages[messages.length - 1];
-    return lastMsg.text;
+    return messages[messages.length - 1].text;
   };
 
   const formatMessageTime = (timestamp) => {
@@ -143,10 +201,10 @@ const VetMessagesPage = () => {
             ) : (
               friends.map((friendship) => {
                 const friend = friendship.friend;
-                const profileImageUrl = friend.profile_image_url || 
+                const profileImageUrl = friend.profile_image_url ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.full_name || friend.username)}&background=059669&color=fff&size=128`;
                 const isSelected = selectedFriend?.username === friend.username;
-                
+
                 return (
                   <div
                     key={friendship.id}
@@ -156,7 +214,7 @@ const VetMessagesPage = () => {
                     }`}
                   >
                     <div className={`relative ${isSelected ? 'ring-2 ring-emerald-600 rounded-full' : ''}`}>
-                      <img 
+                      <img
                         src={profileImageUrl}
                         alt={friend.full_name || friend.username}
                         className="w-14 h-14 rounded-full object-cover"
@@ -178,13 +236,13 @@ const VetMessagesPage = () => {
 
         {/* Message Area */}
         {selectedFriend ? (
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0">
             {isConversationExpanded ? (
               <>
                 {/* Chat Header */}
                 <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img 
+                    <img
                       src={selectedFriend.profile_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFriend.full_name || selectedFriend.username)}&background=059669&color=fff&size=128`}
                       alt={selectedFriend.full_name || selectedFriend.username}
                       className="w-10 h-10 rounded-full object-cover"
@@ -205,11 +263,8 @@ const VetMessagesPage = () => {
                 {/* Messages Container */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
                   {messages.map((message) => {
-                    // Ensure both values are numbers for comparison
                     const isMyMessage = Number(message.sender) === Number(currentUserId);
-                    console.log('Message:', message.id, 'Sender:', message.sender, 'CurrentUser:', currentUserId, 'IsMyMessage:', isMyMessage);
-                    
-                    // Render appointment card
+
                     if (message.message_type === 'appointment_card') {
                       return (
                         <div
@@ -243,14 +298,13 @@ const VetMessagesPage = () => {
                         </div>
                       );
                     }
-                    
-                    // Render regular text message
+
                     return (
                       <div
                         key={message.id}
                         className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
                       >
-                        <div className={`max-w-[70%]`}>
+                        <div className="max-w-[70%]">
                           <div
                             className={`px-4 py-2 rounded-2xl ${
                               isMyMessage
@@ -267,6 +321,7 @@ const VetMessagesPage = () => {
                       </div>
                     );
                   })}
+                  <div ref={messagesEndRef} />
                 </div>
 
                 {/* Message Input */}
@@ -303,13 +358,12 @@ const VetMessagesPage = () => {
                 </div>
               </>
             ) : (
-              /* Minimized Conversation Preview */
-              <div 
+              <div
                 onClick={() => setIsConversationExpanded(true)}
                 className="bg-white border border-gray-200 rounded-lg shadow-lg m-4 p-4 cursor-pointer hover:shadow-xl transition-shadow"
               >
                 <div className="flex items-center gap-3">
-                  <img 
+                  <img
                     src={selectedFriend.profile_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFriend.full_name || selectedFriend.username)}&background=059669&color=fff&size=128`}
                     alt={selectedFriend.full_name || selectedFriend.username}
                     className="w-12 h-12 rounded-full object-cover"

@@ -259,6 +259,9 @@ const Login = () => {
                     
                     {/* Role Selector */}
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('login.role')} <span className="text-red-500">*</span>
+                        </label>
                         <select
                             name="role"
                             value={formData.role}
@@ -279,6 +282,9 @@ const Login = () => {
                     {/* Phone - Only for Farmer/Vet */}
                     {formData.role && formData.role !== "admin" && (
                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                {t('login.phone')} <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 type="tel"
                                 name="phone"
@@ -297,6 +303,9 @@ const Login = () => {
                     {/* Email */}
                     {formData.role && (
                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                {t('login.email')} <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 type="email"
                                 name="email"
@@ -315,6 +324,9 @@ const Login = () => {
                     {/* Password */}
                     {formData.role && (
                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                {t('login.password')} <span className="text-red-500">*</span>
+                            </label>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}

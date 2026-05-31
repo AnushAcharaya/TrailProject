@@ -48,6 +48,7 @@ import FarmerDetailPage from "./pages/vetDashboard/FarmerDetail";
 import ReportsPage from "./pages/reports/ReportsPage";
 import BroadcastNotification from "./pages/admin/BroadcastNotification";
 import CompleteProfile from "./pages/CompleteProfile";
+import HelpSupportPage from "./pages/HelpSupportPage";
 
 function App() {
   return (
@@ -107,6 +108,7 @@ function App() {
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/admin/broadcast" element={<BroadcastNotification />} />
           <Route path="/complete-profile" element={<CompleteProfile />} />
+          <Route path="/help-support" element={<HelpSupportPage />} />
 
         </Routes>
       </Router>

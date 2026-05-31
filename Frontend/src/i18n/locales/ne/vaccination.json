@@ -75,7 +75,7 @@
       },
       "dateGiven": "दिइएको मिति",
       "nextDueDate": "अर्को बाँकी मिति",
-      "nextDueDateHint": "{date} वा पछि हुनुपर्छ",
+      "nextDueDateHint": "{{date}} वा पछि हुनुपर्छ",
       "vetName": "पशु चिकित्सकको नाम",
       "vetNamePlaceholder": "पशु चिकित्सकको नाम प्रविष्ट गर्नुहोस्",
       "notes": "टिप्पणीहरू (वैकल्पिक)",

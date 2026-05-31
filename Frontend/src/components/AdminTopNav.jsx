@@ -12,6 +12,7 @@ const PAGE_TITLES = {
   '/admin/broadcast':                'Send Announcement',
   '/admin/analytics':                'Analytics',
   '/profile-transfer/admin':         'Profile Transfer',
+  '/help-support':                   'Help & Support',
 };
 
 export default function TopNav() {

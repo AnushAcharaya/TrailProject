@@ -176,73 +176,60 @@ const AppointmentRequestForm = () => {
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      // Format data for API
-      const appointmentData = formatAppointmentData(formData);
-      
-      // Create appointment
-      const response = await createAppointment(appointmentData);
-      
-      console.log("Appointment created successfully:", response);
-      
-      // Store appointment data for payment
-      setCreatedAppointment(response);
-      
-      // Check if payment is required
-      if (response.appointment_fee && response.appointment_fee > 0) {
-        // Show payment method selection modal
-        setShowPaymentModal(true);
-        setIsSubmitting(false);
-      } else {
-        // No payment required, show success and redirect
-        setSuccess(true);
-        setTimeout(() => {
-          navigate('/appointments', { state: { appointmentCreated: true } });
-        }, 2000);
-      }
-      
-    } catch (err) {
-      console.error("Error creating appointment:", err);
-      setError(err.response?.data?.message || err.response?.data?.detail || t('form.messages.error'));
-      setIsSubmitting(false);
-    }
+    // Show payment modal first — appointment is NOT created yet
+    setShowPaymentModal(true);
   };
 
   const handlePaymentMethodSelect = async (paymentMethod) => {
+    const appointmentData = formatAppointmentData(formData);
+
     if (paymentMethod === 'cash') {
-      // Cash payment - just show success and redirect
-      setShowPaymentModal(false);
-      setSuccess(true);
-      setTimeout(() => {
-        navigate('/appointments', { 
-          state: { 
-            appointmentCreated: true,
-            message: t('payment.messages.cashSuccess')
-          } 
-        });
-      }, 2000);
-    } else if (paymentMethod === 'esewa') {
-      // eSewa payment - initiate payment
+      // Cash: create appointment now with payment_method = cash
       try {
+        setIsSubmitting(true);
+        setShowPaymentModal(false);
+        await createAppointment({ ...appointmentData, payment_method: 'cash' });
+        setSuccess(true);
+        setTimeout(() => {
+          navigate('/appointments', {
+            state: { appointmentCreated: true, message: t('payment.messages.cashSuccess') }
+          });
+        }, 2000);
+      } catch (err) {
+        console.error('Error creating appointment:', err);
+        setError(err.response?.data?.message || err.response?.data?.detail || t('form.messages.error'));
+        setIsSubmitting(false);
+      }
+    } else if (paymentMethod === 'esewa') {
+      // eSewa: save form data first, then redirect to eSewa
+      // Appointment will be created AFTER payment is confirmed in PaymentSuccess page
+      try {
+        const fee = selectedVet?.consultation_fee || 500;
+
+        // Save appointment data to sessionStorage so PaymentSuccess can create it
+        sessionStorage.setItem('pending_appointment_data', JSON.stringify({
+          ...appointmentData,
+          payment_method: 'esewa',
+          fee,
+          vet_name: selectedVet?.full_name || 'Veterinarian',
+        }));
+
         const paymentData = {
-          amount: createdAppointment.appointment_fee,
+          amount: fee,
           product_code: 'APPOINTMENT_FEE',
-          product_description: `Appointment #${createdAppointment.id} with ${selectedVet?.full_name || 'Veterinarian'}`,
-          tax_amount: 0
+          product_description: `Appointment with ${selectedVet?.full_name || 'Veterinarian'}`,
+          tax_amount: 0,
         };
 
         const result = await initiatePayment(paymentData);
-
         if (result.success) {
-          // Redirect to eSewa
           redirectToEsewa(result.payment_data, result.esewa_url);
         } else {
           throw new Error('Failed to initiate payment');
         }
       } catch (err) {
         console.error('Payment initiation error:', err);
+        sessionStorage.removeItem('pending_appointment_data');
         setError(t('payment.messages.paymentFailed'));
         setShowPaymentModal(false);
         setIsSubmitting(false);

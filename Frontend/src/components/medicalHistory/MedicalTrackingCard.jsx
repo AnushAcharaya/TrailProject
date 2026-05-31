@@ -42,7 +42,7 @@ const MedicineTrackingCard = ({ treatment, onEdit, onDelete }) => {
   const startDateStr = treatment.treatment_date;
   const startDate = parseLocalDate(startDateStr);
 
-  const duration = treatment.medicines?.[0]?.duration || 1;
+  const duration = Math.max(...(treatment.medicines || []).map(m => m.duration || 1), 1);
   const endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + duration - 1);
   const endDateStr = getLocalDateStr(endDate);

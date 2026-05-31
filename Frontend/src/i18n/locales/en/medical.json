@@ -89,8 +89,8 @@
     "durationDays": "days",
     "remove": "Remove",
     "schedulePreview": {
-      "interval": "Doses every {hours} hours starting {time}",
-      "exact": "Doses at: {times}"
+      "interval": "Doses every {{hours}} hours starting {{time}}",
+      "exact": "Doses at: {{times}}"
     },
     "vetName": "Veterinarian Name",
     "vetNamePlaceholder": "e.g., Dr. Smith",

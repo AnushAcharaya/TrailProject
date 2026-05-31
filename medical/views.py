@@ -125,10 +125,17 @@ class TreatmentViewSet(viewsets.ModelViewSet):
     
     def update(self, request, *args, **kwargs):
         # Handle medicines JSON string from FormData
-        data = request.data.copy()
-        
+        # Must convert QueryDict to a regular dict first — DRF's ListSerializer uses
+        # html.parse_html_list() on QueryDicts which ignores our JSON-string medicines key.
+        import json
+        from django.http import QueryDict
+
+        if isinstance(request.data, QueryDict):
+            data = request.data.dict()
+        else:
+            data = dict(request.data)
+
         if 'medicines' in data and isinstance(data['medicines'], str):
-            import json
             data['medicines'] = json.loads(data['medicines'])
         
         partial = kwargs.pop('partial', False)

@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaCalendarCheck, FaUserFriends, FaEnvelope } from 'react-icons/fa';
+import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaCalendarCheck, FaUserFriends, FaEnvelope, FaQuestionCircle } from 'react-icons/fa';
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getReceivedRequests } from "../../services/friendsApi";
@@ -47,6 +47,7 @@ const SideNav = () => {
     { name: t('sidebar.insurance'), icon: FaShieldAlt, path: "/farmerinsurancedashboard" },
     { name: t('sidebar.profileTransfer'), icon: FaExchangeAlt, path: "/profile-transfer/farmer/animals" },
     { name: t('sidebar.settings'), icon: FaCog, path: "/profile" },
+    { name: t('sidebar.helpSupport', 'Help & Support'), icon: FaQuestionCircle, path: "/help-support" },
   ];
 
   const handleLogout = () => {

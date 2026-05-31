@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { verifyPayment } from '../../services/paymentApi';
+import { createAppointment } from '../../services/appointmentApi';
 import { FiCheckCircle, FiLoader } from 'react-icons/fi';
 import { tStatus } from '../../utils/translateEnum';
 import { useLocalizedNumber } from '../../utils/formatNumber';
@@ -16,6 +17,7 @@ const PaymentSuccess = () => {
   const [verificationResult, setVerificationResult] = useState(null);
   const [error, setError] = useState(null);
   const [isInsurancePayment, setIsInsurancePayment] = useState(false);
+  const [isAppointmentPayment, setIsAppointmentPayment] = useState(false);
 
   useEffect(() => {
     const verifyPaymentCallback = async () => {
@@ -79,21 +81,27 @@ const PaymentSuccess = () => {
         if (result.success) {
           setVerificationResult(result);
 
-          // Decide where the user should go next, but DON'T auto-navigate.
-          // Show a clear "Continue" button instead so the user can actually
-          // see the success state before moving on. Auto-redirect was jarring
-          // and made it easy to miss the verification details.
           const pendingEnrollment = sessionStorage.getItem('pending_insurance_enrollment');
           const legacyEnrollment = sessionStorage.getItem('pending_enrollment_id');
+          const pendingAppointment = sessionStorage.getItem('pending_appointment_data');
 
           if (pendingEnrollment || legacyEnrollment) {
             setIsInsurancePayment(true);
-            // Clear legacy keys; the new flow needs `pending_insurance_enrollment`
-            // to stay until the user finishes the upload step.
             if (legacyEnrollment) {
               sessionStorage.removeItem('pending_enrollment_id');
               sessionStorage.removeItem('enrollment_payment_amount');
             }
+          } else if (pendingAppointment) {
+            // eSewa payment succeeded — now create the appointment
+            try {
+              const appointmentData = JSON.parse(pendingAppointment);
+              await createAppointment(appointmentData);
+            } catch (apptErr) {
+              console.error('Failed to create appointment after payment:', apptErr);
+            } finally {
+              sessionStorage.removeItem('pending_appointment_data');
+            }
+            setIsAppointmentPayment(true);
           } else {
             setIsInsurancePayment(false);
           }
@@ -166,7 +174,7 @@ const PaymentSuccess = () => {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('success.title')}</h1>
         <p className="text-gray-600 mb-6">
-          {isInsurancePayment 
+          {isInsurancePayment
             ? t('success.insuranceMessage')
             : t('success.appointmentMessage')}
         </p>
@@ -205,8 +213,8 @@ const PaymentSuccess = () => {
                 <span className="font-semibold">What happens next:</span>
               </p>
               <ul className="list-disc list-inside space-y-1 ml-1">
-                <li>Your veterinarian has been notified of your booking.</li>
-                <li>They will <span className="font-semibold">review and confirm</span> the date and time shortly.</li>
+                <li>Your appointment has been booked successfully.</li>
+                <li>Your veterinarian will <span className="font-semibold">review and confirm</span> the date and time shortly.</li>
                 <li>You'll receive a notification when they accept or suggest a different time.</li>
               </ul>
             </div>
@@ -221,7 +229,7 @@ const PaymentSuccess = () => {
               {
                 state: {
                   paymentSuccess: true,
-                  appointmentCreated: !isInsurancePayment,
+                  appointmentCreated: isAppointmentPayment,
                   refreshKey: Date.now(),
                 },
               }

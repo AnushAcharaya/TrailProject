@@ -31,7 +31,7 @@ export default function SideNav() {
       path: null,
       onClick: () => window.dispatchEvent(new CustomEvent('openProfileModal')),
     },
-    { icon: HelpCircle, label: t('sideNav.helpSupport'), path: null },
+    { icon: HelpCircle, label: t('sideNav.helpSupport'), path: '/help-support' },
   ];
 
   return (

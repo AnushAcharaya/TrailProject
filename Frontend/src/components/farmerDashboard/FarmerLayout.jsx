@@ -1,4 +1,4 @@
-import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaCalendarCheck, FaUserFriends, FaEnvelope } from 'react-icons/fa';
+import { FaHome, FaPaw, FaSyringe, FaNotesMedical, FaChartLine, FaShieldAlt, FaExchangeAlt, FaCog, FaSignOutAlt, FaCalendarCheck, FaUserFriends, FaEnvelope, FaQuestionCircle } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -166,6 +166,7 @@ function FarmerLayout({ children, pageTitle = "Dashboard" }) {
     { name: t('dashboard:sidebar.insurance'), icon: FaShieldAlt, path: "/farmerinsurancedashboard" },
     { name: t('dashboard:sidebar.profileTransfer'), icon: FaExchangeAlt, path: "/profile-transfer/farmer/animals" },
     { name: t('dashboard:sidebar.settings'), icon: FaCog, path: "/profile" },
+    { name: 'Help & Support', icon: FaQuestionCircle, path: "/help-support" },
   ];
 
   const handleNavigation = (item) => {

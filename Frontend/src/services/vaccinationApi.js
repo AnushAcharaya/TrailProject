@@ -126,6 +126,7 @@ export const createVaccination = async (formData) => {
       date_given: formData.dateGiven,
       next_due_date: formData.nextDueDate,
       notes: formData.notes || '',
+      vet_name: formData.vetName || '',
     });
     return { success: true, data: response.data };
   } catch (error) {
@@ -146,6 +147,7 @@ export const updateVaccination = async (id, formData) => {
       date_given: formData.dateGiven,
       next_due_date: formData.nextDueDate,
       notes: formData.notes || '',
+      vet_name: formData.vetName || '',
     });
     return { success: true, data: response.data };
   } catch (error) {
@@ -169,10 +171,10 @@ export const deleteVaccination = async (id) => {
   }
 };
 
-// Get vaccinations by livestock ID
-export const getVaccinationsByLivestock = async (livestockId) => {
+// Get vaccinations by livestock tag ID
+export const getVaccinationsByLivestock = async (tagId) => {
   try {
-    const response = await vaccinationApi.get(`/?livestock=${livestockId}`);
+    const response = await vaccinationApi.get(`/?livestock__tag_id=${tagId}`);
     return { success: true, data: response.data };
   } catch (error) {
     return {

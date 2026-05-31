@@ -298,10 +298,10 @@ export const getActiveTrackingTreatments = async () => {
   }
 };
 
-// Get treatments by livestock ID
-export const getTreatmentsByLivestock = async (livestockId) => {
+// Get treatments by livestock tag ID
+export const getTreatmentsByLivestock = async (tagId) => {
   try {
-    const response = await medicalApi.get(`${BASE_URL}/?livestock=${livestockId}`);
+    const response = await medicalApi.get(`${BASE_URL}/?livestock__tag_id=${tagId}`);
     return { success: true, data: response.data };
   } catch (error) {
     return { success: false, error: error.response?.data || error.message };

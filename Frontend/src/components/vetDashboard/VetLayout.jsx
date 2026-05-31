@@ -1,4 +1,4 @@
-import { FaHome, FaUser, FaCalendarAlt, FaCog, FaSignOutAlt, FaEnvelope, FaUserFriends } from 'react-icons/fa';
+import { FaHome, FaUser, FaCalendarAlt, FaCog, FaSignOutAlt, FaEnvelope, FaUserFriends, FaQuestionCircle } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -262,12 +262,21 @@ function VetLayout({ children, pageTitle = "Dashboard" }) {
             <FaUserFriends className="text-white text-xl" />
             <span className="text-white font-medium">{t('sidebar.friendsList')}</span>
           </div>
-          <div 
+          <div
             onClick={() => navigate('/profile')}
             className="flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors hover:bg-emerald-700"
           >
             <FaCog className="text-white text-xl" />
             <span className="text-white font-medium">{t('sidebar.settings')}</span>
+          </div>
+          <div
+            onClick={() => navigate('/help-support')}
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg cursor-pointer transition-colors ${
+              location.pathname === '/help-support' ? 'bg-emerald-700' : 'hover:bg-emerald-700'
+            }`}
+          >
+            <FaQuestionCircle className="text-white text-xl" />
+            <span className="text-white font-medium">Help &amp; Support</span>
           </div>
         </nav>
 

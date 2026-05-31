@@ -75,7 +75,7 @@
       },
       "dateGiven": "Date Given",
       "nextDueDate": "Next Due Date",
-      "nextDueDateHint": "Must be on or after {date}",
+      "nextDueDateHint": "Must be on or after {{date}}",
       "vetName": "Veterinarian Name",
       "vetNamePlaceholder": "Enter veterinarian name",
       "notes": "Notes (Optional)",

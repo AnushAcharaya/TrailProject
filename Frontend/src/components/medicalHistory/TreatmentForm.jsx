@@ -681,6 +681,7 @@ const TreatmentForm = ({ initialData = null, onSubmit, isEdit = false }) => {
             name="nextTreatmentDate"
             value={formData.nextTreatmentDate || ""}
             onChange={handleChange}
+            min={new Date().toISOString().split('T')[0]}
             className="w-full p-2 border border-light rounded"
           />
         </div>

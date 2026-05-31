@@ -89,8 +89,8 @@
     "durationDays": "दिन",
     "remove": "हटाउनुहोस्",
     "schedulePreview": {
-      "interval": "{time} बाट सुरु गरी प्रत्येक {hours} घण्टामा खुराक",
-      "exact": "खुराक समय: {times}"
+      "interval": "{{time}} बाट सुरु गरी प्रत्येक {{hours}} घण्टामा खुराक",
+      "exact": "खुराक समय: {{times}}"
     },
     "vetName": "पशु चिकित्सकको नाम",
     "vetNamePlaceholder": "उदाहरण: डा. स्मिथ",
